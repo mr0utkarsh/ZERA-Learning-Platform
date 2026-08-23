@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZERA Notes | Create and Save Notes</title>
+  <meta name="description" content="Create, store, and review notes within the ZERA learning dashboard." />
+  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/responsive.css" />
+  <script src="./js/storage.js" defer></script>
+  <script src="./js/notes.js" defer></script>
+  <script src="./js/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="./index.html" class="brand" aria-label="ZERA home"><span class="brand-mark"><span>Z</span></span><span>ZERA</span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./syllabus.html">Syllabus</a>
+        <a href="./notes.html" class="active">Notes</a>
+        <a href="./quiz.html">Quiz</a>
+        <a href="./study-plan.html">Study Plan</a>
+        <a href="./resources.html">Resources</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn btn-secondary btn-small" href="./profile.html">Profile</a>
+        <a class="btn btn-primary btn-small" href="./dashboard.html">Back to Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="page-hero" style="padding: 30px 0; border-radius: 26px; background: linear-gradient(180deg,#0b1e35,#102a43);">
+        <div class="container">
+          <div class="breadcrumb"><span>Dashboard</span> <span>/</span> <span class="current">Notes</span></div>
+          <h1>Study notes</h1>
+          <p>Capture what matters, from AI summaries to personal revision points.</p>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top: 26px;">
+        <article class="panel">
+          <h3>Generate a note</h3>
+          <form id="notesForm">
+            <div class="field">
+              <label for="noteTitle">Title</label>
+              <input id="noteTitle" name="title" type="text" placeholder="Example: Networking Basics" />
+            </div>
+            <div class="field" style="margin-top: 14px;">
+              <label for="noteCategory">Category</label>
+              <select id="noteCategory" name="category">
+                <option value="AI-generated">AI-generated</option>
+                <option value="Revision">Revision</option>
+                <option value="Personal">Personal</option>
+                <option value="Important">Important</option>
+              </select>
+            </div>
+            <div class="field" style="margin-top: 14px;">
+              <label for="noteContent">Content</label>
+              <textarea id="noteContent" name="content" placeholder="Write a summary, formula, or quick explanation..."></textarea>
+            </div>
+            <div style="margin-top: 16px;"><button class="btn btn-primary" type="submit">Save note</button></div>
+          </form>
+        </article>
+
+        <article class="panel">
+          <h3>Saved notes</h3>
+          <div id="notesList"></div>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><small>© 2026 ZERA</small></div></footer>
+</body>
+</html>

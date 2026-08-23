@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZERA Settings</title>
+  <meta name="description" content="Manage your ZERA settings, preferences, and account experience." />
+  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/responsive.css" />
+  <script src="./js/storage.js" defer></script>
+  <script src="./js/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="./index.html" class="brand" aria-label="ZERA home"><span class="brand-mark"><span>Z</span></span><span>ZERA</span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./profile.html">Profile</a>
+        <a href="./settings.html" class="active">Settings</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn btn-secondary btn-small" href="./profile.html">Profile</a>
+        <a class="btn btn-primary btn-small" href="./dashboard.html">Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="panel">
+        <h2>Settings</h2>
+        <div class="field" style="margin-top:18px;">
+          <label for="themeChoice">Theme</label>
+          <select id="themeChoice">
+            <option>Light</option>
+            <option>Dark</option>
+          </select>
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label for="motionChoice">Motion preference</label>
+          <select id="motionChoice">
+            <option>Reduced motion</option>
+            <option>Standard motion</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><small>© 2026 ZERA</small></div></footer>
+</body>
+</html>

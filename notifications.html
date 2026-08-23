@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZERA Notifications</title>
+  <meta name="description" content="View upcoming study reminders, platform updates, and notifications in ZERA." />
+  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/responsive.css" />
+  <script src="./js/storage.js" defer></script>
+  <script src="./js/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="./index.html" class="brand" aria-label="ZERA home"><span class="brand-mark"><span>Z</span></span><span>ZERA</span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./notifications.html" class="active">Notifications</a>
+      </nav>
+      <div class="header-actions"><a class="btn btn-primary btn-small" href="./dashboard.html">Dashboard</a></div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="panel">
+        <h2>Notifications</h2>
+        <div class="task-list" style="margin-top:16px;">
+          <div class="task-item"><strong>Study plan reminder</strong><span>Today</span></div>
+          <div class="task-item"><strong>Quiz available</strong><span>Tomorrow</span></div>
+          <div class="task-item"><strong>Interview practice unlocked</strong><span>Friday</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><small>© 2026 ZERA</small></div></footer>
+</body>
+</html>

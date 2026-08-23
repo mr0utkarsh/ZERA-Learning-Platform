@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZERA Dashboard | Personalized Learning</title>
+  <meta name="description" content="View your ZERA dashboard, course progress, study milestones, and learning recommendations." />
+  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/responsive.css" />
+  <script src="./js/storage.js" defer></script>
+  <script src="./js/progress.js" defer></script>
+  <script src="./js/auth.js" defer></script>
+  <script src="./js/dashboard.js" defer></script>
+  <script src="./js/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="./index.html" class="brand" aria-label="ZERA home"><span class="brand-mark"><span>Z</span></span><span>ZERA</span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="./dashboard.html" class="active">Dashboard</a>
+        <a href="./syllabus.html">Syllabus</a>
+        <a href="./notes.html">Notes</a>
+        <a href="./quiz.html">Quiz</a>
+        <a href="./study-plan.html">Study Plan</a>
+        <a href="./resources.html">Resources</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn btn-secondary btn-small" href="./profile.html">Profile</a>
+        <button class="btn btn-secondary btn-small" type="button" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container app-shell">
+      <aside class="sidebar">
+        <nav>
+          <a class="active" href="./dashboard.html"><span>Overview</span><span>›</span></a>
+          <a href="./syllabus.html"><span>Syllabus</span><span>›</span></a>
+          <a href="./notes.html"><span>Notes</span><span>›</span></a>
+          <a href="./quiz.html"><span>Quiz</span><span>›</span></a>
+          <a href="./mock-test.html"><span>Mock Test</span><span>›</span></a>
+          <a href="./study-plan.html"><span>Study Plan</span><span>›</span></a>
+          <a href="./mock-interview.html"><span>Mock Interview</span><span>›</span></a>
+          <a href="./bookmarks.html"><span>Bookmarks</span><span>›</span></a>
+          <a href="./notifications.html"><span>Notifications</span><span>›</span></a>
+          <a href="./support.html"><span>Support</span><span>›</span></a>
+        </nav>
+      </aside>
+
+      <div class="content-area">
+        <section class="panel">
+          <div class="flex justify-between wrap" style="gap: 16px; align-items: center;">
+            <div>
+              <span class="eyebrow" style="color:#2857b1; background:rgba(59,130,246,0.09); border-color:rgba(59,130,246,0.12);">Dashboard</span>
+              <h2 style="margin-top: 12px;">Welcome back, <span id="userName">Student</span>!</h2>
+            </div>
+            <div class="flex gap-16 wrap" style="align-items:center;">
+              <div class="metric-card" style="min-width:150px;">
+                <span class="kicker">Overall</span>
+                <strong id="overallProgressValue">0%</strong>
+                <span>Progress</span>
+              </div>
+              <button class="btn btn-primary" type="button" id="restartCourseBtn">Restart Course</button>
+            </div>
+          </div>
+
+          <div class="progress-bar" style="margin-top: 20px;">
+            <span id="mainProgressBar" style="width:0%"></span>
+          </div>
+        </section>
+
+        <section class="metrics-row">
+          <article class="metric-card">
+            <span class="kicker">Course Progress</span>
+            <strong id="courseProgressValue">0%</strong>
+            <span>Current subject mastery</span>
+          </article>
+          <article class="metric-card">
+            <span class="kicker">Study Streak</span>
+            <strong id="streakValue">0 days</strong>
+            <span>Consistency score</span>
+          </article>
+          <article class="metric-card">
+            <span class="kicker">Achievements</span>
+            <strong id="achievementValue">0</strong>
+            <span>Badges unlocked</span>
+          </article>
+          <article class="metric-card">
+            <span class="kicker">Next Step</span>
+            <strong id="continueTitle">Continue</strong>
+            <span id="continueTopic">No incomplete topic</span>
+          </article>
+        </section>
+
+        <section class="grid-2">
+          <article class="panel">
+            <h3>Continue Learning</h3>
+            <div class="demo-box">
+              <p><strong>Current focus:</strong> <span>See the next-step card above.</span></p>
+              <p>Review the concept, take one short quiz, and then move to the next topic in your learning flow.</p>
+            </div>
+            <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
+              <a class="btn btn-primary btn-small" href="./syllabus.html">Open Syllabus</a>
+              <a class="btn btn-secondary btn-small" href="./quiz.html">Take a Quiz</a>
+            </div>
+          </article>
+
+          <article class="panel">
+            <h3>Recent activity</h3>
+            <div class="task-list">
+              <div class="task-item"><strong>AI Notes</strong><span>Updated today</span></div>
+              <div class="task-item"><strong>Mock Test</strong><span>Ready to start</span></div>
+              <div class="task-item"><strong>Study Plan</strong><span>Due this week</span></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="panel" id="emptyStatePlaceholder">
+          <h3>Learning snapshot</h3>
+          <div class="empty-state">
+            <strong>No assessments recorded yet</strong>
+            <span>Take a quiz or mock test to start filling your performance insights.</span>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container"><small>© 2026 ZERA</small></div>
+  </footer>
+</body>
+</html>
