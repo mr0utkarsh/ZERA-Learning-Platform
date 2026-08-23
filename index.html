@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZERA – AI-Powered Personalized Learning Platform</title>
+  <meta name="description" content="ZERA helps students organize syllabus, generate notes, solve doubts, practice quizzes, track progress, and prepare with a personalized study routine." />
+  <meta name="theme-color" content="#06121f" />
+  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/responsive.css" />
+  <script src="./js/storage.js" defer></script>
+  <script src="./js/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="./index.html" class="brand" aria-label="ZERA home">
+        <span class="brand-mark"><span>Z</span></span>
+        <span>ZERA</span>
+      </a>
+
+      <nav class="nav" aria-label="Main navigation">
+        <a href="./index.html" class="active">Home</a>
+        <a href="./about.html">About</a>
+        <a href="./features.html">Features</a>
+        <a href="./ai-tools.html">AI Tools</a>
+        <a href="./resources.html">Resources</a> 
+        <a href="./contact.html">Contact</a>
+      </nav>
+
+      <div class="header-actions">
+        <a class="btn btn-secondary btn-small" href="./login.html">Login</a>
+        <a class="btn btn-primary btn-small" href="./dashboard.html">Start Learning</a>
+        <button class="btn btn-secondary btn-small menu-toggle" type="button" aria-expanded="false" aria-label="Toggle menu">Menu</button>
+      </div>
+    </div>
+
+    <div class="mobile-nav container" aria-label="Mobile navigation">
+      <nav class="nav flex-col" style="padding: 16px 0 10px; gap:10px; color:#eaf4ff;">
+        <a href="./index.html" class="active">Home</a>
+        <a href="./about.html">About</a>
+        <a href="./features.html">Features</a>
+        <a href="./ai-tools.html">AI Tools</a>
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./resources.html">Resources</a>
+        <a href="./contact.html">Contact</a>
+        <a href="./login.html">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <span class="eyebrow">100% Free for Students</span>
+          <h1>ZERA – <span class="gradient-text">Your New Era of Learning</span></h1>
+          <p>Learning that adapts to your syllabus, your pace, and your goals. ZERA helps students understand concepts, generate notes, solve doubts, track progress, and prepare smarter for exams and career milestones.</p>
+          <div class="hero-actions">
+            <a href="./dashboard.html" class="btn btn-primary">Start Learning</a>
+            <a href="./ai-tools.html" class="btn btn-secondary">Explore AI Tools</a>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-box">
+              <strong>0%</strong>
+              <span>Initial progress for new students</span>
+            </div>
+            <div class="stat-box">
+              <strong>0</strong>
+              <span>Study streak for new learners</span>
+            </div>
+            <div class="stat-box">
+              <strong>Demo</strong>
+              <span>Safe frontend demo mode</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-visual">
+          <div class="visual-window">
+            <div class="window-top">
+              <div class="dots"><span></span><span></span><span></span></div>
+              <span class="pill success">AI-powered plan</span>
+            </div>
+            <div class="window-body">
+              <div class="welcome-row">
+                <div class="user-badge">
+                  <span class="avatar">AS</span>
+                  <div>
+                    <strong style="color:white; display:block;">Good evening, Aarav</strong>
+                    <small style="color:rgba(232,238,251,0.74);">3 sessions planned today</small>
+                  </div>
+                </div>
+                <span class="pill success">14-day streak</span>
+              </div>
+
+              <div class="stat-blocks">
+                <div class="metric">
+                  <span class="label">Syllabus</span>
+                  <span class="value">72%</span>
+                </div>
+                <div class="metric">
+                  <span class="label">Quiz</span>
+                  <span class="value">81%</span>
+                </div>
+              </div>
+
+              <div class="task-list">
+                <div class="task-item">
+                  <div>
+                    <strong>Normalization</strong>
+                    <span>DBMS • 50 min</span>
+                  </div>
+                  <span class="badge success">Done</span>
+                </div>
+                <div class="task-item">
+                  <div>
+                    <strong>Decision Trees</strong>
+                    <span>AI • 45 min</span>
+                  </div>
+                  <span class="badge neutral">Next</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow" style="color:#2857b1; background:rgba(59,130,246,0.08); border-color:rgba(59,130,246,0.12);">Why ZERA</span>
+          <h2>Built for students who want learning to actually fit their path.</h2>
+        </div>
+
+        <div class="grid-3">
+          <article class="card light-card">
+            <div class="card-icon">01</div>
+            <h3>Personalized learning</h3>
+            <p>ZERA starts from your course, your syllabus, and your weak areas rather than one-size-fits-all lessons.</p>
+          </article>
+          <article class="card light-card">
+            <div class="card-icon">02</div>
+            <h3>Smarter study support</h3>
+            <p>From notes and doubts to quizzes and mock interviews, the platform supports the full study loop.</p>
+          </article>
+          <article class="card light-card">
+            <div class="card-icon">03</div>
+            <h3>Free and transparent</h3>
+            <p>No fake premium wall. ZERA is organized around accessibility and student success.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow" style="color:#2857b1; background:rgba(59,130,246,0.08); border-color:rgba(59,130,246,0.12);">Features</span>
+          <h2>Everything a student needs in one place.</h2>
+        </div>
+
+        <div class="grid-4">
+          <article class="card light-card">
+            <div class="card-icon">✦</div>
+            <h3>Syllabus analysis</h3>
+            <p>Break down topics, subject weightage, and study priorities.</p>
+          </article>
+          <article class="card light-card">
+            <div class="card-icon">✎</div>
+            <h3>AI notes</h3>
+            <p>Generate topic-wise notes for quick review and exam preparation.</p>
+          </article>
+          <article class="card light-card">
+            <div class="card-icon">❓</div>
+            <h3>Doubt solver</h3>
+            <p>Get answers in simple, exam-oriented, and example-based formats.</p>
+          </article>
+          <article class="card light-card">
+            <div class="card-icon">✓</div>
+            <h3>Quiz engine</h3>
+            <p>Practice MCQs with immediate explanation and performance tracking.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow" style="color:#2857b1; background:rgba(59,130,246,0.08); border-color:rgba(59,130,246,0.12);">How it works</span>
+          <h2>A clear learning cycle for better outcomes.</h2>
+        </div>
+
+        <div class="steps">
+          <article class="card step-card">
+            <div class="step-number">1</div>
+            <h3>Upload syllabus</h3>
+            <p>Add a course or syllabus text and let ZERA structure the learning path.</p>
+          </article>
+          <article class="card step-card">
+            <div class="step-number">2</div>
+            <h3>Study smarter</h3>
+            <p>Use AI notes, revision material, doubt support, and quizzes in one workflow.</p>
+          </article>
+          <article class="card step-card">
+            <div class="step-number">3</div>
+            <h3>Track growth</h3>
+            <p>Monitor progress, weak topics, streaks, and study plans over time.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow" style="color:#2857b1; background:rgba(59,130,246,0.08); border-color:rgba(59,130,246,0.12);">AI learning tools</span>
+          <h2>Purpose-built for the student journey.</h2>
+        </div>
+
+        <div class="grid-3">
+          <article class="card light-card">
+            <h3>AI Doubt Solver</h3>
+            <p>Get simple, detailed, and exam-focused explanations for your questions.</p>
+          </article>
+          <article class="card light-card">
+            <h3>AI Quiz Generator</h3>
+            <p>Generate MCQs by subject, topic, and difficulty level.</p>
+          </article>
+          <article class="card light-card">
+            <h3>AI Mock Interview</h3>
+            <p>Practice HR, technical, and behavioral interview flows.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow" style="color:#2857b1; background:rgba(59,130,246,0.08); border-color:rgba(59,130,246,0.12);">Resources</span>
+          <h2>Explore skills and project ideas that help you grow beyond the classroom.</h2>
+        </div>
+
+        <div class="grid-3">
+          <article class="card light-card">
+            <h3>Web Development</h3>
+            <p>Practice layouts, JavaScript, APIs, and real-world projects.</p>
+          </article>
+          <article class="card light-card">
+            <h3>Data Structures</h3>
+            <p>Build problem-solving habits and core technical confidence.</p>
+          </article>
+          <article class="card light-card">
+            <h3>Interview Preparation</h3>
+            <p>Train for conceptual questions, technical rounds, and communication.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow" style="color:#2857b1; background:rgba(59,130,246,0.08); border-color:rgba(59,130,246,0.12);">FAQ</span>
+          <h2>Questions students often ask.</h2>
+        </div>
+
+        <div class="card-stack">
+          <div class="panel">
+            <h3>Is ZERA free?</h3>
+            <p>Yes. ZERA is designed as a free student learning platform with accessible demo functionality and a future-ready architecture.</p>
+          </div>
+          <div class="panel">
+            <h3>Does this frontend use a real AI connection?</h3>
+            <p>No. AI tools run in Demo Mode until a real provider and backend are connected.</p>
+          </div>
+          <div class="panel">
+            <h3>Can progress be saved locally?</h3>
+            <p>Yes. Progress, notes, study plans, and bookmarks are stored in localStorage for safe browser-based demo use.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <div class="container">
+        <div class="panel" style="display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; background:linear-gradient(135deg,#0b1d2d,#122944); color:white; border:none;">
+          <div>
+            <span class="eyebrow" style="background:rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); color:#dcecff;">Ready to begin?</span>
+            <h2 style="margin:12px 0 0; color:white; font-size: clamp(2rem, 3vw, 2.7rem);">Start your next learning chapter with ZERA.</h2>
+          </div>
+          <div class="hero-actions" style="margin-top:0;">
+            <a href="./dashboard.html" class="btn btn-primary">Start Learning</a>
+            <a href="./features.html" class="btn btn-secondary">See Features</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <a href="./index.html" class="brand" aria-label="ZERA home">
+          <span class="brand-mark"><span>Z</span></span>
+          <span>ZERA</span>
+        </a>
+        <p style="margin-top:14px; max-width:400px; color:rgba(232,238,251,0.72);">A free personalized learning platform designed to help students study smarter, stay consistent, and grow with confidence.</p>
+      </div>
+      <div>
+        <h3>Explore</h3>
+        <ul style="list-style:none; padding:0; margin:0; display:grid; gap:8px;">
+          <li><a href="./about.html">About</a></li>
+          <li><a href="./features.html">Features</a></li>
+          <li><a href="./ai-tools.html">AI Tools</a></li>
+          <li><a href="./resources.html">Resources</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Contact</h3>
+        <ul style="list-style:none; padding:0; margin:0; display:grid; gap:8px;">
+          <li>Created by Utkarsh Giri</li>
+          <li><a href="tel:9235542673">9235542673</a></li>
+          <li><a href="./contact.html">Contact page</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container" style="margin-top:24px; padding-top:18px; border-top:1px solid rgba(255,255,255,0.08);">
+      <small>© 2026 ZERA. Built for students. Designed for the future.</small>
+    </div>
+  </footer>
+</body>
+</html>

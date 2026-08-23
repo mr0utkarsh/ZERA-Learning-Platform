@@ -1,0 +1,91 @@
+.component-card {
+  background: rgba(255,255,255,0.96);
+  border: 1px solid rgba(17,34,55,0.07);
+  border-radius: 18px;
+  box-shadow: 0 15px 25px rgba(11,24,38,0.05);
+  padding: 20px;
+}
+
+.component-card h3 {
+  margin: 0 0 6px;
+  color: #0d1d30;
+  font-size: 1.2rem;
+}
+
+.component-card p {
+  color: #526a86;
+  margin: 0;
+}
+
+.link-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.link-list a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0.85rem;
+  border-radius: 12px;
+  background: #f4f8ff;
+  color: #16314e;
+  font-weight: 600;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.kpi-box {
+  background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(34,195,255,0.08));
+  border: 1px solid rgba(59,130,246,0.12);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.kpi-box strong {
+  display: block;
+  font-size: 1.75rem;
+  color: var(--dark);
+}
+
+.kpi-box span {
+  color: #4b607f;
+  font-size: 0.84rem;
+}
+
+.topic-list {
+  display: grid;
+  gap: 10px;
+}
+
+.topic-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(17,34,55,0.06);
+  border-radius: 12px;
+  background: #f9fbff;
+}
+
+.topic-item .right {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #466384;
+}
+
+.code-snippet {
+  background: #081724;
+  color: #d8ebff;
+  border-radius: 16px;
+  padding: 16px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.85rem;
+  overflow: auto;
+}
