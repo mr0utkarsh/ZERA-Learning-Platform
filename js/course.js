@@ -78,12 +78,16 @@
     const bar = document.getElementById('courseProgressBar');
     const summary = document.getElementById('progressSummary');
     const openBtn = document.getElementById('openCourseBtn');
-    if (bar) bar.style.width = `${progress.completionPercentage || 0}%`;
-    if (summary) summary.textContent = `${progress.completedLessons || 0} of ${progress.totalLessons || 0} lessons completed`;
+    const completionPercentage = Number(progress?.completionPercentage || 0);
+    const completedLessons = Number(progress?.completedLessons || 0);
+    const totalLessons = Number(progress?.totalLessons || 0);
+
+    if (bar) bar.style.width = `${completionPercentage}%`;
+    if (summary) summary.textContent = `${completedLessons} of ${totalLessons} lessons completed`;
 
     if (openBtn) {
-      if (progress.nextLesson && progress.nextLesson.id) {
-        openBtn.href = `./lesson.html?courseId=${encodeURIComponent(progress.course.id)}&lessonId=${encodeURIComponent(progress.nextLesson.id)}`;
+      if (progress?.nextLesson && progress.nextLesson.id) {
+        openBtn.href = `./lesson.html?courseId=${encodeURIComponent(progress.course?.id || qs('courseId'))}&lessonId=${encodeURIComponent(progress.nextLesson.id)}`;
         openBtn.classList.remove('disabled');
       } else {
         openBtn.href = '#';
@@ -113,18 +117,20 @@
 
       renderHierarchy(details.hierarchy || [], courseId);
 
-      // Fetch progress snapshot
+      const enrollBtn = document.getElementById('enrollBtn');
+
+      if (details?.course && enrollBtn) {
+        enrollBtn.textContent = 'Enrolled';
+      }
+
       const progressSnapshot = await apiRequest(`/courses/${courseId}/progress`);
       setProgressUI({ ...(progressSnapshot.progress || {}), nextLesson: progressSnapshot.nextLesson, course: progressSnapshot.course });
 
-      // Enroll button
-      const enrollBtn = document.getElementById('enrollBtn');
       if (enrollBtn) {
         enrollBtn.addEventListener('click', async function () {
           enrollBtn.disabled = true; enrollBtn.textContent = 'Enrolling...';
           try {
             const resp = await apiRequest(`/courses/${courseId}/enroll`, { method: 'POST' });
-            // After enrolling refresh progress
             const p = await apiRequest(`/courses/${courseId}/progress`);
             setProgressUI({ ...(p.progress || {}), nextLesson: p.nextLesson, course: p.course });
             enrollBtn.textContent = 'Enrolled';

@@ -141,43 +141,21 @@ export const generateStudyNote = async ({ topic, context, level }) => {
 
 export const generateQuiz = async ({ topic, difficulty, count }) => {
   const response = await getGeminiText(buildPrompt('quiz-generator', { topic, difficulty, count }));
-  const parsed = parseJson(response) || {
-    title: `${topic || 'Study'} quick quiz`,
-    questions: [{
-      prompt: `What is the main idea behind ${topic || 'this topic'}?`,
-      options: ['Definition and application', 'Random guessing', 'Avoiding revision', 'Ignoring examples'],
-      correctAnswer: 'Definition and application',
-      explanation: 'A strong understanding combines definition with practical use.'
-    }]
-  };
-
+  const parsed = parseJson(response);
+  if (!parsed?.title || !Array.isArray(parsed.questions) || !parsed.questions.length) throw new Error('The AI provider returned an invalid quiz format.');
   return parsed;
 };
 
 export const generateStudyPlan = async ({ course, targetDate, hours, weakTopic }) => {
   const response = await getGeminiText(buildPrompt('study-plan', { course, targetDate, hours, weakTopic }));
-  const parsed = parseJson(response) || {
-    title: `${course || 'Course'} study plan`,
-    description: `A focused plan to improve ${weakTopic || 'your weak topic'} over ${targetDate || 'the next 14 days'}.`,
-    schedule: [
-      { title: 'Daily review', time: `${hours || 2} hours`, detail: 'Revise core concepts, weak points, and quick recall questions.' },
-      { title: 'Practice block', time: '30 min', detail: 'Solve 5 to 10 focused questions from the current topic.' },
-      { title: 'Mock test', time: '45 min', detail: 'Check retention and note what needs extra revision.' }
-    ]
-  };
-
+  const parsed = parseJson(response);
+  if (!parsed?.title || !parsed.description || !Array.isArray(parsed.schedule)) throw new Error('The AI provider returned an invalid study-plan format.');
   return parsed;
 };
 
 export const generateMockInterview = async ({ role, domain, difficulty }) => {
   const response = await getGeminiText(buildPrompt('mock-interview', { role, domain, difficulty }));
-  const parsed = parseJson(response) || {
-    title: `${role || 'Student'} interview practice`,
-    questions: [{
-      question: `Tell me about your understanding of ${domain || 'your current subject'}.`,
-      tip: 'Answer with a clear structure: context, action, result, and what you learned.'
-    }]
-  };
-
+  const parsed = parseJson(response);
+  if (!parsed?.title || !Array.isArray(parsed.questions) || !parsed.questions.length) throw new Error('The AI provider returned an invalid interview format.');
   return parsed;
 };

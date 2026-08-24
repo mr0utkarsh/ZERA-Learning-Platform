@@ -3,63 +3,611 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>ZERA Resources | Learning Materials</title>
-  <meta name="description" content="Access learning resources, curated references, and student support materials in ZERA." />
-  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
+
+  <meta
+    name="description"
+    content="Access learning resources, curated references, and student support materials in ZERA."
+  />
+
+  <meta name="theme-color" content="#06121f" />
+
+  <link
+    rel="icon"
+    href="./assets/icons/favicon.svg"
+    type="image/svg+xml"
+  />
+
   <link rel="stylesheet" href="./css/style.css" />
   <link rel="stylesheet" href="./css/components.css" />
   <link rel="stylesheet" href="./css/responsive.css" />
+
   <script src="./js/storage.js" defer></script>
+  <script src="./js/resources.js" defer></script>
   <script src="./js/app.js" defer></script>
 </head>
+
 <body>
+
+  <!-- ================= HEADER ================= -->
+
   <header class="site-header">
+
     <div class="container header-inner">
-      <a href="./index.html" class="brand" aria-label="ZERA home"><span class="brand-mark"><span>Z</span></span><span>ZERA</span></a>
-      <nav class="nav" aria-label="Main navigation">
+
+      <a
+        href="./index.html"
+        class="brand"
+        aria-label="ZERA home"
+      >
+        <span class="brand-mark">
+          <span>Z</span>
+        </span>
+
+        <span>ZERA</span>
+      </a>
+
+
+      <nav
+        class="nav"
+        aria-label="Main navigation"
+      >
         <a href="./index.html">Home</a>
+
         <a href="./about.html">About</a>
+
         <a href="./features.html">Features</a>
+
         <a href="./ai-tools.html">AI Tools</a>
-        <a href="./resources.html" class="active">Resources</a>
+
+        <a
+          href="./resources.html"
+          class="active"
+        >
+          Resources
+        </a>
+
+        <a href="./pyqs.html">PYQs</a>
+
         <a href="./contact.html">Contact</a>
       </nav>
+
+
       <div class="header-actions">
-        <a class="btn btn-secondary btn-small" href="./login.html">Login</a>
-        <a class="btn btn-primary btn-small" href="./dashboard.html">Start Learning</a>
+
+        <a
+          class="btn btn-secondary btn-small"
+          href="./login.html"
+        >
+          Login
+        </a>
+
+        <a
+          class="btn btn-primary btn-small"
+          href="./dashboard.html"
+        >
+          Start Learning
+        </a>
+
+        <button
+          class="btn btn-secondary btn-small menu-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-label="Toggle menu"
+        >
+          Menu
+        </button>
+
       </div>
+
     </div>
+
+
+    <!-- ================= MOBILE NAVIGATION ================= -->
+
+    <div
+      class="mobile-nav container"
+      aria-label="Mobile navigation"
+    >
+
+      <nav
+        class="nav flex-col"
+        style="padding:16px 0 10px; gap:10px; color:#eaf4ff;"
+      >
+
+        <a href="./index.html">
+          Home
+        </a>
+
+        <a href="./about.html">
+          About
+        </a>
+
+        <a href="./features.html">
+          Features
+        </a>
+
+        <a href="./ai-tools.html">
+          AI Tools
+        </a>
+
+        <a href="./dashboard.html">
+          Dashboard
+        </a>
+
+        <a
+          href="./resources.html"
+          class="active"
+        >
+          Resources
+        </a>
+
+        <a href="./pyqs.html">
+          PYQs
+        </a>
+
+        <a href="./contact.html">
+          Contact
+        </a>
+
+        <a href="./login.html">
+          Login
+        </a>
+
+      </nav>
+
+    </div>
+
   </header>
 
+
+  <!-- ================= MAIN CONTENT ================= -->
+
   <main>
+
+    <!-- ================= PAGE HERO ================= -->
+
     <section class="page-hero">
+
       <div class="container">
-        <div class="breadcrumb"><span>Home</span> <span>/</span> <span class="current">Resources</span></div>
-        <h1>Resources</h1>
-        <p>Helpful guides, concept references, and student materials to support your study flow.</p>
+
+        <div class="breadcrumb">
+          <span>Home</span>
+          <span>/</span>
+          <span class="current">
+            Resources
+          </span>
+        </div>
+
+        <h1>
+          Resources
+        </h1>
+
+        <p>
+          Helpful guides, concept references, and student
+          materials to support your study flow.
+        </p>
+
       </div>
+
     </section>
+
+
+    <!-- ================= RESOURCE SECTION ================= -->
 
     <section class="section section-alt">
+
       <div class="container">
-        <div class="grid-3">
-          <article class="card light-card">
-            <h3>Study Guides</h3>
-            <p>Short subject-specific guides to structure revision blocks and key concept coverage.</p>
-          </article>
-          <article class="card light-card">
-            <h3>Revision Templates</h3>
-            <p>Track concepts, memorization, examples, and mistakes using clean weekly study frameworks.</p>
-          </article>
-          <article class="card light-card">
-            <h3>Career Prep</h3>
-            <p>Interview tips, portfolio guidance, and skill-building resources to support growth.</p>
-          </article>
+
+        <div class="section-head">
+
+          <span
+            class="eyebrow"
+            style="
+              color:#2857b1;
+              background:rgba(59,130,246,0.08);
+              border-color:rgba(59,130,246,0.12);
+            "
+          >
+            Learning library
+          </span>
+
+          <h2>
+            Find resources that match your learning goals.
+          </h2>
+
+          <p>
+            Search guides, templates, references, and other
+            materials to support your study journey.
+          </p>
+
         </div>
+
+
+        <!-- ================= FILTERS ================= -->
+
+        <form
+          id="resourceFilters"
+          class="form-grid"
+          role="search"
+          aria-label="Search resources"
+        >
+
+          <div class="field">
+
+            <label for="resourceSearch">
+              Search resources
+            </label>
+
+            <input
+              id="resourceSearch"
+              name="search"
+              type="search"
+              placeholder="Search by title or topic..."
+              autocomplete="off"
+            />
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="resourceType">
+              Resource type
+            </label>
+
+            <select
+              id="resourceType"
+              name="type"
+            >
+              <option value="">
+                All types
+              </option>
+
+              <option value="GUIDE">
+                Guides
+              </option>
+
+              <option value="TEMPLATE">
+                Templates
+              </option>
+
+              <option value="REFERENCE">
+                References
+              </option>
+
+              <option value="NOTES">
+                Notes
+              </option>
+            </select>
+
+          </div>
+
+
+          <div
+            class="field"
+            style="align-self:end;"
+          >
+
+            <button
+              class="btn btn-primary"
+              type="submit"
+            >
+              Search Resources
+            </button>
+
+          </div>
+
+        </form>
+
+
+        <!-- ================= RESOURCE LIST ================= -->
+
+        <div
+          id="resourceList"
+          class="grid-3"
+          style="margin-top:24px;"
+          aria-live="polite"
+        >
+
+          <div class="empty-state">
+
+            <strong>
+              Loading resources...
+            </strong>
+
+            <span>
+              Fetching your course resources.
+            </span>
+
+          </div>
+
+        </div>
+
       </div>
+
     </section>
+
+
+    <!-- ================= QUICK LINKS ================= -->
+
+    <section class="section">
+
+      <div class="container">
+
+        <div class="section-head">
+
+          <span
+            class="eyebrow"
+            style="
+              color:#2857b1;
+              background:rgba(59,130,246,0.08);
+              border-color:rgba(59,130,246,0.12);
+            "
+          >
+            Keep learning
+          </span>
+
+          <h2>
+            Explore more student tools.
+          </h2>
+
+        </div>
+
+
+        <div class="grid-3">
+
+          <article class="card light-card">
+
+            <div class="card-icon">
+              AI
+            </div>
+
+            <h3>
+              AI Tools
+            </h3>
+
+            <p>
+              Ask questions, generate explanations,
+              create quizzes, and plan your study sessions.
+            </p>
+
+            <div class="link-list">
+
+              <a href="./ai-tools.html">
+                <span>
+                  Explore AI Tools
+                </span>
+
+                <span>
+                  →
+                </span>
+              </a>
+
+            </div>
+
+          </article>
+
+
+          <article class="card light-card">
+
+            <div class="card-icon">
+              Q
+            </div>
+
+            <h3>
+              Previous Year Questions
+            </h3>
+
+            <p>
+              Practice previous-year questions and identify
+              important exam topics.
+            </p>
+
+            <div class="link-list">
+
+              <a href="./pyqs.html">
+                <span>
+                  Explore PYQs
+                </span>
+
+                <span>
+                  →
+                </span>
+              </a>
+
+            </div>
+
+          </article>
+
+
+          <article class="card light-card">
+
+            <div class="card-icon">
+              D
+            </div>
+
+            <h3>
+              Dashboard
+            </h3>
+
+            <p>
+              Track your progress, continue learning,
+              manage notes, and follow your study plan.
+            </p>
+
+            <div class="link-list">
+
+              <a href="./dashboard.html">
+                <span>
+                  Open Dashboard
+                </span>
+
+                <span>
+                  →
+                </span>
+              </a>
+
+            </div>
+
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
   </main>
 
-  <footer class="footer"><div class="container"><small>© 2026 ZERA</small></div></footer>
+
+  <!-- ================= FOOTER ================= -->
+
+  <footer class="footer">
+
+    <div class="container footer-grid">
+
+      <div>
+
+        <a
+          href="./index.html"
+          class="brand"
+          aria-label="ZERA home"
+        >
+
+          <span class="brand-mark">
+            <span>Z</span>
+          </span>
+
+          <span>
+            ZERA
+          </span>
+
+        </a>
+
+
+        <p
+          style="
+            margin-top:14px;
+            max-width:430px;
+            color:rgba(232,238,251,0.72);
+          "
+        >
+          A free, student-focused learning platform designed
+          to help learners study smarter, stay consistent,
+          and grow with confidence.
+        </p>
+
+      </div>
+
+
+      <div>
+
+        <h3>
+          Explore
+        </h3>
+
+        <ul
+          style="
+            list-style:none;
+            padding:0;
+            margin:0;
+            display:grid;
+            gap:8px;
+          "
+        >
+
+          <li>
+            <a href="./about.html">
+              About
+            </a>
+          </li>
+
+          <li>
+            <a href="./features.html">
+              Features
+            </a>
+          </li>
+
+          <li>
+            <a href="./ai-tools.html">
+              AI Tools
+            </a>
+          </li>
+
+          <li>
+            <a href="./dashboard.html">
+              Dashboard
+            </a>
+          </li>
+
+          <li>
+            <a href="./pyqs.html">
+              PYQs
+            </a>
+          </li>
+
+        </ul>
+
+      </div>
+
+
+      <div>
+
+        <h3>
+          Contact
+        </h3>
+
+        <ul
+          style="
+            list-style:none;
+            padding:0;
+            margin:0;
+            display:grid;
+            gap:8px;
+          "
+        >
+
+          <li>
+            Created by Utkarsh Giri
+          </li>
+
+          <li>
+            <a href="tel:9235542673">
+              9235542673
+            </a>
+          </li>
+
+          <li>
+            <a href="./contact.html">
+              Contact page
+            </a>
+          </li>
+
+        </ul>
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="container"
+      style="
+        margin-top:24px;
+        padding-top:18px;
+        border-top:1px solid rgba(255,255,255,0.08);
+      "
+    >
+
+      <small>
+        © 2026 ZERA. Built for students.
+      </small>
+
+    </div>
+
+  </footer>
+
 </body>
 </html>

@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="./css/components.css" />
   <link rel="stylesheet" href="./css/responsive.css" />
   <script src="./js/storage.js" defer></script>
-  <script src="./js/progress.js" defer></script>
+  <script src="./js/syllabus.js" defer></script>
   <script src="./js/app.js" defer></script>
 </head>
 <body>
@@ -43,19 +43,19 @@
       </div>
 
       <div class="grid-2" style="margin-top: 26px;">
-        <article class="panel">
+          <article class="panel">
           <h3>Current course</h3>
-          <div class="topic-list">
-            <div class="topic-item"><span>Introduction to Learning Systems</span><span class="badge neutral">In progress</span></div>
-            <div class="topic-item"><span>Study Methods and Habit Design</span><span class="badge neutral">Planned</span></div>
-            <div class="topic-item"><span>Course Planning Basics</span><span class="badge neutral">Planned</span></div>
-            <div class="topic-item"><span>Revision Techniques</span><span class="badge neutral">Planned</span></div>
+          <div class="topic-list" id="syllabusCourseList">
+            <div class="empty-state"><strong>Loading courses</strong><span>Fetching your learning catalog.</span></div>
           </div>
+          <a class="btn btn-primary btn-small" id="syllabusCourseLink" href="./dashboard.html" style="margin-top:16px;">Open course</a>
         </article>
         <article class="panel">
           <h3>Progress overview</h3>
-          <div class="progress-bar" data-progress="25"><span></span></div>
-          <p style="margin-top: 14px; color:#415772;">25% completed overall for the current module.</p>
+          <div class="progress-bar"><span id="syllabusProgressBar" style="width:0%"></span></div>
+          <p id="syllabusProgressSummary" style="margin-top: 14px; color:#415772;">Loading progress...</p>
+          <strong id="syllabusCourseTitle" style="display:block; margin-top:10px;"></strong>
+          <span id="syllabusCourseStatus" class="badge neutral" style="display:inline-block; margin-top:8px;">Not started</span>
         </article>
       </div>
     </div>

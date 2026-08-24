@@ -1,10 +1,7 @@
 (function () {
-  const responses = {
-    simple: 'A strong way to approach this is to break the concept into a definition, key idea, and a small real-world example. Start with the core principle, then connect it to what you are studying before practicing a question.',
-    detailed: 'This concept is best understood by identifying the underlying principle, the common misconceptions, and one or two examples. In a learning workflow, you should first understand the idea, then test it with practice problems so the concept becomes durable.',
-    exam: 'For exam-style answers, define the concept clearly, mention its importance, provide a concise example, and briefly explain the key difference from similar ideas. This keeps the answer precise while showing understanding.',
-    example: 'Example approach: define the term, state the rule, then show a short scenario. For instance, if the topic is data structures, explain how the idea works in a real case and then connect that to a question pattern.'
-  };
+  const base = 'http://localhost:5000/api';
+  const token = () => localStorage.getItem('zera_token');
+  async function request(path, options = {}) { const response = await fetch(`${base}${path}`, { method: options.method || 'GET', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` }, ...(options.body ? { body: JSON.stringify(options.body) } : {}) }); const data = await response.json().catch(() => ({})); if (!response.ok || !data.success) throw new Error(data.message || 'Request failed.'); return data.data; }
 
   function renderMessage(content, type) {
     const box = document.getElementById('chatBox');
@@ -28,7 +25,9 @@
   }
 
   document.addEventListener('DOMContentLoaded', function () {
-    bindQuestionChips();
+    if (!token()) { window.location.replace('./login.html'); return; }
+    document.querySelectorAll('.question-chip').forEach((chip) => chip.addEventListener('click', () => { const input = document.getElementById('questionInput'); if (input) input.value = chip.textContent.trim(); }));
+    request('/ai/status').then((status) => { const node = document.getElementById('aiStatus'); if (node) node.textContent = status.message; }).catch((error) => { const node = document.getElementById('aiStatus'); if (node) node.textContent = error.message; });
 
     const sendBtn = document.getElementById('sendQuestion');
     const clearBtn = document.getElementById('clearChat');
@@ -36,7 +35,7 @@
     const select = document.getElementById('responseStyle');
 
     if (sendBtn) {
-      sendBtn.addEventListener('click', function () {
+      sendBtn.addEventListener('click', async function () {
         const prompt = (input?.value || '').trim();
         if (!prompt) {
           renderMessage('Please ask a question so ZERA can respond.', 'bot');
@@ -45,17 +44,15 @@
 
         renderMessage(prompt, 'user');
 
-        const mode = select?.value || 'simple';
-        const answer = responses[mode] || responses.simple;
-        setTimeout(() => renderMessage(`ZERA says: ${answer}`, 'bot'), 250);
-        if (input) input.value = '';
+        sendBtn.disabled = true;
+        try { const result = await request('/ai/doubt-solver', { method: 'POST', body: { question: prompt, style: select?.value || 'simple' } }); renderMessage(result.answer, 'bot'); if (input) input.value = ''; } catch (error) { renderMessage(error.message, 'bot'); } finally { sendBtn.disabled = false; }
       });
     }
 
     if (clearBtn) {
       clearBtn.addEventListener('click', function () {
         const box = document.getElementById('chatBox');
-        if (box) box.innerHTML = '<div class="chat-item bot">Your AI learning partner is ready. Ask a question and get a demo explanation.</div>';
+        if (box) box.innerHTML = '<div class="chat-item bot">Your AI learning partner is ready. Ask a question.</div>';
       });
     }
   });

@@ -5,13 +5,16 @@ import {
   adminLogin,
   me,
   forgotPassword,
-  resetPasswordRequest
+  resetPasswordRequest,
+  requestOtp,
+  verifyOtp
 } from '../controllers/authController.js';
 import { authenticate } from '../middleware/authMiddleware.js';
 import {
   createUserSchema,
   loginSchema,
   forgotPasswordSchema,
+  verifyOtpSchema,
   resetPasswordSchema,
   validateRequest
 } from '../utils/validators.js';
@@ -23,6 +26,8 @@ router.post('/login', validateRequest(loginSchema), login);
 router.post('/admin/login', validateRequest(loginSchema), adminLogin);
 router.get('/me', authenticate, me);
 router.post('/forgot-password', validateRequest(forgotPasswordSchema), forgotPassword);
+router.post('/request-otp', validateRequest(forgotPasswordSchema), requestOtp);
+router.post('/verify-otp', validateRequest(verifyOtpSchema), verifyOtp);
 router.post('/reset-password', validateRequest(resetPasswordSchema), resetPasswordRequest);
 
 export default router;

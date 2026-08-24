@@ -1,8 +1,9 @@
 import bcrypt from 'bcryptjs';
+import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../config/prisma.js';
 import { env } from '../config/env.js';
-import { emailService } from './emailService.js';
+import { emailService, sendOtpEmail } from './emailService.js';
 
 export const sanitizeUser = (user) => {
   if (!user) return null;
@@ -226,4 +227,27 @@ export const resetPassword = async (token, password) => {
     success: true,
     message: 'Password reset successful.'
   };
+};
+
+export const requestPasswordOtp = async (email) => {
+  const user = await findUserForAuth(email);
+  if (!user) return { success: true, message: 'If an account exists, a verification code will be sent.' };
+  const latest = await prisma.otpChallenge.findFirst({ where: { userId: user.id, purpose: 'PASSWORD_RESET' }, orderBy: { createdAt: 'desc' } });
+  if (latest && Date.now() - latest.lastSentAt.getTime() < 60_000) { const error = new Error('Please wait before requesting another code.'); error.statusCode = 429; throw error; }
+  const otp = String(crypto.randomInt(100000, 1000000));
+  const challenge = await prisma.otpChallenge.create({ data: { userId: user.id, purpose: 'PASSWORD_RESET', codeHash: await bcrypt.hash(otp, 12), expiresAt: new Date(Date.now() + 10 * 60_000) } });
+  try { await sendOtpEmail(user.email, user.name, otp); } catch (error) { await prisma.otpChallenge.delete({ where: { id: challenge.id } }); throw error; }
+  return { success: true, message: 'If an account exists, a verification code will be sent.' };
+};
+
+export const verifyPasswordOtp = async (email, otp) => {
+  const user = await findUserForAuth(email);
+  if (!user) { const error = new Error('Invalid verification code.'); error.statusCode = 401; throw error; }
+  const challenge = await prisma.otpChallenge.findFirst({ where: { userId: user.id, purpose: 'PASSWORD_RESET', verifiedAt: null }, orderBy: { createdAt: 'desc' } });
+  if (!challenge || challenge.expiresAt < new Date()) { const error = new Error('The verification code is invalid or expired.'); error.statusCode = 401; throw error; }
+  if (challenge.attempts >= 5) { const error = new Error('Too many invalid code attempts. Request a new code.'); error.statusCode = 429; throw error; }
+  const valid = await bcrypt.compare(String(otp), challenge.codeHash);
+  if (!valid) { await prisma.otpChallenge.update({ where: { id: challenge.id }, data: { attempts: { increment: 1 } } }); const error = new Error('The verification code is invalid.'); error.statusCode = 401; throw error; }
+  await prisma.otpChallenge.update({ where: { id: challenge.id }, data: { verifiedAt: new Date() } });
+  return { success: true, resetToken: createPasswordResetToken(user) };
 };

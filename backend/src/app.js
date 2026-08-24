@@ -8,6 +8,7 @@ import courseRoutes from './routes/courseRoutes.js';
 import onboardingRoutes from './routes/onboardingRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 const app = express();
 
@@ -49,6 +50,7 @@ app.use('/api', courseRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

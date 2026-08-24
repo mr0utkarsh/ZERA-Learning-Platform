@@ -2,7 +2,7 @@
 
 ## Product direction
 
-ZERA is a student-first learning platform focused on personalization, progress tracking, and AI-assisted learning. The frontend is a GitHub Pages-compatible static website with demo logic powered by localStorage.
+ZERA is a student-first learning platform focused on personalization, progress tracking, and AI-assisted learning. The frontend is a static HTML client backed by authenticated Express APIs and Prisma/MySQL persistence.
 
 ## Target future stack
 
@@ -76,9 +76,9 @@ Email:
 - database query protections
 - audited logging
 
-## Demo-mode policy
+## Provider configuration
 
-The frontend in this repository intentionally does not claim real production AI or secured backend behavior. All dynamic functionality is a frontend demo and must be clearly labeled as Demo Mode when a real provider is not connected.
+Gemini-powered features require `GEMINI_API_KEY`. Password reset and OTP delivery require `EMAIL_PROVIDER=smtp`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_SECURE`, `EMAIL_USER`, `EMAIL_PASS`, and `EMAIL_FROM`. Missing provider configuration is returned as an explicit error; the backend does not fabricate responses.
 
 ## GitHub Pages compatibility
 

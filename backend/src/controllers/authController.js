@@ -4,7 +4,9 @@ import {
   loginAdminUser,
   getCurrentUser,
   initiatePasswordReset,
-  resetPassword
+  resetPassword,
+  requestPasswordOtp,
+  verifyPasswordOtp
 } from '../services/authService.js';
 
 export const signup = async (req, res, next) => {
@@ -86,4 +88,12 @@ export const resetPasswordRequest = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+export const requestOtp = async (req, res, next) => {
+  try { return res.status(200).json({ success: true, data: await requestPasswordOtp(req.body.email) }); } catch (error) { next(error); }
+};
+
+export const verifyOtp = async (req, res, next) => {
+  try { return res.status(200).json({ success: true, data: await verifyPasswordOtp(req.body.email, req.body.otp) }); } catch (error) { next(error); }
 };

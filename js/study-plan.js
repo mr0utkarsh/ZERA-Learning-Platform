@@ -20,16 +20,10 @@
     const hours = document.getElementById('planHours')?.value || '2';
     const weakTopic = document.getElementById('planWeakTopic')?.value || 'Revision loops';
 
-    const schedule = [
-      { title: 'Daily review', time: `${hours} hours`, detail: `Focus on ${course} fundamentals and revise weak areas like ${weakTopic}.` },
-      { title: 'Practice set', time: '30 min', detail: 'Attempt a quiz and review mistakes immediately.' },
-      { title: 'Concept rebuild', time: '45 min', detail: `Revisit difficult concepts before ${examDate}.` },
-      { title: 'Mock assessment', time: '60 min', detail: 'Take one timed practice round and track weak topics.' }
-    ];
-
-    const title = `${course} study plan`;
-    const description = `Target: ${examDate}. Daily study time: ${hours} hours. Focus topic: ${weakTopic}.`;
-    await request('/study-plans', { method: 'POST', body: { title, description, schedule } });
+    const generated = await fetch('http://localhost:5000/api/ai/study-plan', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('zera_token')}` }, body: JSON.stringify({ course, targetDate: examDate, hours, weakTopic }) }).then((response) => response.json());
+    if (!generated.success) throw new Error(generated.message || 'Unable to generate study plan.');
+    const plan = generated.data;
+    await request('/study-plans', { method: 'POST', body: { title: plan.title, description: plan.description, schedule: plan.schedule } });
     await loadPlans();
   }
 
@@ -43,10 +37,10 @@
     }
 
     const tasks = Array.isArray(plan) ? plan : [];
-    root.innerHTML = tasks.flatMap((item) => item.schedule || []).map((task) => `
+    root.innerHTML = tasks.flatMap((item) => (Array.isArray(item.schedule) ? item.schedule.map((task) => ({ ...task, planTitle: item.title })) : [])).map((task) => `
       <article class="panel">
         <div style="display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap;">
-          <strong>${task.title}</strong>
+          <strong>${task.planTitle || 'Study task'} · ${task.title}</strong>
           <span class="badge neutral">${task.time}</span>
         </div>
         <p style="margin-top:8px;">${task.detail}</p>

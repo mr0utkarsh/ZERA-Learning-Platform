@@ -15,6 +15,11 @@ export const forgotPasswordSchema = z.object({
   email: z.string().trim().email('Please provide a valid email address')
 });
 
+export const verifyOtpSchema = z.object({
+  email: z.string().trim().email('Please provide a valid email address'),
+  otp: z.string().regex(/^\d{6}$/, 'Enter the six-digit verification code')
+});
+
 export const resetPasswordSchema = z.object({
   token: z.string().min(10, 'Reset token is required'),
   password: z.string().min(8, 'Password must be at least 8 characters').max(128, 'Password must be 128 characters or fewer')
@@ -22,6 +27,10 @@ export const resetPasswordSchema = z.object({
 
 export const idSchema = z.object({
   id: z.string().min(1)
+});
+
+export const updateStudentStatusSchema = z.object({
+  status: z.enum(['ACTIVE', 'SUSPENDED'])
 });
 
 export const onboardingProfileSchema = z.object({

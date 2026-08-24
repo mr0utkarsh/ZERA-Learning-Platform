@@ -63,10 +63,16 @@
 
       const prev = sequence[idx - 1] || null;
       const next = sequence[idx + 1] || null;
+      const completionState = snapshot?.progress || {};
 
       const prevBtn = document.getElementById('prevBtn');
       const nextBtn = document.getElementById('nextBtn');
       const completeBtn = document.getElementById('completeBtn');
+
+      if (completeBtn) {
+        const isCompleted = completionState.lastLessonId === lessonId || completionState.completedLessons >= idx + 1;
+        completeBtn.textContent = isCompleted ? 'Completed' : 'Mark as complete';
+      }
 
       if (prevBtn) {
         if (prev) {
@@ -89,13 +95,10 @@
           try {
             const res = await apiRequest(`/courses/${courseId}/lessons/${lessonId}/complete`, { method: 'POST' });
             showMessage('Progress saved.', 'success');
-            // navigate to next lesson if available
             const nextLesson = res.nextLesson || null;
             if (nextLesson && nextLesson.id && next && next.id === nextLesson.id) {
-              // redirect to next lesson
               window.location.href = `./lesson.html?courseId=${encodeURIComponent(courseId)}&lessonId=${encodeURIComponent(nextLesson.id)}`;
             } else {
-              // update UI progress
               completeBtn.textContent = 'Completed';
             }
           } catch (err) {

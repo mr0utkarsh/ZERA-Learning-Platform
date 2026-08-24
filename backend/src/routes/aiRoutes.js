@@ -1,5 +1,6 @@
 import express from 'express';
 import { authenticate } from '../middleware/authMiddleware.js';
+import { prisma } from '../config/prisma.js';
 import {
   aiStatus,
   generateDoubtAnswer,
@@ -41,7 +42,23 @@ router.post('/notes', async (req, res, next) => {
 router.post('/quiz', async (req, res, next) => {
   try {
     const result = await generateQuiz(req.body || {});
-    res.json({ success: true, data: result });
+    const questions = result.questions.filter((question) => question.prompt && Array.isArray(question.options) && question.correctAnswer).map((question) => ({
+      prompt: String(question.prompt).slice(0, 500),
+      options: question.options,
+      correctAnswer: String(question.correctAnswer).slice(0, 500),
+      explanation: question.explanation ? String(question.explanation).slice(0, 1000) : null
+    }));
+    if (!questions.length) throw new Error('The AI provider returned no valid quiz questions.');
+    const quiz = await prisma.quiz.create({
+      data: {
+        courseId: req.body.courseId || null,
+        title: String(result.title).slice(0, 160),
+        description: result.description ? String(result.description).slice(0, 1000) : null,
+        questions: { create: questions }
+      },
+      include: { questions: { select: { id: true, prompt: true, options: true, explanation: true } } }
+    });
+    res.status(201).json({ success: true, data: quiz });
   } catch (error) {
     next(error);
   }

@@ -2,7 +2,7 @@
 
 ZERA is a free, student-first learning platform designed to help learners organize their syllabus, track progress, generate notes, solve doubts, take quizzes, prepare for interviews, and build a stronger study routine.
 
-This repository is a GitHub Pages-friendly frontend with localStorage-based demo functionality. It is designed to scale toward a future backend architecture with authentication, database access, and AI provider integration.
+This repository contains a static frontend and an Express/Prisma backend with authenticated MySQL persistence. AI and SMTP features require external provider configuration.
 
 ## Core idea
 
@@ -21,12 +21,12 @@ ZERA gives students a structured path through their learning journey without for
 
 - Premium responsive landing experience
 - About and feature pages for the product narrative
-- AI tools hub with Demo Mode labels
+- Authenticated AI tools hub
 - Dashboard with course progress and next-step guidance
 - Syllabus tracking with states for not started, active, and complete
-- Quiz and mock test demos with localStorage persistence
+- Persisted quiz and mock test assessments
 - Study plan generation and task tracking
-- AI mock interview demo
+- AI mock interview integration
 - Bookmarks, notifications, and personal notes
 - Authentication UI for login, signup, forgot password, and reset flows
 - Admin login and admin-ready structure
@@ -68,13 +68,9 @@ The project is designed for GitHub Pages with root-relative and relative asset u
 
 No localhost, absolute filesystem, or backend-only dependency is required for the frontend to render.
 
-## Demo-mode limitations
+## External configuration
 
-This project intentionally does not claim real AI or backend integration.
-
-- AI tools operate in Demo Mode
-- localStorage stores frontend demo state only
-- passwords, OTPs, API keys, and secrets are never stored in the repository
+Set `DATABASE_URL`, `JWT_SECRET`, and `PASSWORD_RESET_TOKEN_SECRET`. Live Gemini requires `GEMINI_API_KEY`. Password reset and OTP delivery require `EMAIL_PROVIDER=smtp`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_SECURE`, `EMAIL_USER`, `EMAIL_PASS`, `EMAIL_FROM`, and `CLIENT_URL`.
 
 ## Future backend architecture
 

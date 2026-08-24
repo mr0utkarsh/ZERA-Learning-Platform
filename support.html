@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="./css/components.css" />
   <link rel="stylesheet" href="./css/responsive.css" />
   <script src="./js/storage.js" defer></script>
+  <script src="./js/support.js" defer></script>
   <script src="./js/app.js" defer></script>
 </head>
 <body>
@@ -28,11 +29,13 @@
     <div class="container">
       <div class="panel">
         <h2>Support Center</h2>
-        <ul class="feature-list" style="margin-top: 16px;">
-          <li>Need help with your learning flow? Contact the support desk.</li>
-          <li>Use the contact page for questions, complaints, or academic support.</li>
-          <li>Support system is designed for future backend-enabled reporting and admin handling.</li>
-        </ul>
+        <form id="supportForm" style="margin-top:16px;">
+          <div class="field"><label for="supportCategory">Category</label><input id="supportCategory" name="category" required value="Learning support" /></div>
+          <div class="field" style="margin-top:14px;"><label for="supportSubject">Subject</label><input id="supportSubject" name="subject" required /></div>
+          <div class="field" style="margin-top:14px;"><label for="supportMessage">Message</label><textarea id="supportMessage" name="message" required></textarea></div>
+          <button class="btn btn-primary" type="submit" style="margin-top:16px;">Send support request</button>
+          <div id="supportStatus" class="notice" style="margin-top:14px;" hidden></div>
+        </form>
       </div>
     </div>
   </main>

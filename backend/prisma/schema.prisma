@@ -54,6 +54,7 @@ model User {
   notifications   Notification[]
   supportRequests SupportRequest[]
   syllabusUploads SyllabusUpload[]
+  otpChallenges   OtpChallenge[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
@@ -93,6 +94,21 @@ model SyllabusUpload {
   @@index([userId, createdAt])
 }
 
+model OtpChallenge {
+  id         String    @id @default(cuid())
+  userId     String
+  purpose    String
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  lastSentAt DateTime  @default(now())
+  verifiedAt DateTime?
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+
+  @@index([userId, purpose, createdAt])
+}
+
 model Course {
   id          String       @id @default(cuid())
   title       String
@@ -106,6 +122,8 @@ model Course {
   notes       Note[]
   quizzes     Quiz[]
   mockTests   MockTest[]
+  pyqs        Pyq[]
+  resources   Resource[]
   studyPlans  StudyPlan[]
   bookmarks   Bookmark[]
   createdAt   DateTime     @default(now())
@@ -168,6 +186,44 @@ model Topic {
   updatedAt   DateTime  @updatedAt
 
   @@index([chapterId, sequence])
+}
+
+model Pyq {
+  id          String   @id @default(cuid())
+  courseId    String
+  subjectId   String?
+  topicId     String?
+  year        Int
+  question    String   @db.Text
+  answer      String?  @db.Text
+  options     Json?
+  explanation String?  @db.Text
+  source      String?
+  course      Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([courseId, year])
+  @@index([subjectId])
+  @@index([topicId])
+}
+
+model Resource {
+  id           String   @id @default(cuid())
+  courseId     String?
+  subjectId    String?
+  topicId      String?
+  title        String
+  description  String?  @db.Text
+  resourceType String   @default("REFERENCE")
+  url          String
+  course       Course?  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([courseId, resourceType])
+  @@index([subjectId])
+  @@index([topicId])
 }
 
 model Lesson {
@@ -287,9 +343,25 @@ model MockTest {
   description String?
   durationMin Int?
   course      Course?           @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  questions   MockQuestion[]
   attempts    MockTestAttempt[]
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
+}
+
+model MockQuestion {
+  id            String   @id @default(cuid())
+  mockTestId    String
+  prompt        String
+  options       Json
+  correctAnswer String
+  explanation   String?
+  sequence      Int      @default(0)
+  mockTest      MockTest @relation(fields: [mockTestId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([mockTestId, sequence])
 }
 
 model MockTestAttempt {
