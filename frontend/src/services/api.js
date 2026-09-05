@@ -3,6 +3,8 @@
  * reverse proxy in production) forwards to the backend. Auth travels in
  * an httpOnly cookie — no tokens in JS memory/localStorage.
  */
+const API_BASE_URL = String(import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+
 async function request(method, path, body, isForm = false) {
   const options = {
     method,
@@ -19,7 +21,7 @@ async function request(method, path, body, isForm = false) {
   }
   let res;
   try {
-    res = await fetch(`/api${path}`, options);
+    res = await fetch(`${API_BASE_URL}/api${path}`, options);
   } catch {
     throw new ApiClientError('Cannot reach the server. Please check your connection.', 0);
   }
