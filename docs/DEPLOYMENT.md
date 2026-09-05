@@ -15,7 +15,7 @@ connection string.
 
 ```bash
 cd backend
-DATABASE_URL="postgresql://USER:PASS@HOST:5432/zera?schema=public" npx prisma migrate deploy
+DATABASE_URL="postgresql://USER:PASS@HOST:5432/zera?schema=public" npm run db:deploy
 ```
 
 > The repo ships with `prisma/schema.postgresql.prisma` as the canonical schema.
@@ -35,8 +35,9 @@ DATABASE_URL="postgresql://USER:PASS@HOST:5432/zera?schema=public" npx prisma mi
    - SMTP: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM`
    - AI: `AI_PROVIDER=openai`, `AI_API_KEY`, optional `AI_MODEL`, `OPENAI_BASE_URL`
    - **Leave `DEV_SHOW_OTP` unset/false in production** (OTPs must travel only by email)
-3. Start command: `npm start` (runs `src/server.js`).
-4. Health check: `GET /api/health`.
+3. Build command: `npm run db:deploy` (syncs the PostgreSQL schema, generates the Prisma client, and applies committed migrations).
+4. Start command: `npm start` (runs `src/server.js`).
+5. Health check: `GET /api/health`.
 
 Notes:
 - In production the session cookie is `Secure` + `SameSite=None`, so the frontend

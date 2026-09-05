@@ -19,16 +19,20 @@ datasource db {
 enum Role {
   STUDENT
   ADMIN
+  SUPER_ADMIN
 }
 
 enum AccountStatus {
   ACTIVE
   SUSPENDED
+  INVITED
+  PENDING
 }
 
 enum OtpPurpose {
   EMAIL_VERIFICATION
   PASSWORD_RESET
+  ADMIN_INVITE
 }
 
 enum QuizType {
