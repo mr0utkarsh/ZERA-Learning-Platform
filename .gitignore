@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Environment files — NEVER commit secrets
+.env
+.env.*
+!.env.example
+
+# Build output
+frontend/dist/
+build/
+
+# Database
+*.db
+*.db-journal
+backend/prisma/dev.db*
+backend/prisma/test.db*
+
+# Uploads (user content)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Logs & misc
+*.log
+.DS_Store
+coverage/
+.cache/
+tmp/
+temp/

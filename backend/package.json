@@ -1,0 +1,45 @@
+{
+  "name": "zera-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ZERA backend \u2014 Express + Prisma API",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "db:generate": "node scripts/sync-prisma-db.js && prisma generate",
+    "db:migrate": "node scripts/sync-prisma-db.js && prisma migrate dev --name init",
+    "db:deploy": "node scripts/sync-prisma-db.js && prisma migrate deploy",
+    "db:push": "node scripts/sync-prisma-db.js && prisma db push",
+    "db:studio": "prisma studio",
+    "db:seed": "node prisma/seed.js",
+    "test": "node scripts/run-tests.js",
+    "test:watch": "vitest"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "adm-zip": "^0.6.0",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^10.0.0",
+    "pdf-parse": "^1.1.1"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0",
+    "supertest": "^7.0.0",
+    "vitest": "^2.1.9"
+  },
+  "overrides": {
+    "qs": "^6.15.4"
+  }
+}

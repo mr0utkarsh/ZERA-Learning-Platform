@@ -1,0 +1,451 @@
+// ============================================================
+// ZERA — Prisma schema
+// Target database: PostgreSQL (production).
+// For local zero-config development the provider can be synced
+// to sqlite by scripts/sync-prisma-db.js (see README).
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Enums ----------
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum OtpPurpose {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+enum QuizType {
+  QUIZ
+  MOCK_TEST
+}
+
+enum QuestionType {
+  MCQ
+  TRUE_FALSE
+  SHORT_ANSWER
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum NoteStyle {
+  STANDARD
+  HANDWRITTEN
+}
+
+enum InterviewStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum StudyPlanStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
+enum ActivityType {
+  LESSON_COMPLETED
+  QUIZ_ATTEMPTED
+  TEST_ATTEMPTED
+  NOTE_GENERATED
+  PYQ_ATTEMPTED
+  INTERVIEW_COMPLETED
+  STUDY_PLAN_CREATED
+  SYLLABUS_ANALYZED
+}
+
+// ---------- Identity ----------
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  passwordHash String
+  role         Role          @default(STUDENT)
+  status       AccountStatus @default(ACTIVE)
+
+  // Profile
+  bio          String?
+  avatarColor  String        @default("#6c5ce7")
+  institution  String?
+  gradeLevel   String?
+  preferences  String        @default("{}") // JSON: { dailyGoalMinutes, preferredSubjects, theme }
+
+  emailVerified Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  otps               Otp[]
+  courses            Course[]
+  lessonCompletions  LessonCompletion[]
+  lessonNotes        LessonNote[]
+  notes              Note[]
+  doubtConversations DoubtConversation[]
+  quizAttempts       QuizAttempt[]
+  studySessions      StudySession[]
+  pyqAttempts        PyqAttempt[]
+  pyqBookmarks       PyqBookmark[]
+  studyPlans         StudyPlan[]
+  interviews         InterviewSession[]
+  activities         ActivityLog[]
+}
+
+model Otp {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash  String
+  purpose   OtpPurpose
+  expiresAt DateTime
+  attempts  Int        @default(0)
+  used      Boolean    @default(false)
+  createdAt DateTime   @default(now())
+
+  @@index([userId, purpose])
+}
+
+// ---------- Course hierarchy: Course → Subject → Unit → Chapter → Topic → Lesson ----------
+
+model Course {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  institution String?
+  // null userId => global course available to every student
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source      String   @default("MANUAL") // MANUAL | SYLLABUS_UPLOAD
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subjects Subject[]
+}
+
+model Subject {
+  id        String  @id @default(cuid())
+  name      String
+  code      String?
+  courseId  String
+  course    Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  order     Int     @default(0)
+  createdAt DateTime @default(now())
+
+  units    Unit[]
+  pyqs     Pyq[]
+}
+
+model Unit {
+  id        String    @id @default(cuid())
+  name      String
+  subjectId String
+  subject   Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  order     Int       @default(0)
+  createdAt DateTime  @default(now())
+
+  chapters Chapter[]
+}
+
+model Chapter {
+  id        String   @id @default(cuid())
+  name      String
+  unitId    String
+  unit      Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  topics Topic[]
+}
+
+model Topic {
+  id        String   @id @default(cuid())
+  name      String
+  chapterId String
+  chapter   Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  important Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  lessons Lesson[]
+}
+
+model Lesson {
+  id          String   @id @default(cuid())
+  title       String
+  content     String?
+  objectives  String? // JSON array of strings
+  topicId     String
+  topic       Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  completions LessonCompletion[]
+  notes       LessonNote[]
+  sessions    StudySession[]
+}
+
+// ---------- Progress ----------
+
+model LessonCompletion {
+  id          String   @id @default(cuid())
+  userId      String
+  lessonId    String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completedAt DateTime @default(now())
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+}
+
+model StudySession {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson?  @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  minutes   Int
+  date      DateTime @default(now())
+}
+
+model ActivityLog {
+  id        String       @id @default(cuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      ActivityType
+  message   String
+  meta      String? // JSON
+  createdAt DateTime     @default(now())
+
+  @@index([userId, createdAt])
+}
+
+// ---------- Notes ----------
+
+model Note {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Polymorphic target: SUBJECT | UNIT | CHAPTER | TOPIC | LESSON + targetId
+  targetType String
+  targetId   String
+  title      String
+  content    String // Markdown
+  style      NoteStyle @default(STANDARD)
+  source     String    @default("AI") // AI | MANUAL
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([userId, targetType, targetId])
+}
+
+model LessonNote {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, lessonId])
+}
+
+// ---------- Doubt solver ----------
+
+model DoubtConversation {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  context   String? // optional lesson/topic context
+  createdAt DateTime @default(now())
+
+  messages DoubtMessage[]
+}
+
+model DoubtMessage {
+  id               String            @id @default(cuid())
+  conversationId   String
+  conversation     DoubtConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role             String // USER | ASSISTANT | SYSTEM
+  content          String
+  createdAt        DateTime          @default(now())
+
+  @@index([conversationId])
+}
+
+// ---------- Quizzes & mock tests ----------
+
+model Quiz {
+  id           String   @id @default(cuid())
+  userId       String? // owner when AI-generated for a student; null for global
+  title        String
+  type         QuizType @default(QUIZ)
+  subjectName  String?
+  scopeName    String? // chapter/topic scope label
+  difficulty   String   @default("MEDIUM") // EASY | MEDIUM | HARD
+  timeLimitMin Int? // mock tests only
+  questions    String // JSON array (validated)
+  createdAt    DateTime @default(now())
+
+  attempts QuizAttempt[]
+}
+
+model QuizAttempt {
+  id             String        @id @default(cuid())
+  quizId         String
+  quiz           Quiz          @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status         AttemptStatus @default(IN_PROGRESS)
+  answers        String? // JSON array
+  score          Int?
+  total          Int
+  percentage     Float?
+  correctCount   Int?
+  incorrectCount Int?
+  timeTakenSec   Int?
+  startedAt      DateTime      @default(now())
+  submittedAt    DateTime?
+
+  @@index([userId])
+  @@index([quizId])
+}
+
+// ---------- Previous year questions ----------
+
+model Pyq {
+  id         String   @id @default(cuid())
+  subjectId  String?
+  subject    Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  subjectName String
+  year       Int
+  exam       String?
+  topic      String?
+  difficulty String   @default("MEDIUM")
+  question   String
+  solution   String?
+  createdAt  DateTime @default(now())
+
+  attempts   PyqAttempt[]
+  bookmarks  PyqBookmark[]
+
+  @@index([subjectName, year])
+}
+
+model PyqAttempt {
+  id        String   @id @default(cuid())
+  pyqId     String
+  pyq       Pyq      @relation(fields: [pyqId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answer    String
+  correct   Boolean?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, pyqId])
+}
+
+model PyqBookmark {
+  id        String   @id @default(cuid())
+  pyqId     String
+  pyq       Pyq      @relation(fields: [pyqId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, pyqId])
+}
+
+// ---------- Study plans ----------
+
+model StudyPlan {
+  id             String          @id @default(cuid())
+  userId         String
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId       String?
+  dailyMinutes   Int
+  targetDate     DateTime
+  preferredDays  String // JSON array, e.g. ["Mon","Tue"]
+  status         StudyPlanStatus @default(ACTIVE)
+  source         String          @default("AI") // AI | MANUAL
+  createdAt      DateTime        @default(now())
+
+  tasks StudyPlanTask[]
+}
+
+model StudyPlanTask {
+  id        String    @id @default(cuid())
+  planId    String
+  plan      StudyPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  title     String
+  detail    String?
+  date      DateTime
+  done      Boolean   @default(false)
+  order     Int       @default(0)
+
+  @@index([planId])
+}
+
+// ---------- Mock interviews ----------
+
+model InterviewSession {
+  id             String          @id @default(cuid())
+  userId         String
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           String
+  domain         String
+  difficulty     String          @default("MEDIUM")
+  status         InterviewStatus @default(IN_PROGRESS)
+  currentRound   Int             @default(0)
+  totalRounds    Int             @default(5)
+  finalScore     Float?
+  summary        String? // JSON: strengths, improvements, suggested topics
+  createdAt      DateTime        @default(now())
+
+  exchanges InterviewExchange[]
+}
+
+model InterviewExchange {
+  id        String           @id @default(cuid())
+  sessionId String
+  session   InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  round     Int
+  question  String
+  answer    String?
+  feedback  String? // JSON: score + rubric breakdown
+  createdAt DateTime         @default(now())
+
+  @@index([sessionId])
+}
+
+/// Server-side configuration set by admins (e.g. AI provider + keys).
+/// Values containing secrets are AES-256-GCM encrypted at rest; the full
+/// value is never returned by any API after saving.
+model AdminSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

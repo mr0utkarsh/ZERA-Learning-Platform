@@ -1,0 +1,370 @@
+// ============================================================
+// ZERA — Prisma schema (SQLite variant for local dev / tests)
+// Identical model to schema.postgresql.prisma, but enums are
+// represented as String because SQLite has no native enum type.
+// Allowed values are enforced in backend/src/utils/enums.js.
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String @id @default(cuid())
+  name         String
+  email        String @unique
+  passwordHash String
+  role         String @default("STUDENT") // Role: STUDENT | ADMIN
+  status       String @default("ACTIVE") // AccountStatus: ACTIVE | SUSPENDED
+
+  bio         String?
+  avatarColor String  @default("#6c5ce7")
+  institution String?
+  gradeLevel  String?
+  preferences String  @default("{}")
+
+  emailVerified Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  otps               Otp[]
+  courses            Course[]
+  lessonCompletions  LessonCompletion[]
+  lessonNotes        LessonNote[]
+  notes              Note[]
+  doubtConversations DoubtConversation[]
+  quizAttempts       QuizAttempt[]
+  studySessions      StudySession[]
+  pyqAttempts        PyqAttempt[]
+  pyqBookmarks       PyqBookmark[]
+  studyPlans         StudyPlan[]
+  interviews         InterviewSession[]
+  activities         ActivityLog[]
+}
+
+model Otp {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash  String
+  purpose   String // EMAIL_VERIFICATION | PASSWORD_RESET
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, purpose])
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  institution String?
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source      String   @default("MANUAL")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subjects Subject[]
+}
+
+model Subject {
+  id        String   @id @default(cuid())
+  name      String
+  code      String?
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  units Unit[]
+  pyqs  Pyq[]
+}
+
+model Unit {
+  id        String   @id @default(cuid())
+  name      String
+  subjectId String
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  chapters Chapter[]
+}
+
+model Chapter {
+  id        String   @id @default(cuid())
+  name      String
+  unitId    String
+  unit      Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  topics Topic[]
+}
+
+model Topic {
+  id        String   @id @default(cuid())
+  name      String
+  chapterId String
+  chapter   Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  important Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  lessons Lesson[]
+}
+
+model Lesson {
+  id         String   @id @default(cuid())
+  title      String
+  content    String?
+  objectives String?
+  topicId    String
+  topic      Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  completions LessonCompletion[]
+  notes       LessonNote[]
+  sessions    StudySession[]
+}
+
+model LessonCompletion {
+  id          String   @id @default(cuid())
+  userId      String
+  lessonId    String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completedAt DateTime @default(now())
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+}
+
+model StudySession {
+  id       String   @id @default(cuid())
+  userId   String
+  lessonId String?
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson   Lesson?  @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  minutes  Int
+  date     DateTime @default(now())
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  message   String
+  meta      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model Note {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetType String
+  targetId   String
+  title      String
+  content    String
+  style      String   @default("STANDARD") // STANDARD | HANDWRITTEN
+  source     String   @default("AI")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId, targetType, targetId])
+}
+
+model LessonNote {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, lessonId])
+}
+
+model DoubtConversation {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  context   String?
+  createdAt DateTime @default(now())
+
+  messages DoubtMessage[]
+}
+
+model DoubtMessage {
+  id             String            @id @default(cuid())
+  conversationId String
+  conversation   DoubtConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String // USER | ASSISTANT | SYSTEM
+  content        String
+  createdAt      DateTime          @default(now())
+
+  @@index([conversationId])
+}
+
+model Quiz {
+  id           String   @id @default(cuid())
+  userId       String?
+  title        String
+  type         String   @default("QUIZ") // QUIZ | MOCK_TEST
+  subjectName  String?
+  scopeName    String?
+  difficulty   String   @default("MEDIUM")
+  timeLimitMin Int?
+  questions    String
+  createdAt    DateTime @default(now())
+
+  attempts QuizAttempt[]
+}
+
+model QuizAttempt {
+  id             String    @id @default(cuid())
+  quizId         String
+  quiz           Quiz      @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status         String    @default("IN_PROGRESS") // IN_PROGRESS | COMPLETED
+  answers        String?
+  score          Int?
+  total          Int
+  percentage     Float?
+  correctCount   Int?
+  incorrectCount Int?
+  timeTakenSec   Int?
+  startedAt      DateTime  @default(now())
+  submittedAt    DateTime?
+
+  @@index([userId])
+  @@index([quizId])
+}
+
+model Pyq {
+  id          String   @id @default(cuid())
+  subjectId   String?
+  subject     Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  subjectName String
+  year        Int
+  exam        String?
+  topic       String?
+  difficulty  String   @default("MEDIUM")
+  question    String
+  solution    String?
+  createdAt   DateTime @default(now())
+
+  attempts  PyqAttempt[]
+  bookmarks PyqBookmark[]
+
+  @@index([subjectName, year])
+}
+
+model PyqAttempt {
+  id        String   @id @default(cuid())
+  pyqId     String
+  pyq       Pyq      @relation(fields: [pyqId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answer    String
+  correct   Boolean?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, pyqId])
+}
+
+model PyqBookmark {
+  id        String   @id @default(cuid())
+  pyqId     String
+  pyq       Pyq      @relation(fields: [pyqId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, pyqId])
+}
+
+model StudyPlan {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId      String?
+  dailyMinutes  Int
+  targetDate    DateTime
+  preferredDays String
+  status        String   @default("ACTIVE") // ACTIVE | COMPLETED | ABANDONED
+  source        String   @default("AI")
+  createdAt     DateTime @default(now())
+
+  tasks StudyPlanTask[]
+}
+
+model StudyPlanTask {
+  id     String    @id @default(cuid())
+  planId String
+  plan   StudyPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  title  String
+  detail String?
+  date   DateTime
+  done   Boolean   @default(false)
+  order  Int       @default(0)
+
+  @@index([planId])
+}
+
+model InterviewSession {
+  id           String  @id @default(cuid())
+  userId       String
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role         String
+  domain       String
+  difficulty   String  @default("MEDIUM")
+  status       String  @default("IN_PROGRESS") // IN_PROGRESS | COMPLETED
+  currentRound Int     @default(0)
+  totalRounds  Int     @default(5)
+  finalScore   Float?
+  summary      String?
+  createdAt    DateTime @default(now())
+
+  exchanges InterviewExchange[]
+}
+
+model InterviewExchange {
+  id        String           @id @default(cuid())
+  sessionId String
+  session   InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  round     Int
+  question  String
+  answer    String?
+  feedback  String?
+  createdAt DateTime         @default(now())
+
+  @@index([sessionId])
+}
+
+/// Server-side configuration set by admins (e.g. AI provider + keys).
+/// Values containing secrets are AES-256-GCM encrypted at rest; the full
+/// value is never returned by any API after saving.
+model AdminSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
