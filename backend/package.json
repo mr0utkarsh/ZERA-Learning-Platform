@@ -9,7 +9,7 @@
     "start": "node src/server.js",
     "db:generate": "node scripts/sync-prisma-db.js && prisma generate",
     "db:migrate": "node scripts/sync-prisma-db.js && prisma migrate dev --name init",
-    "db:deploy": "node scripts/sync-prisma-db.js && prisma generate && prisma migrate deploy",
+    "db:deploy": "npm ci --include=dev --ignore-scripts && node scripts/sync-prisma-db.js && prisma generate && prisma migrate deploy",
     "db:push": "node scripts/sync-prisma-db.js && prisma db push",
     "db:studio": "prisma studio",
     "db:seed": "node prisma/seed.js",
