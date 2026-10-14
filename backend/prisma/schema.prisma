@@ -58,6 +58,50 @@ enum ActivityType {
   STUDY_TASK_COMPLETED
   NOTE_CREATED
   SYLLABUS_UPLOADED
+  DOUBT_ASKED
+  INTERVIEW_COMPLETED
+  RESOURCE_BOOKMARKED
+}
+
+/// Per-topic learning state for a student's confirmed syllabus (Feature 9).
+/// NEEDS_REVISION is distinct from COMPLETED so a topic can be mastered and
+/// later flagged for revision without inflating completion.
+enum TopicStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  NEEDS_REVISION
+}
+
+/// Lifecycle of an OCR job on a handwritten note or scanned document.
+/// SKIPPED means no OCR was attempted (e.g. a typed note), which is honest and
+/// distinct from DONE or FAILED.
+enum OcrStatus {
+  PENDING
+  PROCESSING
+  DONE
+  FAILED
+  SKIPPED
+}
+
+/// Author of a doubt-solver message.
+enum DoubtSender {
+  USER
+  ASSISTANT
+}
+
+/// What an OTP is for. Purpose binding stops a code issued for one action from
+/// being replayed against another (e.g. a reset OTP used as a login OTP).
+enum VerificationPurpose {
+  EMAIL_VERIFY
+  PASSWORD_RESET
+  LOGIN_OTP
+}
+
+/// Delivery channel for a verification code.
+enum VerificationChannel {
+  EMAIL
+  SMS
 }
 
 model User {
@@ -85,6 +129,13 @@ model User {
   syllabusUploads  SyllabusUpload[]
   lessonCompletions LessonCompletion[]
   activities       ActivityLog[]
+  confirmedSyllabi ConfirmedSyllabus[]
+  topicProgress    TopicProgress[]
+  doubtConversations DoubtConversation[]
+  interviewSessions  InterviewSession[]
+  resourceBookmarks  ResourceBookmark[]
+  storedObjects      StoredObject[]
+  auditEvents        AuditLog[]        @relation("AuditActor")
   sentInvites      AdminInvite[]     @relation("InviteSender")
   decidedInvites   AdminInvite[]     @relation("InviteDecider")
   createdAt        DateTime          @default(now())
@@ -95,8 +146,8 @@ model User {
 }
 
 model Profile {
-  id                   String   @id @default(cuid())
-  userId               String   @unique
+  id                   String    @id @default(cuid())
+  userId               String    @unique
   phone                String?
   bio                  String?
   avatarUrl            String?
@@ -106,10 +157,30 @@ model Profile {
   learningGoal         String?
   studyLevel           String?
   weeklyHours          Int?
-  onboardingCompleted  Boolean  @default(false)
-  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  onboardingCompleted  Boolean   @default(false)
+
+  // ── Academic onboarding (Step 2). All optional so a student can skip and
+  // complete later; conditional questions are enforced in the API layer. ──
+  displayName          String?
+  country              String?
+  language             String?
+  educationLevel       String?   // school | diploma | undergraduate | postgraduate | competitive
+  courseProgram        String?   // e.g. "B.Tech CSE", "BA Economics"
+  semester             String?   // e.g. "Semester 5" or "Year 2"
+  branch               String?   // specialization / subject stream
+  subjects             Json?     // string[] of subjects / papers
+  examType             String?   // e.g. "End Semester", "UPSC Prelims"
+  examDate             DateTime? // expected examination date, if known
+  dailyMinutes         Int?      // daily study availability
+  studyDays            Json?     // string[] e.g. ["Mon","Wed","Fri"]
+  studyTimePref        String?   // morning | afternoon | evening | night
+  difficultAreas       Json?     // string[] topics the student finds hard
+  explanationStyle     String?   // simple | detailed | example-first | exam-focused
+  preferredLanguage    String?   // language for AI explanations
+
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 }
 
 model AdminInvite {
@@ -140,6 +211,12 @@ model SyllabusUpload {
   analysis       Json?
   analysisStatus AnalysisStatus @default(EXTRACTED)
   aiError        String?
+  // Private Supabase Storage object backing this upload, when the file was
+  // persisted to a bucket (rather than only its extracted text being kept).
+  storagePath    String?
+  // Set once the student confirms the detected structure on the review screen.
+  confirmed      Boolean        @default(false)
+  confirmedAt    DateTime?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -466,6 +543,13 @@ model StudyTask {
   detail      String?
   timeLabel   String?
   sequence    Int       @default(0)
+  // Task kind so the plan can include revision and practice sessions, not just
+  // "study" blocks. topicId links a task to a real confirmed syllabus topic.
+  kind        String    @default("STUDY") // STUDY | REVISION | PRACTICE | QUIZ
+  topicId     String?
+  dueDate     DateTime?
+  // status is authoritative; isCompleted is kept in sync for existing clients.
+  status      String    @default("PENDING") // PENDING | COMPLETED | SKIPPED
   isCompleted Boolean   @default(false)
   completedAt DateTime?
   studyPlan   StudyPlan @relation(fields: [studyPlanId], references: [id], onDelete: Cascade)
@@ -475,6 +559,8 @@ model StudyTask {
 
   @@index([studyPlanId, sequence])
   @@index([userId, isCompleted])
+  @@index([userId, status])
+  @@index([userId, dueDate])
 }
 
 model Bookmark {
@@ -534,11 +620,26 @@ model UserSettings {
 }
 
 model HandwrittenNote {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
   title     String
   drawing   Json
-  preview   String?  @db.Text
+  preview   String?   @db.Text
+
+  // ── OCR pipeline (Feature 3) ──
+  // The uploaded handwriting image is stored privately; storagePath points at
+  // the Supabase Storage object. A signed URL is minted on demand and never
+  // stored, so the image is never publicly reachable.
+  storagePath   String?
+  mimeType      String?
+  sizeBytes     Int?
+  ocrStatus     OcrStatus @default(SKIPPED)
+  ocrProvider   String?   // which OCR provider produced the text
+  ocrConfidence Float?    // 0..1 mean confidence, or null when unknown
+  extractedText String?   @db.Text // raw OCR output, preserved verbatim
+  correctedText String?   @db.Text // student-edited OCR result
+  ocrError      String?   // honest failure reason when ocrStatus = FAILED
+
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -584,3 +685,243 @@ model PreviousQuestion {
   @@index([subject, year])
   @@index([courseId])
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Confirmed syllabus (Steps 3-4 + Feature 1)
+//
+// A student's reviewed, student-owned syllabus structure. This is separate from
+// the shared Course catalog: nothing here is global, and every node is owned by
+// one user through the ConfirmedSyllabus -> userId chain. The personalized plan
+// and progress tracker are generated only from confirmed topics.
+// ─────────────────────────────────────────────────────────────────────────────
+model ConfirmedSyllabus {
+  id          String    @id @default(cuid())
+  userId      String
+  uploadId    String?   // source SyllabusUpload, when it came from an upload
+  courseName  String
+  semester    String?
+  institution String?
+  examType    String?
+  examDate    DateTime?
+  status      String    @default("CONFIRMED") // DRAFT | CONFIRMED
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user     User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjects ConfirmedSubject[]
+
+  @@index([userId, updatedAt])
+}
+
+model ConfirmedSubject {
+  id         String   @id @default(cuid())
+  syllabusId String
+  title      String
+  sequence   Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  syllabus ConfirmedSyllabus @relation(fields: [syllabusId], references: [id], onDelete: Cascade)
+  units    ConfirmedUnit[]
+
+  @@index([syllabusId, sequence])
+}
+
+model ConfirmedUnit {
+  id        String   @id @default(cuid())
+  subjectId String
+  title     String
+  sequence  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subject ConfirmedSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  topics  ConfirmedTopic[]
+
+  @@index([subjectId, sequence])
+}
+
+model ConfirmedTopic {
+  id            String   @id @default(cuid())
+  unitId        String
+  title         String
+  description   String?
+  difficulty    String?  // easy | medium | hard (student/AI assessed)
+  sequence      Int      @default(0)
+  // Flags captured during confirmation so uncertain extraction is never
+  // silently treated as fact.
+  uncertain     Boolean  @default(false)
+  needsRevision Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  unit     ConfirmedUnit @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  progress TopicProgress?
+
+  @@index([unitId, sequence])
+}
+
+/// One progress row per confirmed topic per student (Feature 9). The invariant
+/// is enforced by the unique constraint on topicId, so progress can never be
+/// double-counted. See progressService.js for the documented completion formula.
+model TopicProgress {
+  id          String      @id @default(cuid())
+  userId      String
+  topicId     String      @unique
+  status      TopicStatus @default(NOT_STARTED)
+  completedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic ConfirmedTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+}
+
+
+// ─── Doubt solver (Feature 5) ────────────────────────────────────────────────
+model DoubtConversation {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String?
+  topicId   String?  // links the conversation to a confirmed topic when known
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages DoubtMessage[]
+
+  @@index([userId, updatedAt])
+}
+
+model DoubtMessage {
+  id             String      @id @default(cuid())
+  conversationId String
+  sender         DoubtSender
+  content        String      @db.Text
+  provider       String?     // which AI provider produced an ASSISTANT message
+  createdAt      DateTime    @default(now())
+
+  conversation DoubtConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+}
+
+// ─── Mock interview (Feature 10) ─────────────────────────────────────────────
+model InterviewSession {
+  id            String   @id @default(cuid())
+  userId        String
+  role          String
+  skills        Json     // string[]
+  interviewType String   // technical | hr | behavioral | mixed
+  status        String   @default("IN_PROGRESS") // IN_PROGRESS | COMPLETED
+  questions     Json?    // generated questions
+  feedback      Json?    // rubric evaluation, missing concepts, suggestions
+  score         Int?     // rubric score out of 100; never a hiring prediction
+  provider      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, updatedAt])
+}
+
+// ─── Skills & project resources (Feature 11) ─────────────────────────────────
+model LearningResource {
+  id                String   @id @default(cuid())
+  title             String
+  url               String
+  skill             String
+  technology        String
+  level             String   // beginner | intermediate | advanced
+  projectType       String?
+  source            String?  // e.g. "Official docs"
+  description       String?  @db.Text
+  verified          Boolean  @default(false) // link/source reviewed by an admin
+  createdByAdminId  String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  bookmarks ResourceBookmark[]
+
+  @@index([skill])
+  @@index([technology])
+  @@index([level])
+  @@index([verified])
+}
+
+model ResourceBookmark {
+  id         String   @id @default(cuid())
+  userId     String
+  resourceId String
+  completed  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resource LearningResource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, resourceId])
+  @@index([userId, createdAt])
+}
+
+// ─── Private file storage bookkeeping ────────────────────────────────────────
+/// Records an object stored in a private Supabase Storage bucket. The bucket is
+/// never public; access is via short-lived signed URLs minted on demand.
+model StoredObject {
+  id        String   @id @default(cuid())
+  userId    String
+  bucket    String
+  path      String
+  mimeType  String?
+  sizeBytes Int?
+  kind      String   // syllabus | handwriting | resource
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, kind])
+  @@index([userId, createdAt])
+}
+
+// ─── Purpose-bound verification codes (Brevo email/SMS) ──────────────────────
+/// Generalizes the password-reset OTP to any purpose and channel. Codes are
+/// stored only as a hash, carry an attempt counter, an expiry, a resend
+/// cooldown, and are consumed (consumedAt set) after a single successful use.
+model VerificationOtp {
+  id          String              @id @default(cuid())
+  email       String?
+  phone       String?
+  channel     VerificationChannel
+  purpose     VerificationPurpose
+  codeHash    String
+  attempts    Int                 @default(0)
+  maxAttempts Int                 @default(5)
+  resendAfter DateTime
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  createdAt   DateTime            @default(now())
+
+  @@index([email, purpose])
+  @@index([phone, purpose])
+  @@index([expiresAt])
+}
+
+// ─── Administrative audit trail ──────────────────────────────────────────────
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String   // e.g. "USER_SUSPENDED", "RESOURCE_VERIFIED"
+  targetType String?
+  targetId   String?
+  meta       Json?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+}
+
