@@ -144,6 +144,31 @@ export const taskRescheduleSchema = z.object({
   dueDate: z.string().datetime({ offset: true }).nullable().optional()
 });
 
+/** Body for POST /api/doubts — ask a doubt. */
+export const doubtAskSchema = z.object({
+  conversationId: z.string().trim().min(1).optional(),
+  topicId: z.string().trim().min(1).optional(),
+  question: z.string().trim().min(1, 'A question is required').max(4000),
+  style: z.string().trim().max(40).optional(),
+  language: z.string().trim().max(40).optional()
+});
+
+/** Body for POST /api/interviews — start a mock interview. */
+export const interviewStartSchema = z.object({
+  role: z.string().trim().min(1, 'A target role is required').max(120),
+  skills: z.array(z.string().trim().max(60)).max(20).optional(),
+  interviewType: z.enum(['technical', 'hr', 'behavioral', 'mixed']).optional(),
+  count: z.coerce.number().int().min(1).max(10).optional()
+});
+
+/** Body for POST /api/interviews/:id/evaluate — submit answers. */
+export const interviewEvaluateSchema = z.object({
+  answers: z.array(z.object({
+    questionId: z.string().trim().min(1),
+    answer: z.string().trim().max(8000)
+  })).max(20)
+});
+
 export const validateProfileSetup = (body) => {
   const result = onboardingProfileSchema.safeParse(body ?? {});
   if (!result.success) {
