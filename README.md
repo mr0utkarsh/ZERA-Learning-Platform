@@ -1,107 +1,71 @@
-# ZERA – AI-Powered Personalized Learning Platform
+# ZERA – Your New Era of Learning
 
-ZERA is a free, student-first learning platform designed to help learners organize their syllabus, track progress, generate notes, solve doubts, take quizzes, prepare for interviews, and build a stronger study routine.
+ZERA is a student-first AI-powered personalized learning platform. Students
+register, complete academic onboarding, upload a syllabus, confirm its
+structure, and receive a personalized study workflow backed by a real backend,
+persistent database, and configurable AI providers.
 
-This repository is a GitHub Pages-friendly frontend with localStorage-based demo functionality. It is designed to scale toward a future backend architecture with authentication, database access, and AI provider integration.
+## Architecture
 
-## Core idea
-
-ZERA gives students a structured path through their learning journey without forcing them into paywalls or generic content. It helps learners:
-
-- understand their syllabus
-- generate notes and revision material
-- practice with quizzes and mock tests
-- plan study sessions
-- track course progress
-- build a study streak
-- save bookmarks and personal notes
-- prepare for interview-style questions
-
-## Features
-
-- Premium responsive landing experience
-- About and feature pages for the product narrative
-- AI tools hub with Demo Mode labels
-- Dashboard with course progress and next-step guidance
-- Syllabus tracking with states for not started, active, and complete
-- Quiz and mock test demos with localStorage persistence
-- Study plan generation and task tracking
-- AI mock interview demo
-- Bookmarks, notifications, and personal notes
-- Authentication UI for login, signup, forgot password, and reset flows
-- Admin login and admin-ready structure
-- Progress, streak, and achievements logic using localStorage
-
-## Frontend architecture
-
-- Static HTML pages at the repository root
-- Shared CSS in `css/`
-- Shared JavaScript in `js/`
-- Assets under `assets/`
-- Documentation in `docs/architecture.md`
+- `frontend/` — React 18 + TypeScript + Vite + Tailwind CSS (Vite build, Vercel-ready).
+- `backend/` — Node.js ESM + Express 4 + Prisma 5 + PostgreSQL (Railway-ready).
+- Database — Supabase PostgreSQL, migrations tracked in `backend/prisma/migrations`.
+- File storage — private Supabase Storage buckets with short-lived signed URLs.
+- AI — server-side provider abstraction with failover `gemini -> groq -> openrouter -> deepseek`. Keys stay server-side.
+- Email — SMTP (Brevo relay configured). SMS — Brevo transactional API with honest capability reporting.
 
 ## Local development
 
-Because this is a GitHub Pages-ready static frontend, no install step is required.
-
-Open the project folder and launch a local server:
+Backend (port 5000):
 
 ```bash
-cd "ZERA-Learning-Platform"
-python -m http.server 8000
+cd backend
+cp .env.example .env   # fill in DATABASE_URL + secrets
+npm install
+npx prisma generate
+npx prisma migrate deploy   # or `prisma migrate dev` for local iteration
+npm run dev
 ```
 
-Then open:
+Tests (disposable real PostgreSQL via PGlite, never touches production):
 
-```text
-http://localhost:8000/
+```bash
+cd backend
+npm test
 ```
 
-## GitHub Pages deployment
+Frontend (Vite dev on :5500, proxies `/api` to the backend):
 
-The project is designed for GitHub Pages with root-relative and relative asset usage, such as:
-
-```html
-<link rel="stylesheet" href="./css/style.css">
-<script src="./js/app.js" defer></script>
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-No localhost, absolute filesystem, or backend-only dependency is required for the frontend to render.
+Production build:
 
-## Demo-mode limitations
+```bash
+cd frontend
+VITE_API_URL=https://<your-backend> npm run build
+```
 
-This project intentionally does not claim real AI or backend integration.
+## Deployment
 
-- AI tools operate in Demo Mode
-- localStorage stores frontend demo state only
-- passwords, OTPs, API keys, and secrets are never stored in the repository
+- Frontend → Vercel (project root `frontend/`, `npm run build` → `dist/`).
+- Backend → Railway (start command `npx prisma migrate deploy && node src/server.js`, health check `/api/health`).
+- Database → Supabase PostgreSQL. Apply migrations with `prisma migrate deploy` at deploy time.
+- Never commit secrets. Service-role keys stay on the server.
 
-## Future backend architecture
+## Honesty policy
 
-The project is structured to evolve toward:
-
-Frontend -> Backend API -> PostgreSQL + Prisma -> AI provider
-
-Suggested future services include:
-
-- Google Gemini
-- Resend or Brevo for email
-- PostgreSQL for transactional data
-- Prisma for schema management
+Every feature reports its real state. AI, OCR, storage, and SMS endpoints
+return explicit `503/502` errors naming the missing configuration instead of
+fabricating results. Performance analytics derive only from real completed
+activities and show an empty state for new students.
 
 ## Security notes
 
-- Do not store real passwords, OTP values, API keys, or secrets in localStorage
-- Use environment variables in a future backend
-- Use secure session/auth handling in the production backend
-- Validate and sanitize all user input before persistence
+- Custom JWT auth is the single authoritative system (Supabase Auth is not used).
+- Ownership (`userId`) is enforced server-side on every private resource.
+- No fabricated scores, streaks, historical data, or provider delivery claims.
 
-## Creator
-
-Created by Utkarsh Giri
-
-Contact: 9235542673
-
-## License
-
-This project is licensed under the MIT License. See [LICENSE.txt](LICENSE.txt).
