@@ -9,6 +9,8 @@ import onboardingRoutes from './routes/onboardingRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import confirmedSyllabusRoutes from './routes/confirmedSyllabusRoutes.js';
+import progressRoutes from './routes/progressRoutes.js';
 import { rateLimit } from './middleware/rateLimit.js';
 import { ApiError } from './utils/ApiError.js';
 
@@ -65,6 +67,8 @@ app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/syllabus', confirmedSyllabusRoutes);
+app.use('/api/progress', progressRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

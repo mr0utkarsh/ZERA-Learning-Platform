@@ -40,6 +40,40 @@ export const syllabusUploadSchema = z.object({
   extractedText: z.string().trim().min(1, 'The selected syllabus file is empty').max(100000)
 });
 
+const topicSchema = z.object({
+  title: z.string().trim().min(1, 'A topic title is required').max(200),
+  description: z.string().trim().max(2000).optional(),
+  difficulty: z.enum(['easy', 'medium', 'hard']).optional(),
+  uncertain: z.boolean().optional(),
+  needsRevision: z.boolean().optional()
+});
+
+const unitSchema = z.object({
+  title: z.string().trim().min(1, 'A unit title is required').max(160),
+  topics: z.array(topicSchema).min(1, 'A unit needs at least one topic')
+});
+
+const subjectSchema = z.object({
+  title: z.string().trim().min(1, 'A subject title is required').max(160),
+  units: z.array(unitSchema).min(1, 'A subject needs at least one unit')
+});
+
+/** Body for POST /api/syllabus/confirm — the student-reviewed structure. */
+export const confirmSyllabusSchema = z.object({
+  uploadId: z.string().trim().min(1).optional(),
+  courseName: z.string().trim().min(1, 'A course name is required').max(160),
+  semester: z.string().trim().max(40).optional(),
+  institution: z.string().trim().max(160).optional(),
+  examType: z.string().trim().max(80).optional(),
+  examDate: z.string().datetime({ offset: true }).optional(),
+  subjects: z.array(subjectSchema).min(1, 'Add at least one subject')
+});
+
+/** Body for PATCH /api/progress/topics/:id — a manual status update. */
+export const topicStatusSchema = z.object({
+  status: z.enum(['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'NEEDS_REVISION'])
+});
+
 export const validateProfileSetup = (body) => {
   const result = onboardingProfileSchema.safeParse(body ?? {});
   if (!result.success) {
