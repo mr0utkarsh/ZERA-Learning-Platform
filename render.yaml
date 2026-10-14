@@ -1,0 +1,95 @@
+services:
+  - type: web
+    name: zera-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm ci && npx prisma generate
+    startCommand: npx prisma migrate deploy && node src/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "5000"
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: "7d"
+      - key: SESSION_SECRET
+        sync: false
+      - key: PASSWORD_RESET_TOKEN_SECRET
+        sync: false
+      - key: PASSWORD_RESET_TOKEN_EXPIRES_IN
+        value: "1h"
+      - key: CLIENT_URL
+        value: "https://frontend-rho-black-yokhl3gpzr.vercel.app"
+      - key: ALLOWED_ORIGINS
+        value: "https://frontend-rho-black-yokhl3gpzr.vercel.app"
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: DEEPSEEK_API_KEY_2
+        sync: false
+      - key: DEEPSEEK_API_KEY_2_ALT
+        sync: false
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: XPL_CHATGPT6_API_KEY
+        sync: false
+      - key: XPL_CHATGPT6_BASE_URL
+        sync: false
+      - key: XPL_API_KEY
+        sync: false
+      - key: XPL_BASE_URL
+        sync: false
+      - key: EMAIL_PROVIDER
+        value: "smtp"
+      - key: EMAIL_HOST
+        value: "smtp-relay.brevo.com"
+      - key: EMAIL_PORT
+        value: "587"
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_SYLLABI_BUCKET
+        value: "syllabi"
+      - key: SUPABASE_HANDWRITING_BUCKET
+        value: "handwriting"
+      - key: SIGNED_URL_EXPIRES_IN
+        value: "900"
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_SMS_SENDER
+        value: "ZERA"
+      - key: BREVO_SMS_RECIPIENT
+        sync: false
+      - key: OCR_PROVIDER
+        sync: false
+      - key: OCR_API_URL
+        sync: false
+      - key: OCR_API_KEY
+        sync: false
+      - key: OCR_TIMEOUT_MS
+        value: "30000"
+      - key: SEED_ADMIN_EMAIL
+        sync: false
+      - key: SEED_ADMIN_PASSWORD
+        sync: false
+      - key: SEED_ADMIN_NAME
+        value: "Platform Owner"
