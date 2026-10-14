@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="./css/style.css" />
   <link rel="stylesheet" href="./css/components.css" />
   <link rel="stylesheet" href="./css/responsive.css" />
+  <script src="./js/api.js" defer></script>
+  <script src="./js/personal-notes.js" defer></script>
   <script src="./js/storage.js" defer></script>
   <script src="./js/app.js" defer></script>
 </head>
@@ -29,10 +31,37 @@
     <div class="container">
       <div class="panel">
         <h2>Personal notes</h2>
-        <div class="empty-state" style="margin-top: 16px;">
-          <strong>No personal notes yet</strong>
-          <span>Use the notes workspace to capture your own questions, formulas, and reflections.</span>
-        </div>
+        <p class="muted" style="margin-top:6px;">Capture your own questions, formulas, and reflections. Notes are saved to your account.</p>
+
+        <form id="personalNotesForm" style="margin-top:18px;">
+          <input type="hidden" name="noteId" id="noteId" value="" />
+          <div class="field">
+            <label for="noteTitle">Title</label>
+            <input id="noteTitle" name="title" type="text" placeholder="e.g. Quadratic formulas" required maxlength="160" />
+          </div>
+          <div class="field" style="margin-top:14px;">
+            <label for="noteCategory">Category</label>
+            <select id="noteCategory" name="category">
+              <option value="Personal">Personal</option>
+              <option value="Formula">Formula</option>
+              <option value="Question">Question</option>
+              <option value="Revision">Revision</option>
+            </select>
+          </div>
+          <div class="field" style="margin-top:14px;">
+            <label for="noteContent">Content</label>
+            <textarea id="noteContent" name="content" placeholder="Write your note..." required maxlength="20000" rows="8"></textarea>
+          </div>
+          <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-primary" type="submit">Save note</button>
+            <button class="btn btn-ghost" type="button" id="cancelEdit" hidden>Cancel edit</button>
+          </div>
+        </form>
+
+        <div class="notice" id="noteMessage" aria-live="polite" style="margin-top:14px;"></div>
+
+        <h3 style="margin-top:26px;">Saved notes</h3>
+        <div id="personalNotesList" style="margin-top:12px;"></div>
       </div>
     </div>
   </main>

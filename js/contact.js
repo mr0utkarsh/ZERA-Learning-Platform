@@ -1,1 +1,39 @@
-(() => { document.addEventListener('DOMContentLoaded', () => { const form=document.querySelector('#contactForm'), message=document.querySelector('#contactStatus'); if(!form)return; form.addEventListener('submit',async e=>{e.preventDefault(); if(!localStorage.getItem('zera_token')){message.textContent='Please log in before sending a support request.';message.className='notice error';return;} const button=form.querySelector('button');button.disabled=true;try{const r=await fetch('http://localhost:5000/api/student/support-requests',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${localStorage.getItem('zera_token')}`},body:JSON.stringify({category:form.category.value,subject:form.subject.value,message:form.message.value})}),d=await r.json().catch(()=>({}));if(!r.ok||!d.success)throw new Error(d.message||'Unable to send your message.');form.reset();message.textContent='Your support request was saved. Reference: '+d.data.id;message.className='notice success';}catch(err){message.textContent=err.message;message.className='notice error';}finally{button.disabled=false;}});});})();
+(() => {
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('#contactForm');
+    const message = document.querySelector('#contactStatus');
+    if (!form) return;
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const api = window.ZeraApi;
+
+      if (!api.isLoggedIn()) {
+        message.textContent = 'Please log in before sending a support request.';
+        message.className = 'notice error';
+        return;
+      }
+
+      const button = form.querySelector('button');
+      button.disabled = true;
+
+      try {
+        const data = await api.support.create({
+          category: form.category.value,
+          subject: form.subject.value,
+          message: form.message.value
+        });
+
+        form.reset();
+        message.textContent = 'Your support request was saved. Reference: ' + data.id;
+        message.className = 'notice success';
+      } catch (error) {
+        message.textContent = error.message;
+        message.className = 'notice error';
+      } finally {
+        button.disabled = false;
+      }
+    });
+  });
+})();

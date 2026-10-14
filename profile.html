@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="./css/style.css" />
   <link rel="stylesheet" href="./css/components.css" />
   <link rel="stylesheet" href="./css/responsive.css" />
+  <script src="./js/api.js" defer></script>
+  <script src="./js/profile.js" defer></script>
   <script src="./js/storage.js" defer></script>
   <script src="./js/app.js" defer></script>
 </head>
@@ -35,24 +37,54 @@
     <div class="container">
       <div class="panel">
         <h2>Profile</h2>
+
         <div class="form-grid" style="margin-top:18px;">
           <div class="field">
             <label>Full name</label>
-            <input type="text" value="Aarav Sharma" />
+            <p id="profileName" style="font-weight:600;"></p>
           </div>
           <div class="field">
             <label>Email</label>
-            <input type="email" value="aarav@example.com" />
+            <p id="profileEmail" style="font-weight:600;"></p>
           </div>
           <div class="field">
-            <label>Course</label>
-            <input type="text" value="ZERA Foundations" />
+            <label>Role</label>
+            <p id="profileRole" style="font-weight:600;"></p>
           </div>
           <div class="field">
-            <label>Learning goal</label>
-            <input type="text" value="Build consistent study habits and exam confidence" />
+            <label>Member since</label>
+            <p id="profileMemberSince" style="font-weight:600;"></p>
           </div>
         </div>
+
+        <h3 style="margin-top:26px;">Edit details</h3>
+        <form id="profileForm" class="form-grid" style="margin-top:14px;">
+          <div class="field">
+            <label for="profilePhone">Phone</label>
+            <input id="profilePhone" name="phone" type="tel" placeholder="Optional" />
+          </div>
+          <div class="field">
+            <label for="profileInstitution">Institution</label>
+            <input id="profileInstitution" name="institution" type="text" placeholder="Optional" />
+          </div>
+          <div class="field">
+            <label for="profileCity">City</label>
+            <input id="profileCity" name="city" type="text" placeholder="Optional" />
+          </div>
+          <div class="field">
+            <label for="profileGraduationYear">Graduation year</label>
+            <input id="profileGraduationYear" name="graduationYear" type="number" min="1990" max="2100" placeholder="Optional" />
+          </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="profileBio">Bio</label>
+            <textarea id="profileBio" name="bio" placeholder="Tell us a little about your study goals" maxlength="500"></textarea>
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <button class="btn btn-primary" type="submit">Save profile</button>
+          </div>
+        </form>
+
+        <div class="notice" id="profileMessage" aria-live="polite" style="margin-top:14px;"></div>
       </div>
     </div>
   </main>

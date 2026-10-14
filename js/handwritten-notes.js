@@ -1,12 +1,7 @@
 (() => {
-  const api = async (path, options = {}) => {
-    const response = await fetch(`http://localhost:5000/api/student${path}`, { method: options.method || 'GET', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('zera_token')}` }, ...(options.body ? { body: JSON.stringify(options.body) } : {}) });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok || !data.success) throw new Error(data.message || 'Request failed.');
-    return data.data;
-  };
+  const api = (path, options = {}) => window.ZeraApi.request(path, { ...options, base: '/api/student' });
   document.addEventListener('DOMContentLoaded', () => {
-    if (!localStorage.getItem('zera_token')) return location.replace('./login.html');
+    if (!window.ZeraApi.isLoggedIn()) return location.replace('./login.html');
     const canvas = document.querySelector('#noteCanvas'); const context = canvas.getContext('2d'); const strokes = []; const root = document.querySelector('#handwrittenList'); const message = document.querySelector('#handwrittenMessage'); let active;
     const show = (text, type) => { message.textContent = text; message.className = `notice ${type}`; };
     const getPoint = event => { const bounds = canvas.getBoundingClientRect(); return { x: (event.clientX - bounds.left) * canvas.width / bounds.width, y: (event.clientY - bounds.top) * canvas.height / bounds.height }; };

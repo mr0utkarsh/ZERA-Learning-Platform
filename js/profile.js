@@ -1,1 +1,68 @@
-(() => { const api = async (path, options = {}) => { const r = await fetch(`http://localhost:5000/api/student${path}`, { method: options.method || 'GET', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('zera_token')}` }, ...(options.body ? { body: JSON.stringify(options.body) } : {}) }); const d = await r.json().catch(() => ({})); if (!r.ok || !d.success) throw new Error(d.message || 'Request failed.'); return d.data; }; const message = (text, type) => { const el = document.querySelector('#profileMessage'); el.textContent = text; el.className = `notice ${type}`; }; document.addEventListener('DOMContentLoaded', async () => { if (!localStorage.getItem('zera_token')) return location.replace('./login.html'); const form = document.querySelector('#profileForm'); try { const { user, profile = {} } = await api('/profile'); Object.entries({ ...profile, name: user.name, email: user.email }).forEach(([key, value]) => { const el = document.getElementById(key); if (el && value != null) el.value = value; }); } catch (e) { message(e.message, 'error'); } form.addEventListener('submit', async e => { e.preventDefault(); const values = Object.fromEntries(new FormData(form)); values.weeklyHours = values.weeklyHours ? Number(values.weeklyHours) : null; try { const saved = await api('/profile', { method: 'PUT', body: values }); localStorage.setItem('zera_user', JSON.stringify({ ...(JSON.parse(localStorage.getItem('zera_user') || '{}')), ...saved.user, isLoggedIn: true })); message('Profile saved. It will be loaded again on your next visit.', 'success'); } catch (err) { message(err.message, 'error'); } }); }); })();
+(() => {
+  const api = window.ZeraApi.student;
+
+  const message = (text, type) => {
+    const el = document.querySelector('#profileMessage');
+    if (!el) return;
+    el.textContent = text;
+    el.className = `notice ${type}`;
+  };
+
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el && value != null) el.textContent = value == null ? '' : String(value);
+  };
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    if (!window.ZeraApi.isLoggedIn()) {
+      location.replace('./login.html');
+      return;
+    }
+
+    const form = document.querySelector('#profileForm');
+
+    try {
+      const profile = await api.profile();
+      const user = (profile && profile.user) || {};
+
+      setText('profileName', user.name);
+      setText('profileEmail', user.email);
+      setText('profileRole', user.role);
+      setText('profileMemberSince', user.createdAt ? new Date(user.createdAt).toLocaleDateString() : null);
+
+      if (form && profile) {
+        ['phone', 'bio', 'city', 'institution', 'graduationYear'].forEach((key) => {
+          const field = form.elements[key];
+          if (field && profile[key] != null) field.value = profile[key];
+        });
+      }
+    } catch (error) {
+      message(error.message, 'error');
+    }
+
+    if (!form) return;
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const values = Object.fromEntries(new FormData(form).entries());
+      const button = form.querySelector('button[type="submit"]');
+      if (button) button.disabled = true;
+
+      try {
+        // PATCH, and only the fields the route actually accepts.
+        await api.updateProfile({
+          phone: values.phone,
+          bio: values.bio,
+          city: values.city,
+          institution: values.institution,
+          graduationYear: values.graduationYear
+        });
+        message('Profile saved. It will be loaded again on your next visit.', 'success');
+      } catch (error) {
+        message(error.message, 'error');
+      } finally {
+        if (button) button.disabled = false;
+      }
+    });
+  });
+})();

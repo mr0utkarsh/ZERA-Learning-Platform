@@ -385,8 +385,13 @@ export const ensureCourseEnrollment = async (userId, courseId) => {
   const allLessons = flattenCourseLessons(courseTree);
   const totalLessons = allLessons.length;
 
-  if (!enrollment.progress || enrollment.progress.length === 0) {
-    const progress = await prisma.progress.create({
+  // `Enrollment.progress` is a 1:1 relation, so Prisma returns a single object
+  // (or null) rather than a list. Reading it as a list made every call after the
+  // first throw "Cannot read properties of undefined (reading 'totalLessons')".
+  let progressRecord = enrollment.progress;
+
+  if (!progressRecord) {
+    progressRecord = await prisma.progress.create({
       data: {
         enrollmentId: enrollment.id,
         userId,
@@ -403,20 +408,11 @@ export const ensureCourseEnrollment = async (userId, courseId) => {
       where: { id: enrollment.id },
       include: { progress: true }
     });
-
-    return { enrollment, progress, totalLessons };
-  }
-
-  const progressRecord = enrollment.progress[0];
-
-  if (progressRecord.totalLessons !== totalLessons) {
-    await prisma.progress.update({
+  } else if (progressRecord.totalLessons !== totalLessons) {
+    // The catalog grew since this student enrolled, so the denominator moves.
+    progressRecord = await prisma.progress.update({
       where: { id: progressRecord.id },
-      data: {
-        totalLessons,
-        completionPercentage: progressRecord.completionPercentage || 0,
-        completedLessons: progressRecord.completedLessons || 0
-      }
+      data: { totalLessons }
     });
   }
 
@@ -424,19 +420,27 @@ export const ensureCourseEnrollment = async (userId, courseId) => {
 };
 
 export const getCourseProgressSnapshot = async (userId, courseId) => {
-  const { enrollment, progress, totalLessons } = await ensureCourseEnrollment(userId, courseId);
+  const { enrollment, progress } = await ensureCourseEnrollment(userId, courseId);
   const courseTree = await buildCourseTree(courseId);
   const lessonSequence = flattenCourseLessons(courseTree);
 
-  const currentIndex = progress.lastLessonId
-    ? lessonSequence.findIndex((lesson) => lesson.id === progress.lastLessonId)
-    : -1;
+  // Completion is derived from the LessonCompletion rows, not from a
+  // high-water mark: completing lesson 9 of 10 must not imply lessons 1-8 are
+  // finished.
+  const completions = await prisma.lessonCompletion.findMany({
+    where: { userId, courseId },
+    select: { lessonId: true, completedAt: true }
+  });
+  const completedIds = new Set(completions.map((row) => row.lessonId));
 
-  const completedLessons = currentIndex >= 0 ? currentIndex + 1 : 0;
-  const nextLesson = lessonSequence[completedLessons] || null;
+  const completedLessons = lessonSequence.filter((lesson) => completedIds.has(lesson.id)).length;
+  const totalLessons = lessonSequence.length;
   const completionPercentage = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
   const normalizedStatus = completionPercentage >= 100 ? 'COMPLETED' : completionPercentage > 0 ? 'IN_PROGRESS' : 'NOT_STARTED';
+
+  // Resume at the first lesson that is not yet complete.
+  const nextLesson = lessonSequence.find((lesson) => !completedIds.has(lesson.id)) || null;
 
   const updatedProgress = await prisma.progress.update({
     where: { id: progress.id },
@@ -445,7 +449,8 @@ export const getCourseProgressSnapshot = async (userId, courseId) => {
       completionPercentage,
       status: normalizedStatus,
       totalLessons,
-      lastLessonId: progress.lastLessonId || null
+      lastLessonId: progress.lastLessonId || nextLesson?.id || null,
+      lastAccessedAt: new Date()
     }
   });
 
@@ -471,7 +476,8 @@ export const getCourseProgressSnapshot = async (userId, courseId) => {
       lastLessonId: updatedProgress.lastLessonId
     },
     nextLesson,
-    lessonSequence
+    lessonSequence,
+    completedLessonIds: [...completedIds]
   };
 };
 
@@ -487,30 +493,44 @@ export const markLessonCompleted = async (userId, courseId, lessonId) => {
   }
 
   const { progress } = await ensureCourseEnrollment(userId, courseId);
-  const lastIndex = progress.lastLessonId
-    ? lessonSequence.findIndex((item) => item.id === progress.lastLessonId)
-    : -1;
 
-  const lessonIndex = lessonSequence.findIndex((item) => item.id === lessonId);
-  const targetIndex = Math.max(lastIndex, lessonIndex);
-  const updatedLastLessonId = lessonSequence[targetIndex]?.id || null;
-  const completedLessons = targetIndex >= 0 ? targetIndex + 1 : 0;
-  const completionPercentage = lessonSequence.length > 0 ? Math.round((completedLessons / lessonSequence.length) * 100) : 0;
+  // One row per lesson actually completed. The unique (userId, lessonId)
+  // constraint makes repeat calls idempotent instead of inflating progress.
+  await prisma.lessonCompletion.upsert({
+    where: { userId_lessonId: { userId, lessonId } },
+    create: { userId, lessonId, courseId },
+    update: {}
+  });
+
+  const completions = await prisma.lessonCompletion.findMany({
+    where: { userId, courseId },
+    select: { lessonId: true }
+  });
+  const completedIds = new Set(completions.map((row) => row.lessonId));
+
+  const completedLessons = lessonSequence.filter((item) => completedIds.has(item.id)).length;
+  const totalLessons = lessonSequence.length;
+  const completionPercentage = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+  const nextLesson = lessonSequence.find((item) => !completedIds.has(item.id)) || null;
 
   const updatedProgress = await prisma.progress.update({
     where: { id: progress.id },
     data: {
-      lastLessonId: updatedLastLessonId,
+      lastLessonId: lessonId,
       completedLessons,
       completionPercentage,
-      totalLessons: lessonSequence.length,
+      totalLessons,
+      lastAccessedAt: new Date(),
       status: completionPercentage >= 100 ? 'COMPLETED' : completionPercentage > 0 ? 'IN_PROGRESS' : 'NOT_STARTED'
     }
   });
 
-  const nextLesson = lessonSequence[Math.min(completedLessons, lessonSequence.length - 1)] || null;
+  await prisma.activityLog.create({
+    data: { userId, courseId, type: 'LESSON_COMPLETED' }
+  });
 
   return {
+    completedLessonIds: [...completedIds],
     progress: {
       id: updatedProgress.id,
       completionPercentage: updatedProgress.completionPercentage,

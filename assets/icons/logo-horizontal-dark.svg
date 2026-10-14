@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 44" role="img" aria-label="ZERA">
+  <defs>
+    <linearGradient id="logoGradientDark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#60A5FA"/>
+      <stop offset="50%" stop-color="#818CF8"/>
+      <stop offset="100%" stop-color="#A78BFA"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Symbol: Compact geometric Z -->
+  <g id="symbol" transform="translate(0, 6)">
+    <!-- Foundation bar -->
+    <rect x="0" y="24" width="28" height="4" rx="2" fill="url(#logoGradientDark)"/>
+    <!-- Transformation diagonal -->
+    <path d="M26,28 L4,4" stroke="url(#logoGradientDark)" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <!-- Mastery bar -->
+    <rect x="4" y="0" width="24" height="4" rx="2" fill="url(#logoGradientDark)"/>
+    <!-- Accent dot -->
+    <circle cx="26" cy="2" r="2.5" fill="#67E8F9" opacity="0.95"/>
+  </g>
+  
+  <!-- Wordmark -->
+  <g id="wordmark" transform="translate(38, 0)">
+    <text x="0" y="32" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-size="32" font-weight="800" letter-spacing="-0.03em" fill="#F4F9FF">ZERA</text>
+    <text x="0" y="32" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-size="32" font-weight="800" letter-spacing="-0.03em" fill="url(#logoGradientDark)" opacity="0.2">Z</text>
+  </g>
+</svg>

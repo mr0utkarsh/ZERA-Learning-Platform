@@ -1,21 +1,8 @@
 (function () {
-  const API_BASE_URL = 'http://localhost:5000/api';
-  function getToken() { return localStorage.getItem('zera_token'); }
+  const api = window.ZeraApi;
 
   async function apiRequest(path, options = {}) {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-      method: options.method || 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
-        ...(options.headers || {})
-      },
-      ...(options.body ? { body: JSON.stringify(options.body) } : {})
-    });
-
-    const data = await response.json().catch(() => ({ success: false, message: 'Request failed.' }));
-    if (!response.ok || !data.success) throw new Error(data.message || 'Request failed.');
-    return data.data;
+    return api.request(path, options);
   }
 
   function qs(name) { return new URLSearchParams(window.location.search).get(name); }
@@ -33,7 +20,7 @@
       return;
     }
 
-    if (!getToken()) { window.location.href = './login.html'; return; }
+    if (!api.isLoggedIn()) { window.location.href = './login.html'; return; }
 
     try {
       // ensure catalog

@@ -3,6 +3,12 @@ import { env } from '../config/env.js';
 import { prisma } from '../config/prisma.js';
 import { sanitizeUser } from '../services/authService.js';
 
+/** Roles allowed through requireAdmin. */
+const ADMIN_ROLES = new Set(['ADMIN', 'SUPER_ADMIN']);
+
+/** Roles allowed through requireStudent. Admins also carry the student surface. */
+const STUDENT_ROLES = new Set(['STUDENT', 'ADMIN', 'SUPER_ADMIN']);
+
 export const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -36,9 +42,19 @@ export const authenticate = async (req, res, next) => {
       });
     }
 
+    // Bumping tokenVersion (password change, password reset, forced sign-out)
+    // instantly invalidates every JWT that was issued before the bump.
+    const tokenVersion = typeof decoded.ver === 'number' ? decoded.ver : 0;
+    if (tokenVersion !== user.tokenVersion) {
+      return res.status(401).json({
+        success: false,
+        message: 'Session is no longer valid. Please sign in again.'
+      });
+    }
+
     req.user = sanitizeUser(user);
-    next();
-  } catch (error) {
+    return next();
+  } catch {
     return res.status(401).json({
       success: false,
       message: 'Invalid or expired authentication token.'
@@ -46,13 +62,16 @@ export const authenticate = async (req, res, next) => {
   }
 };
 
-export const requireAdmin = (req, res, next) => {
-  if (!req.user || req.user.role !== 'ADMIN') {
-    return res.status(403).json({
-      success: false,
-      message: 'Administrator access is required.'
-    });
-  }
+const deny = (res, label) => res.status(403).json({
+  success: false,
+  message: `${label} access is required.`
+});
 
-  next();
-};
+export const requireAdmin = (req, res, next) =>
+  (req.user && ADMIN_ROLES.has(req.user.role) ? next() : deny(res, 'Administrator'));
+
+export const requireSuperAdmin = (req, res, next) =>
+  (req.user?.role === 'SUPER_ADMIN' ? next() : deny(res, 'Super administrator'));
+
+export const requireStudent = (req, res, next) =>
+  (req.user && STUDENT_ROLES.has(req.user.role) ? next() : deny(res, 'Student'));

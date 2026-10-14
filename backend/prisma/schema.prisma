@@ -3,13 +3,15 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
   STUDENT
   ADMIN
+  SUPER_ADMIN
 }
 
 enum UserStatus {
@@ -36,82 +38,139 @@ enum QuestionType {
   SHORT_ANSWER
 }
 
+enum InviteStatus {
+  PENDING
+  APPROVED
+  REVOKED
+  EXPIRED
+}
+
+enum AnalysisStatus {
+  EXTRACTED
+  AI_ANALYZED
+  AI_FAILED
+}
+
+enum ActivityType {
+  LESSON_COMPLETED
+  QUIZ_SUBMITTED
+  MOCK_TEST_SUBMITTED
+  STUDY_TASK_COMPLETED
+  NOTE_CREATED
+  SYLLABUS_UPLOADED
+}
+
 model User {
-  id              String           @id @default(cuid())
-  name            String
-  email           String           @unique
-  passwordHash    String
-  role            Role             @default(STUDENT)
-  status          UserStatus       @default(ACTIVE)
-  profile         Profile?
-  enrollments     Enrollment[]
-  progress        Progress[]
-  notes           Note[]
-  quizAttempts    QuizAttempt[]
-  mockAttempts    MockTestAttempt[]
-  studyPlans      StudyPlan[]
-  bookmarks       Bookmark[]
-  notifications   Notification[]
-  supportRequests SupportRequest[]
-  syllabusUploads SyllabusUpload[]
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  id               String            @id @default(cuid())
+  name             String
+  email            String            @unique
+  passwordHash     String
+  role             Role              @default(STUDENT)
+  status           UserStatus        @default(ACTIVE)
+  tokenVersion     Int               @default(0)
+  lastLoginAt      DateTime?
+  profile          Profile?
+  settings         UserSettings?
+  enrollments      Enrollment[]
+  progress         Progress[]
+  notes            Note[]
+  handwrittenNotes HandwrittenNote[]
+  quizAttempts     QuizAttempt[]
+  mockAttempts     MockTestAttempt[]
+  studyPlans       StudyPlan[]
+  studyTasks       StudyTask[]
+  bookmarks        Bookmark[]
+  notifications    Notification[]
+  supportRequests  SupportRequest[]
+  syllabusUploads  SyllabusUpload[]
+  lessonCompletions LessonCompletion[]
+  activities       ActivityLog[]
+  sentInvites      AdminInvite[]     @relation("InviteSender")
+  decidedInvites   AdminInvite[]     @relation("InviteDecider")
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 
   @@index([email])
+  @@index([role, status])
 }
 
 model Profile {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  phone           String?
-  bio             String?
-  avatarUrl       String?
-  institution     String?
-  city            String?
-  graduationYear  Int?
-  learningGoal    String?
-  studyLevel      String?
-  weeklyHours     Int?
-  onboardingCompleted Boolean @default(false)
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  phone                String?
+  bio                  String?
+  avatarUrl            String?
+  institution          String?
+  city                 String?
+  graduationYear       Int?
+  learningGoal         String?
+  studyLevel           String?
+  weeklyHours          Int?
+  onboardingCompleted  Boolean  @default(false)
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model AdminInvite {
+  id          String       @id @default(cuid())
+  email       String
+  name        String
+  role        Role         @default(ADMIN)
+  status      InviteStatus @default(PENDING)
+  invitedById String
+  decidedById String?
+  decidedAt   DateTime?
+  createdAt   DateTime     @default(now())
+
+  invitedBy User  @relation("InviteSender", fields: [invitedById], references: [id], onDelete: Cascade)
+  decidedBy User? @relation("InviteDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([email])
 }
 
 model SyllabusUpload {
-  id            String   @id @default(cuid())
-  userId        String
-  fileName      String
-  mimeType      String?
-  extractedText String   @db.Text
-  analysis      Json?
-  analysisStatus String  @default("EXTRACTED")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String         @id @default(cuid())
+  userId         String
+  fileName       String
+  mimeType       String?
+  sizeBytes      Int            @default(0)
+  extractedText  String         @db.Text
+  analysis       Json?
+  analysisStatus AnalysisStatus @default(EXTRACTED)
+  aiError        String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+  @@index([userId, analysisStatus])
 }
 
 model Course {
-  id          String       @id @default(cuid())
-  title       String
-  slug        String       @unique
-  description String?
-  difficulty  String?
-  isPublished Boolean      @default(false)
-  subjects    Subject[]
-  enrollments Enrollment[]
-  progress    Progress[]
-  notes       Note[]
-  quizzes     Quiz[]
-  mockTests   MockTest[]
-  studyPlans  StudyPlan[]
-  bookmarks   Bookmark[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id                String              @id @default(cuid())
+  title             String
+  slug              String              @unique
+  description       String?
+  difficulty        String?
+  isPublished       Boolean             @default(false)
+  subjects          Subject[]
+  enrollments       Enrollment[]
+  progress          Progress[]
+  notes             Note[]
+  quizzes           Quiz[]
+  mockTests         MockTest[]
+  studyPlans        StudyPlan[]
+  bookmarks         Bookmark[]
+  previousQuestions PreviousQuestion[]
+  activities        ActivityLog[]
+  lessonCompletions LessonCompletion[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
 
   @@index([slug])
+  @@index([isPublished])
 }
 
 model Subject {
@@ -171,18 +230,19 @@ model Topic {
 }
 
 model Lesson {
-  id              String           @id @default(cuid())
+  id              String            @id @default(cuid())
   topicId         String
   title           String
   content         String?
   mediaUrl        String?
   durationMin     Int?
-  sequence        Int              @default(0)
-  topic           Topic            @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  progressEntries Progress[]       @relation("ProgressLastLesson")
+  sequence        Int               @default(0)
+  topic           Topic             @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  progressEntries Progress[]        @relation("ProgressLastLesson")
+  completions     LessonCompletion[]
   bookmarks       Bookmark[]
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
   @@index([topicId, sequence])
 }
@@ -196,35 +256,73 @@ model Enrollment {
   endedAt     DateTime?
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  progress    Progress[]
+  progress    Progress?
 
   @@unique([userId, courseId])
   @@index([userId, courseId])
 }
 
 model Progress {
-  id                  String         @id @default(cuid())
-  enrollmentId        String
-  userId              String
-  courseId            String
-  completionPercentage Float         @default(0)
-  completedLessons    Int            @default(0)
-  totalLessons        Int            @default(0)
-  status              ProgressStatus @default(NOT_STARTED)
-  lastLessonId        String?
-  lastAccessedAt      DateTime?
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
+  id                   String         @id @default(cuid())
+  enrollmentId         String         @unique
+  userId               String
+  courseId             String
+  completionPercentage Float          @default(0)
+  completedLessons     Int            @default(0)
+  totalLessons         Int            @default(0)
+  status               ProgressStatus @default(NOT_STARTED)
+  lastLessonId         String?
+  lastAccessedAt       DateTime?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
 
-  enrollment          Enrollment     @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
-  user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course              Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  lastLesson          Lesson?        @relation("ProgressLastLesson", fields: [lastLessonId], references: [id], onDelete: SetNull)
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course     Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lastLesson Lesson?    @relation("ProgressLastLesson", fields: [lastLessonId], references: [id], onDelete: SetNull)
 
-  @@unique([enrollmentId])
   @@unique([userId, courseId])
   @@index([userId, courseId])
   @@index([courseId, status])
+}
+
+/// One row per lesson a student has actually finished. This is the source of
+/// truth for course progress — a high-water-mark on Progress alone would report
+/// lessons as complete that were never touched.
+model LessonCompletion {
+  id          String   @id @default(cuid())
+  userId      String
+  lessonId    String
+  courseId    String
+  completedAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([userId, courseId])
+  @@index([courseId])
+}
+
+/// Append-only record of real student activity, used for progress signals that
+/// are not lesson-based (assessments, study-plan tasks, notes, uploads).
+model ActivityLog {
+  id        String       @id @default(cuid())
+  userId    String
+  courseId  String?
+  type      ActivityType
+  score     Int?
+  total     Int?
+  meta      Json?
+  createdAt DateTime     @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course? @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, type])
+  @@index([courseId, type])
 }
 
 model Note {
@@ -232,13 +330,15 @@ model Note {
   userId      String
   courseId    String?
   title       String
-  content     String
+  content     String   @db.Text
   tags        Json?
   isPinned    Boolean  @default(false)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   course      Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([userId, updatedAt])
 }
 
 model Quiz {
@@ -247,11 +347,16 @@ model Quiz {
   title       String
   description String?
   timeLimit   Int?
+  isPublished Boolean       @default(true)
+  source      String        @default("SEEDED")
   course      Course?       @relation(fields: [courseId], references: [id], onDelete: SetNull)
   questions   Question[]
   attempts    QuizAttempt[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+
+  @@index([courseId])
+  @@index([createdAt])
 }
 
 model Question {
@@ -262,22 +367,28 @@ model Question {
   correctAnswer String
   explanation   String?
   type          QuestionType  @default(MCQ)
+  sequence      Int           @default(0)
   quiz          Quiz          @relation(fields: [quizId], references: [id], onDelete: Cascade)
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+
+  @@index([quizId, sequence])
 }
 
 model QuizAttempt {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   userId         String
   quizId         String
-  score          Int      @default(0)
-  totalQuestions Int      @default(0)
+  score          Int       @default(0)
+  totalQuestions Int       @default(0)
   answers        Json?
-  startedAt      DateTime @default(now())
+  startedAt      DateTime  @default(now())
   submittedAt    DateTime?
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quiz           Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz           Quiz      @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startedAt])
+  @@index([quizId])
 }
 
 model MockTest {
@@ -286,10 +397,30 @@ model MockTest {
   title       String
   description String?
   durationMin Int?
+  isPublished Boolean           @default(true)
   course      Course?           @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  questions   MockTestQuestion[]
   attempts    MockTestAttempt[]
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
+
+  @@index([courseId])
+  @@index([createdAt])
+}
+
+model MockTestQuestion {
+  id            String   @id @default(cuid())
+  mockTestId    String
+  prompt        String
+  options       Json
+  correctAnswer String
+  explanation   String?
+  sequence      Int      @default(0)
+  mockTest      MockTest @relation(fields: [mockTestId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([mockTestId, sequence])
 }
 
 model MockTestAttempt {
@@ -303,56 +434,153 @@ model MockTestAttempt {
   submittedAt    DateTime?
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   mockTest       MockTest  @relation(fields: [mockTestId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startedAt])
+  @@index([mockTestId])
 }
 
 model StudyPlan {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   userId      String
   courseId    String?
   title       String
   description String?
-  status      String   @default("ACTIVE")
+  status      String      @default("ACTIVE")
   schedule    Json?
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course      Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course      Course?     @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  tasks       StudyTask[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([userId, updatedAt])
+}
+
+/// Individually completable study-plan task. Persisting each task separately is
+/// what allows task completion to be real rather than an in-memory array.
+model StudyTask {
+  id          String    @id @default(cuid())
+  studyPlanId String
+  userId      String
+  title       String
+  detail      String?
+  timeLabel   String?
+  sequence    Int       @default(0)
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+  studyPlan   StudyPlan @relation(fields: [studyPlanId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([studyPlanId, sequence])
+  @@index([userId, isCompleted])
 }
 
 model Bookmark {
-  id          String   @id @default(cuid())
-  userId      String
-  courseId    String?
-  lessonId    String?
-  title       String
-  url         String?
-  notes       String?
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course      Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
-  lesson      Lesson?  @relation(fields: [lessonId], references: [id], onDelete: SetNull)
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String?
+  lessonId  String?
+  title     String
+  url       String?
+  notes     String?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  lesson    Lesson?  @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
 
 model Notification {
-  id          String   @id @default(cuid())
-  userId      String
-  title       String
-  message     String
-  isRead      Boolean  @default(false)
-  type        String   @default("INFO")
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  type      String   @default("INFO")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, isRead])
 }
 
 model SupportRequest {
-  id          String        @id @default(cuid())
-  userId      String
-  category    String
+  id        String        @id @default(cuid())
+  userId    String
+  category  String
+  subject   String
+  message   String        @db.Text
+  status    SupportStatus @default(OPEN)
+  response  String?       @db.Text
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([status])
+}
+
+model UserSettings {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  theme         String   @default("LIGHT")
+  motionReduced Boolean  @default(false)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model HandwrittenNote {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  drawing   Json
+  preview   String?  @db.Text
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, updatedAt])
+}
+
+model PasswordResetOtp {
+  id        String   @id @default(cuid())
+  email     String
+  otpHash   String
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+/// Burned JWT `jti` values. A signed reset token stays valid until it expires,
+/// so consuming one records its id here to make it strictly single-use.
+model UsedResetToken {
+  jti       String   @id
+  userId    String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
+}
+
+model PreviousQuestion {
+  id          String   @id @default(cuid())
+  title       String
   subject     String
-  message     String
-  status      SupportStatus @default(OPEN)
-  response    String?
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  year        Int
+  semester    String?
+  fileUrl     String?
+  description String?  @db.Text
+  courseId    String?
+  course      Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([subject, year])
+  @@index([courseId])
 }

@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="./css/style.css" />
   <link rel="stylesheet" href="./css/components.css" />
   <link rel="stylesheet" href="./css/responsive.css" />
+  <script src="./js/api.js" defer></script>
+  <script src="./js/contact.js" defer></script>
   <script src="./js/storage.js" defer></script>
   <script src="./js/app.js" defer></script>
 </head>
@@ -44,19 +46,37 @@
       <div class="container grid-2">
         <article class="panel">
           <h3>Send a message</h3>
-          <div class="field">
-            <label for="contactName">Name</label>
-            <input id="contactName" type="text" placeholder="Your name" />
-          </div>
-          <div class="field" style="margin-top: 14px;">
-            <label for="contactEmail">Email</label>
-            <input id="contactEmail" type="email" placeholder="you@example.com" />
-          </div>
-          <div class="field" style="margin-top: 14px;">
-            <label for="contactMessage">Message</label>
-            <textarea id="contactMessage" placeholder="Describe your issue or question..."></textarea>
-          </div>
-          <div style="margin-top: 16px;"><button class="btn btn-primary" type="button">Send message</button></div>
+          <p class="muted">Your request is saved to your account so you can track it.</p>
+          <form id="contactForm">
+            <div class="field">
+              <label for="contactName">Name</label>
+              <input id="contactName" name="name" type="text" placeholder="Your name" autocomplete="name" />
+            </div>
+            <div class="field" style="margin-top: 14px;">
+              <label for="contactEmail">Email</label>
+              <input id="contactEmail" name="email" type="email" placeholder="you@example.com" autocomplete="email" />
+            </div>
+            <div class="field" style="margin-top: 14px;">
+              <label for="contactCategory">Category</label>
+              <select id="contactCategory" name="category">
+                <option value="General">General</option>
+                <option value="Account">Account</option>
+                <option value="Billing">Billing</option>
+                <option value="Bug">Bug report</option>
+                <option value="Feedback">Feedback</option>
+              </select>
+            </div>
+            <div class="field" style="margin-top: 14px;">
+              <label for="contactSubject">Subject</label>
+              <input id="contactSubject" name="subject" type="text" placeholder="Short summary" required />
+            </div>
+            <div class="field" style="margin-top: 14px;">
+              <label for="contactMessage">Message</label>
+              <textarea id="contactMessage" name="message" placeholder="Describe your issue or question..." required></textarea>
+            </div>
+            <div style="margin-top: 16px;"><button class="btn btn-primary" type="submit">Send message</button></div>
+            <div class="notice" id="contactStatus" aria-live="polite" style="margin-top: 14px;"></div>
+          </form>
         </article>
 
         <article class="panel">

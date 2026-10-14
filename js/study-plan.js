@@ -1,6 +1,5 @@
 (function () {
-  const base = 'http://localhost:5000/api/student';
-  const request = async (path, options = {}) => { const response = await fetch(`${base}${path}`, { method: options.method || 'GET', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('zera_token')}` }, ...(options.body ? { body: JSON.stringify(options.body) } : {}) }); const data = await response.json().catch(() => ({})); if (!response.ok || !data.success) throw new Error(data.message || 'Request failed.'); return data.data; };
+  const request = (path, options = {}) => window.ZeraApi.request(path, { ...options, base: '/api/student' });
   function read(key, fallback) {
     try {
       const raw = localStorage.getItem(key);

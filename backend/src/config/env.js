@@ -2,32 +2,105 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const env = {
-  NODE_ENV: process.env.NODE_ENV || 'development',
-  PORT: Number(process.env.PORT || 5000),
-  DATABASE_URL: process.env.DATABASE_URL || '',
-  JWT_SECRET: process.env.JWT_SECRET || 'development-secret-change-me',
-  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
-  CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:3000',
-  GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
-  EMAIL_PROVIDER: (process.env.EMAIL_PROVIDER || '').toLowerCase(),
-  EMAIL_HOST: process.env.EMAIL_HOST || '',
-  EMAIL_PORT: Number(process.env.EMAIL_PORT || 587),
-  EMAIL_USER: process.env.EMAIL_USER || '',
-  EMAIL_PASS: process.env.EMAIL_PASS || '',
-  EMAIL_FROM: process.env.EMAIL_FROM || 'noreply@example.com',
-  SESSION_SECRET: process.env.SESSION_SECRET || 'development-session-secret',
-  PASSWORD_RESET_TOKEN_SECRET: process.env.PASSWORD_RESET_TOKEN_SECRET || process.env.JWT_SECRET || 'development-secret-change-me',
-  PASSWORD_RESET_TOKEN_EXPIRES_IN: process.env.PASSWORD_RESET_TOKEN_EXPIRES_IN || '1h'
+const isProduction = process.env.NODE_ENV === 'production';
+
+/** Values that must never reach production, because they are public defaults. */
+const INSECURE_DEFAULTS = new Set([
+  'development-secret-change-me',
+  'development-session-secret'
+]);
+
+const read = (key, fallback = '') => {
+  const value = process.env[key];
+  return value === undefined || value === '' ? fallback : value;
 };
 
-export const ensureRequiredEnv = () => {
-  const missing = [];
+const readInt = (key, fallback) => {
+  const raw = process.env[key];
+  if (raw === undefined || raw === '') return fallback;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
 
-  if (!env.DATABASE_URL) missing.push('DATABASE_URL');
-  if (!env.JWT_SECRET) missing.push('JWT_SECRET');
+export const env = {
+  NODE_ENV: read('NODE_ENV', 'development'),
+  PORT: readInt('PORT', 5000),
+  DATABASE_URL: read('DATABASE_URL'),
+  DIRECT_URL: read('DIRECT_URL'),
+  JWT_SECRET: read('JWT_SECRET', 'development-secret-change-me'),
+  JWT_EXPIRES_IN: read('JWT_EXPIRES_IN', '7d'),
+  CLIENT_URL: read('CLIENT_URL', 'http://localhost:3000'),
+  ALLOWED_ORIGINS: read('ALLOWED_ORIGINS')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+  GEMINI_API_KEY: read('GEMINI_API_KEY'),
+  GEMINI_MODEL: read('GEMINI_MODEL', 'gemini-2.0-flash'),
+  GROQ_API_KEY: read('GROQ_API_KEY'),
+  GROQ_MODEL: read('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+  OPENROUTER_API_KEY: read('OPENROUTER_API_KEY'),
+  OPENROUTER_MODEL: read('OPENROUTER_MODEL', 'openai/gpt-4o-mini'),
+  DEEPSEEK_API_KEY: read('DEEPSEEK_API_KEY'),
+  DEEPSEEK_MODEL: read('DEEPSEEK_MODEL', 'deepseek-chat'),
+  ELEVENLABS_API_KEY: read('ELEVENLABS_API_KEY'),
+  AI_TIMEOUT_MS: readInt('AI_TIMEOUT_MS', 30_000),
+  EMAIL_PROVIDER: read('EMAIL_PROVIDER').toLowerCase(),
+  EMAIL_HOST: read('EMAIL_HOST'),
+  EMAIL_PORT: readInt('EMAIL_PORT', 587),
+  EMAIL_USER: read('EMAIL_USER'),
+  EMAIL_PASS: read('EMAIL_PASS'),
+  EMAIL_FROM: read('EMAIL_FROM', 'noreply@example.com'),
+  SESSION_SECRET: read('SESSION_SECRET', 'development-session-secret'),
+  PASSWORD_RESET_TOKEN_SECRET: read(
+    'PASSWORD_RESET_TOKEN_SECRET',
+    read('JWT_SECRET', 'development-secret-change-me')
+  ),
+  PASSWORD_RESET_TOKEN_EXPIRES_IN: read('PASSWORD_RESET_TOKEN_EXPIRES_IN', '1h'),
+  MAX_UPLOAD_BYTES: readInt('MAX_UPLOAD_BYTES', 10 * 1024 * 1024),
+  SEED_ADMIN_EMAIL: read('SEED_ADMIN_EMAIL'),
+  SEED_ADMIN_PASSWORD: read('SEED_ADMIN_PASSWORD'),
+  SEED_ADMIN_NAME: read('SEED_ADMIN_NAME')
+};
 
-  if (missing.length > 0) {
-    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+export const isProd = isProduction;
+
+/**
+ * Origins permitted to call the API. In production this must be an explicit
+ * allow-list: there is no wildcard, no `null` origin, and no implicit localhost.
+ */
+export const allowedOrigins = () => {
+  if (env.ALLOWED_ORIGINS.length > 0) return env.ALLOWED_ORIGINS;
+  if (isProduction) return [];
+  return [/^http:\/\/localhost:\d+$/, /^http:\/\/127\.0\.0\.1:\d+$/];
+};
+
+export const validateEnv = () => {
+  const problems = [];
+
+  if (!env.DATABASE_URL) problems.push('DATABASE_URL is not set');
+  if (!env.JWT_SECRET) problems.push('JWT_SECRET is not set');
+  if (!env.SESSION_SECRET) problems.push('SESSION_SECRET is not set');
+  if (!env.PASSWORD_RESET_TOKEN_SECRET) problems.push('PASSWORD_RESET_TOKEN_SECRET is not set');
+
+  if (isProduction) {
+    if (INSECURE_DEFAULTS.has(env.JWT_SECRET)) {
+      problems.push('JWT_SECRET is still the public development default');
+    }
+    if (INSECURE_DEFAULTS.has(env.SESSION_SECRET)) {
+      problems.push('SESSION_SECRET is still the public development default');
+    }
+    if (INSECURE_DEFAULTS.has(env.PASSWORD_RESET_TOKEN_SECRET)) {
+      problems.push('PASSWORD_RESET_TOKEN_SECRET is still the public development default');
+    }
+    if (env.ALLOWED_ORIGINS.length === 0) {
+      problems.push('ALLOWED_ORIGINS must list the frontend origins allowed in production');
+    }
+  }
+
+  if (problems.length > 0) {
+    throw new Error(`Invalid environment configuration:\n  - ${problems.join('\n  - ')}`);
   }
 };
+
+/** @deprecated use validateEnv */
+export const ensureRequiredEnv = validateEnv;

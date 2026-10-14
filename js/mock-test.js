@@ -84,5 +84,11 @@
     draw();
   }
 
-  document.addEventListener('DOMContentLoaded', renderTest);
+  document.addEventListener('DOMContentLoaded', function () {
+    if (!localStorage.getItem('zera_token')) {
+      window.location.replace('./login.html');
+      return;
+    }
+    renderTest();
+  });
 })();

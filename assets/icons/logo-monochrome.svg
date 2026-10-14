@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" role="img" aria-label="ZERA">
+  <!-- Monochrome primary logo - single color version -->
+  <!-- Symbol: Geometric Z representing learning progression -->
+  <g id="symbol" transform="translate(0, 10)">
+    <!-- Foundation bar (bottom horizontal) -->
+    <rect x="0" y="42" width="50" height="6" rx="3" fill="currentColor"/>
+    <!-- Transformation diagonal -->
+    <path d="M46,48 L10,0" stroke="currentColor" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <!-- Mastery bar (top horizontal) -->
+    <rect x="10" y="-6" width="40" height="6" rx="3" fill="currentColor"/>
+    <!-- Accent dot -->
+    <circle cx="46" cy="-3" r="4" fill="currentColor"/>
+  </g>
+  
+  <!-- Wordmark: ZERA -->
+  <g id="wordmark" transform="translate(70, 0)">
+    <text x="0" y="58" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-size="56" font-weight="800" letter-spacing="-0.04em" fill="currentColor">ZERA</text>
+  </g>
+</svg>

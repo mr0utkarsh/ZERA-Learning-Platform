@@ -54,18 +54,21 @@ const analyzeText = (text) => {
 export const saveSyllabusUpload = async (userId, input) => {
   const extractedText = normalizeText(input.extractedText, 100000);
   if (!extractedText) {
-    const error = new Error('The selected file does not contain readable text. Upload a TXT, MD, CSV, or text-based syllabus file.');
+    const error = new Error('The selected file does not contain readable text. Upload a TXT, MD, CSV, DOCX or text-based PDF syllabus file.');
     error.statusCode = 400;
     throw error;
   }
 
   const analysis = analyzeText(extractedText);
+  const sizeBytes = Number.isFinite(Number(input.sizeBytes)) ? Number(input.sizeBytes) : Buffer.byteLength(extractedText, 'utf-8');
+
   const syllabus = await prisma.$transaction(async (tx) => {
     const created = await tx.syllabusUpload.create({
       data: {
         userId,
         fileName: normalizeText(input.fileName, 255) || 'syllabus.txt',
         mimeType: normalizeText(input.mimeType, 120) || null,
+        sizeBytes,
         extractedText,
         analysis,
         analysisStatus: 'EXTRACTED'
@@ -79,5 +82,11 @@ export const saveSyllabusUpload = async (userId, input) => {
     return created;
   });
 
-  return { id: syllabus.id, fileName: syllabus.fileName, analysis: syllabus.analysis, analysisStatus: syllabus.analysisStatus };
+  return {
+    id: syllabus.id,
+    fileName: syllabus.fileName,
+    sizeBytes: syllabus.sizeBytes,
+    analysis: syllabus.analysis,
+    analysisStatus: syllabus.analysisStatus
+  };
 };

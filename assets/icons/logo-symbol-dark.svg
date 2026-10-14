@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="ZERA symbol">
+  <defs>
+    <linearGradient id="symbolGradientDark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#60A5FA"/>
+      <stop offset="50%" stop-color="#818CF8"/>
+      <stop offset="100%" stop-color="#A78BFA"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background for app icon contexts -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="#06121F"/>
+  
+  <!-- Symbol centered: Geometric Z representing learning progression -->
+  <g transform="translate(7, 7)">
+    <!-- Foundation bar (bottom horizontal) -->
+    <rect x="0" y="34" width="40" height="5" rx="2.5" fill="url(#symbolGradientDark)"/>
+    <!-- Transformation diagonal -->
+    <path d="M38,39 L4,5" stroke="url(#symbolGradientDark)" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <!-- Mastery bar (top horizontal) -->
+    <rect x="8" y="-1" width="32" height="5" rx="2.5" fill="url(#symbolGradientDark)"/>
+    <!-- Accent dot - represents the "spark" of understanding -->
+    <circle cx="38" cy="1.5" r="3.5" fill="#67E8F9" opacity="0.95"/>
+  </g>
+</svg>

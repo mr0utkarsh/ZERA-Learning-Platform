@@ -1,10 +1,11 @@
 (function () {
-  const responses = {
-    simple: 'A strong way to approach this is to break the concept into a definition, key idea, and a small real-world example. Start with the core principle, then connect it to what you are studying before practicing a question.',
-    detailed: 'This concept is best understood by identifying the underlying principle, the common misconceptions, and one or two examples. In a learning workflow, you should first understand the idea, then test it with practice problems so the concept becomes durable.',
-    exam: 'For exam-style answers, define the concept clearly, mention its importance, provide a concise example, and briefly explain the key difference from similar ideas. This keeps the answer precise while showing understanding.',
-    example: 'Example approach: define the term, state the rule, then show a short scenario. For instance, if the topic is data structures, explain how the idea works in a real case and then connect that to a question pattern.'
-  };
+  const api = window.ZeraApi;
+
+  // Kept as a named local so the call sites below read the same as before; the
+  // transport now lives entirely in js/api.js.
+  async function apiRequest(path, body) {
+    return api.request(path, { method: 'POST', body });
+  }
 
   function renderMessage(content, type) {
     const box = document.getElementById('chatBox');
@@ -20,14 +21,17 @@
     document.querySelectorAll('.question-chip').forEach((chip) => {
       chip.addEventListener('click', () => {
         const input = document.getElementById('questionInput');
-        if (input) {
-          input.value = chip.textContent.trim();
-        }
+        if (input) input.value = chip.textContent.trim();
       });
     });
   }
 
   document.addEventListener('DOMContentLoaded', function () {
+    if (!api.isLoggedIn()) {
+      window.location.replace('./login.html');
+      return;
+    }
+
     bindQuestionChips();
 
     const sendBtn = document.getElementById('sendQuestion');
@@ -36,26 +40,52 @@
     const select = document.getElementById('responseStyle');
 
     if (sendBtn) {
-      sendBtn.addEventListener('click', function () {
-        const prompt = (input?.value || '').trim();
-        if (!prompt) {
+      sendBtn.addEventListener('click', async function () {
+        const question = (input?.value || '').trim();
+        if (!question) {
           renderMessage('Please ask a question so ZERA can respond.', 'bot');
           return;
         }
 
-        renderMessage(prompt, 'user');
-
-        const mode = select?.value || 'simple';
-        const answer = responses[mode] || responses.simple;
-        setTimeout(() => renderMessage(`ZERA says: ${answer}`, 'bot'), 250);
+        renderMessage(question, 'user');
         if (input) input.value = '';
+
+        const style = select?.value || 'simple';
+        sendBtn.disabled = true;
+
+        // Show a typing indicator
+        const typingId = 'typing-indicator';
+        const box = document.getElementById('chatBox');
+        const typing = document.createElement('div');
+        typing.className = 'chat-item bot';
+        typing.id = typingId;
+        typing.textContent = 'ZERA is thinking…';
+        box?.appendChild(typing);
+        if (box) box.scrollTop = box.scrollHeight;
+
+        try {
+          const result = await apiRequest('/doubt-solver', { question, style });
+          const answer = result?.answer || 'I could not generate a response. Please try again.';
+          document.getElementById(typingId)?.remove();
+          renderMessage(`ZERA: ${answer}`, 'bot');
+        } catch (error) {
+          document.getElementById(typingId)?.remove();
+          // If AI not configured, show a friendly fallback
+          if (error.message.includes('GEMINI_API_KEY') || error.message.includes('not configured')) {
+            renderMessage('ZERA AI is not configured yet. Add GEMINI_API_KEY to the backend environment to enable live answers.', 'bot');
+          } else {
+            renderMessage(`Error: ${error.message}`, 'bot');
+          }
+        } finally {
+          sendBtn.disabled = false;
+        }
       });
     }
 
     if (clearBtn) {
       clearBtn.addEventListener('click', function () {
         const box = document.getElementById('chatBox');
-        if (box) box.innerHTML = '<div class="chat-item bot">Your AI learning partner is ready. Ask a question and get a demo explanation.</div>';
+        if (box) box.innerHTML = '<div class="chat-item bot">Your AI learning partner is ready. Ask a question to get started.</div>';
       });
     }
   });

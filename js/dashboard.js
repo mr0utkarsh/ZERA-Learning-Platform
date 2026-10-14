@@ -1,5 +1,5 @@
-﻿(function () {
-  const API_BASE_URL = 'http://localhost:5000/api';
+(function () {
+  const api = window.ZeraApi;
 
   function read(key, fallback) {
     try {
@@ -10,29 +10,10 @@
     }
   }
 
-  function getToken() {
-    return localStorage.getItem('zera_token');
-  }
-
   async function apiRequest(path, options = {}) {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-      method: options.method || 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
-        ...(options.headers || {})
-      },
-      ...(options.body ? { body: JSON.stringify(options.body) } : {})
-    });
-
-    const data = await response.json().catch(() => ({ success: false, message: 'Request failed.' }));
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.message || 'Request failed.');
-    }
-
-    return data.data;
+    return api.request(path, options);
   }
+
 
   function getCoreStats() {
     const progress = read('zera_progress', { overall: 0, courses: {} });
@@ -131,7 +112,7 @@
   }
 
   async function loadDashboardData() {
-    if (!getToken()) {
+    if (!api.isLoggedIn()) {
       window.location.href = './login.html';
       return;
     }

@@ -1,1 +1,59 @@
-(() => { const api = async (path, options = {}) => { const r = await fetch(`http://localhost:5000/api/student${path}`, { method: options.method || 'GET', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('zera_token')}` }, ...(options.body ? { body: JSON.stringify(options.body) } : {}) }); const d = await r.json().catch(() => ({})); if (!r.ok || !d.success) throw new Error(d.message || 'Request failed.'); return d.data; }; const apply = s => { document.documentElement.dataset.theme = s.theme.toLowerCase(); document.documentElement.classList.toggle('reduce-motion', s.motionReduced); }; document.addEventListener('DOMContentLoaded', async () => { if (!localStorage.getItem('zera_token')) return location.replace('./login.html'); const form = document.querySelector('#settingsForm'), message = document.querySelector('#settingsMessage'); const show = (t, k) => { message.textContent = t; message.className = `notice ${k}`; }; try { const s = await api('/settings'); form.theme.value = s.theme; form.motionReduced.checked = s.motionReduced; apply(s); } catch (e) { show(e.message, 'error'); } form.addEventListener('submit', async e => { e.preventDefault(); try { const s = await api('/settings', { method: 'PUT', body: { theme: form.theme.value, motionReduced: form.motionReduced.checked } }); apply(s); show('Settings saved.', 'success'); } catch (err) { show(err.message, 'error'); } }); }); })();
+(() => {
+  const api = window.ZeraApi.student;
+
+  const apply = (settings) => {
+    if (!settings) return;
+    document.documentElement.dataset.theme = String(settings.theme || 'LIGHT').toLowerCase();
+    document.documentElement.classList.toggle('reduce-motion', Boolean(settings.motionReduced));
+  };
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    if (!window.ZeraApi.isLoggedIn()) {
+      location.replace('./login.html');
+      return;
+    }
+
+    const form = document.querySelector('#settingsForm');
+    const message = document.querySelector('#settingsMessage');
+
+    const show = (text, kind) => {
+      if (!message) return;
+      message.textContent = text;
+      message.className = `notice ${kind}`;
+    };
+
+    if (!form) {
+      show('Settings form is missing on this page.', 'error');
+      return;
+    }
+
+    try {
+      const settings = await api.settings();
+      // The API stores theme as an enum string; the select uses title case.
+      form.theme.value = String(settings.theme || 'LIGHT').toLowerCase();
+      form.motionReduced.checked = Boolean(settings.motionReduced);
+      apply(settings);
+    } catch (error) {
+      show(error.message, 'error');
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const button = form.querySelector('button[type="submit"]');
+      if (button) button.disabled = true;
+
+      try {
+        const saved = await api.saveSettings({
+          theme: form.theme.value.toUpperCase(),
+          motionReduced: form.motionReduced.checked
+        });
+        apply(saved);
+        show('Settings saved.', 'success');
+      } catch (error) {
+        show(error.message, 'error');
+      } finally {
+        if (button) button.disabled = false;
+      }
+    });
+  });
+})();

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 44" role="img" aria-label="ZERA">
+  <!-- Monochrome horizontal logo - single color version -->
+  <!-- Symbol: Compact geometric Z -->
+  <g id="symbol" transform="translate(0, 6)">
+    <!-- Foundation bar -->
+    <rect x="0" y="24" width="28" height="4" rx="2" fill="currentColor"/>
+    <!-- Transformation diagonal -->
+    <path d="M26,28 L4,4" stroke="currentColor" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <!-- Mastery bar -->
+    <rect x="4" y="0" width="24" height="4" rx="2" fill="currentColor"/>
+    <!-- Accent dot -->
+    <circle cx="26" cy="2" r="2.5" fill="currentColor"/>
+  </g>
+  
+  <!-- Wordmark -->
+  <g id="wordmark" transform="translate(38, 0)">
+    <text x="0" y="32" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-size="32" font-weight="800" letter-spacing="-0.03em" fill="currentColor">ZERA</text>
+  </g>
+</svg>

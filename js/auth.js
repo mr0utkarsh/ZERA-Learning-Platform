@@ -1,34 +1,25 @@
-﻿(function () {
-  const API_BASE_URL = 'http://localhost:5000/api/auth';
+(function () {
+  const api = window.ZeraApi;
 
   function getState() {
-    try {
-      return JSON.parse(localStorage.getItem('zera_user') || '{}');
-    } catch {
-      return {};
-    }
+    return api.getUser();
   }
 
   function setUser(payload) {
-    localStorage.setItem('zera_user', JSON.stringify(payload));
+    api.setUser(payload);
   }
 
   function setToken(token) {
-    localStorage.setItem('zera_token', token);
+    api.setToken(token);
   }
 
   function clearSession() {
-    localStorage.removeItem('zera_token');
-    localStorage.setItem('zera_user', JSON.stringify({ isLoggedIn: false }));
+    api.clearSession();
   }
 
   async function redirectAfterStudentAuth() {
-    const response = await fetch('http://localhost:5000/api/onboarding', {
-      headers: { Authorization: `Bearer ${localStorage.getItem('zera_token')}` }
-    });
-    const data = await response.json().catch(() => null);
-    if (!response.ok || !data?.success) throw new Error(data?.message || 'Unable to load your learning setup.');
-    window.location.href = data.data.isComplete ? './dashboard.html' : './onboarding.html';
+    const data = await api.onboarding.get();
+    window.location.href = data.isComplete ? './dashboard.html' : './onboarding.html';
   }
 
   function showMessage(el, text, type = 'info') {
@@ -37,24 +28,6 @@
     el.className = 'notice ' + type;
   }
 
-  async function apiRequest(path, payload, method = 'POST') {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(localStorage.getItem('zera_token') ? { Authorization: `Bearer ${localStorage.getItem('zera_token')}` } : {})
-      },
-      body: payload ? JSON.stringify(payload) : undefined
-    });
-
-    const data = await response.json().catch(() => ({ success: false, message: 'Request failed.' }));
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.message || 'Authentication request failed.');
-    }
-
-    return data;
-  }
 
   function bindForm(formId, mode) {
     const form = document.getElementById(formId);
@@ -96,7 +69,7 @@
             throw new Error('Name must be at least 2 characters long.');
           }
 
-          const result = await apiRequest('/signup', {
+          const result = await api.auth.signup({
             name: trimmedName,
             email: String(payload.email).trim().toLowerCase(),
             password: String(payload.password)
@@ -105,13 +78,13 @@
           const user = result.data.user;
           setUser({ ...user, isLoggedIn: true });
           setToken(result.data.token);
-          showMessage(messageEl, 'Account created successfully. Let’s set up your learning path.', 'success');
+          showMessage(messageEl, 'Account created successfully. Let us set up your learning path.', 'success');
           setTimeout(() => { redirectAfterStudentAuth().catch((error) => showMessage(messageEl, error.message, 'error')); }, 500);
           return;
         }
 
         if (mode === 'login') {
-          const result = await apiRequest('/login', {
+          const result = await api.auth.login({
             email: String(payload.email).trim().toLowerCase(),
             password: String(payload.password)
           });
@@ -125,7 +98,7 @@
         }
 
         if (mode === 'forgot') {
-          const resp = await apiRequest('/forgot-password', { email: String(payload.email).trim().toLowerCase() });
+          const resp = await api.auth.forgotPassword({ email: String(payload.email).trim().toLowerCase() });
           // Backend may return a config error if email not set; pass that message to UI
           showMessage(messageEl, resp.message || 'If that email is registered, reset instructions are being prepared. Check your configured email provider setup.', 'notice');
           return;
@@ -137,7 +110,7 @@
             throw new Error('Missing reset token. Use the reset link provided by email.');
           }
 
-          await apiRequest('/reset-password', {
+          await api.auth.resetPassword({
             token,
             password: String(payload.password)
           });
@@ -148,7 +121,7 @@
         }
 
         if (mode === 'admin-login') {
-          const result = await apiRequest('/admin/login', {
+          const result = await api.auth.adminLogin({
             email: String(payload.email).trim().toLowerCase(),
             password: String(payload.password)
           });
@@ -186,7 +159,7 @@
     }
 
     const currentUser = getState();
-    const hasToken = Boolean(localStorage.getItem('zera_token'));
+    const hasToken = api.isLoggedIn();
     if (currentUser && currentUser.isLoggedIn && hasToken && window.location.pathname.endsWith('login.html')) {
       redirectAfterStudentAuth().catch(() => {
         // A stale or expired session must not trap the student in a login/onboarding redirect loop.

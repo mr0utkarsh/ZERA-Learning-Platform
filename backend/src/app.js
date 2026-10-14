@@ -2,39 +2,41 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import { env } from './config/env.js';
+import { env, allowedOrigins, isProd } from './config/env.js';
 import authRoutes from './routes/authRoutes.js';
 import courseRoutes from './routes/courseRoutes.js';
 import onboardingRoutes from './routes/onboardingRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import { rateLimit } from './middleware/rateLimit.js';
+import { ApiError } from './utils/ApiError.js';
 
 const app = express();
 
-const allowedOrigins = [
-  env.CLIENT_URL,
-  'http://localhost:3000',
-  'http://localhost:8000',
-  'http://127.0.0.1:3000',
-  'http://127.0.0.1:8000',
-  'null'
-].filter(Boolean);
+const explicitOrigins = allowedOrigins();
 
 app.use(helmet());
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin) || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin) || /^https:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) {
+    // Requests without an Origin header (curl, server-to-server, health checks)
+    // are not browser cross-origin requests and carry no ambient credentials.
+    if (!origin) {
       callback(null, true);
       return;
     }
 
-    callback(new Error('Not allowed by CORS'));
+    const permitted = explicitOrigins.some((entry) =>
+      entry instanceof RegExp ? entry.test(origin) : entry === origin
+    );
+
+    callback(permitted ? null : new ApiError(403, 'Origin not allowed'), permitted);
   },
   credentials: true
 }));
 app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true }));
-app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+app.use(morgan(isProd ? 'combined' : 'dev'));
 
 app.get('/api/health', (req, res) => {
   res.json({
@@ -44,11 +46,25 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Brute-force protection for credential endpoints, applied before the routers
+// so the limit is enforced on the real handlers.
+app.use('/api/auth/login', rateLimit({ windowMs: 15 * 60_000, max: 10 }));
+// Privileged login is a distinct endpoint with a distinct budget, so it needs
+// its own limiter or it becomes an unthrottled alternative to /login.
+app.use('/api/auth/admin/login', rateLimit({ windowMs: 15 * 60_000, max: 10 }));
+// The public registration route is /signup; mounting the limiter on
+// /register left account creation completely unthrottled.
+app.use('/api/auth/signup', rateLimit({ windowMs: 60 * 60_000, max: 10 }));
+app.use('/api/auth/forgot-password', rateLimit({ windowMs: 60 * 60_000, max: 5 }));
+app.use('/api/auth/reset-password', rateLimit({ windowMs: 60 * 60_000, max: 5 }));
+app.use('/api/auth/verify-otp', rateLimit({ windowMs: 15 * 60_000, max: 10 }));
+
 app.use('/api/auth', authRoutes);
 app.use('/api', courseRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
@@ -57,15 +73,28 @@ app.use((req, res) => {
   });
 });
 
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  console.error(err);
-
   const status = err.statusCode || 500;
-  const message = err.message || 'Internal server error';
+  const isClientError = status < 500;
+
+  if (!isClientError) {
+    console.error('[unhandled]', err);
+  }
+
+  // A body rejected mid-stream (e.g. an oversized upload) still has unread
+  // bytes on the socket. Answer, then close, so the client reliably receives the
+  // status instead of a connection reset.
+  if (req.unread && req.readable) {
+    res.set('Connection', 'close');
+  }
 
   res.status(status).json({
     success: false,
-    message
+    // 5xx messages can contain SQL, file paths or provider payloads, so they are
+    // never echoed to the client. 4xx messages are deliberate and safe.
+    message: isClientError ? err.message || 'Request failed' : 'Internal server error',
+    ...(process.env.NODE_ENV !== 'production' && !isClientError ? { debug: err.message } : {})
   });
 });
 

@@ -32,11 +32,35 @@ export const onboardingProfileSchema = z.object({
   weeklyHours: z.coerce.number().int().min(1, 'Choose at least one hour per week').max(80)
 });
 
+// Only used for the legacy JSON path; the multipart route validates the real
+// file in the controller instead.
 export const syllabusUploadSchema = z.object({
   fileName: z.string().trim().min(1).max(255),
   mimeType: z.string().trim().max(120).optional(),
   extractedText: z.string().trim().min(1, 'The selected syllabus file is empty').max(100000)
 });
+
+export const validateProfileSetup = (body) => {
+  const result = onboardingProfileSchema.safeParse(body ?? {});
+  if (!result.success) {
+    const issue = result.error.issues[0];
+    const error = new Error(issue?.message || 'Invalid profile payload');
+    error.statusCode = 400;
+    throw error;
+  }
+  return result.data;
+};
+
+export const otpSendSchema = z.object({
+  email: z.string().trim().email('Please provide a valid email address')
+});
+
+export const otpVerifySchema = z.object({
+  email: z.string().trim().email('Please provide a valid email address'),
+  otp: z.string().trim().length(6, 'OTP must be exactly 6 digits').regex(/^\d{6}$/, 'OTP must be 6 numeric digits'),
+  password: z.string().min(8, 'Password must be at least 8 characters').max(128, 'Password must be 128 characters or fewer')
+});
+
 
 export const validateRequest = (schema) => (req, res, next) => {
   const result = schema.safeParse(req.body ?? {});

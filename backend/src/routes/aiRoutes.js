@@ -6,7 +6,8 @@ import {
   generateStudyNote,
   generateQuiz,
   generateStudyPlan,
-  generateMockInterview
+  generateMockInterview,
+  analyzeSyllabusWithAi
 } from '../services/aiService.js';
 
 const router = express.Router();
@@ -59,6 +60,16 @@ router.post('/study-plan', async (req, res, next) => {
 router.post('/mock-interview', async (req, res, next) => {
   try {
     const result = await generateMockInterview(req.body || {});
+    res.json({ success: true, data: result });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/analyze-syllabus', async (req, res, next) => {
+  try {
+    const text = req.body?.text || '';
+    const result = await analyzeSyllabusWithAi(text);
     res.json({ success: true, data: result });
   } catch (error) {
     next(error);

@@ -1,6 +1,17 @@
+/**
+ * zeraStorage – thin localStorage wrapper.
+ *
+ * All mock / dummy user data has been removed.
+ * The only thing this module does on DOMContentLoaded is initialize
+ * application-level defaults (empty arrays / zero values) so that
+ * code that reads storage does not crash on missing keys.
+ *
+ * User identity is managed exclusively by js/auth.js (JWT + real backend).
+ */
 (function () {
   const STORAGE_KEYS = {
     user: 'zera_user',
+    token: 'zera_token',
     progress: 'zera_progress',
     courses: 'zera_courses',
     activity: 'zera_activity',
@@ -17,7 +28,7 @@
   };
 
   function safeParse(raw) {
-    try { return raw ? JSON.parse(raw) : null; } catch (error) { return null; }
+    try { return raw ? JSON.parse(raw) : null; } catch { return null; }
   }
 
   function get(key, fallback) {
@@ -30,94 +41,42 @@
     localStorage.setItem(key, JSON.stringify(value));
   }
 
+  /**
+   * Initialize only non-user, non-auth defaults.
+   * Streak, achievements, and preferences default to safe values.
+   * Nothing here sets or fakes a logged-in user session.
+   */
   function initDefaults() {
-    if (!get(STORAGE_KEYS.user, null)) {
-      set(STORAGE_KEYS.user, {
-        name: 'Aarav Sharma',
-        email: 'aarav@example.com',
-        role: 'student',
-        isLoggedIn: true
-      });
-    }
-
-    if (!get(STORAGE_KEYS.progress, null)) {
-      set(STORAGE_KEYS.progress, {
-        overall: 0,
-        courses: {
-          'ZERA Foundations': {
-            progress: 0,
-            subjects: {
-              'Core Concepts': { progress: 0, topics: [
-                { title: 'Introduction to Learning Systems', complete: false },
-                { title: 'Study Methods and Habit Design', complete: false },
-                { title: 'Course Planning Basics', complete: false },
-                { title: 'Revision Techniques', complete: false }
-              ] }
-            }
-          }
-        }
-      });
-    }
-
-    if (!get(STORAGE_KEYS.courses, null)) {
-      set(STORAGE_KEYS.courses, [
-        { id: 'course-foundations', name: 'ZERA Foundations', level: 'Beginner', progress: 0, status: 'Not Started' },
-        { id: 'course-web', name: 'Web Development Fundamentals', level: 'Beginner', progress: 0, status: 'Not Started' },
-        { id: 'course-data', name: 'Data Structures and Algorithms', level: 'Intermediate', progress: 0, status: 'Not Started' }
-      ]);
-    }
-
     if (!get(STORAGE_KEYS.activity, null)) {
       set(STORAGE_KEYS.activity, []);
     }
-
-    if (!get(STORAGE_KEYS.bookmarks, null)) {
-      set(STORAGE_KEYS.bookmarks, []);
-    }
-
-    if (!get(STORAGE_KEYS.notes, null)) {
-      set(STORAGE_KEYS.notes, [
-        { id: 'n1', title: 'AI revision note', category: 'AI-generated', content: 'Focus on active recall and spaced repetition.' }
-      ]);
-    }
-
-    if (!get(STORAGE_KEYS.personalNotes, null)) {
-      set(STORAGE_KEYS.personalNotes, []);
-    }
-
-    if (!get(STORAGE_KEYS.quizAttempts, null)) {
-      set(STORAGE_KEYS.quizAttempts, []);
-    }
-
-    if (!get(STORAGE_KEYS.mockTests, null)) {
-      set(STORAGE_KEYS.mockTests, []);
-    }
-
-    if (!get(STORAGE_KEYS.studyPlan, null)) {
-      set(STORAGE_KEYS.studyPlan, []);
-    }
-
-    if (!get(STORAGE_KEYS.notifications, null)) {
-      set(STORAGE_KEYS.notifications, [
-        { id: 'n-1', title: 'Study plan reminder', text: 'Your revision block starts in 30 minutes.', time: 'Today' }
-      ]);
-    }
-
     if (!get(STORAGE_KEYS.streak, null)) {
       set(STORAGE_KEYS.streak, { days: 0, lastActiveDate: null });
     }
-
     if (!get(STORAGE_KEYS.achievements, null)) {
       set(STORAGE_KEYS.achievements, []);
     }
-
     if (!get(STORAGE_KEYS.preferences, null)) {
       set(STORAGE_KEYS.preferences, { theme: 'light', reducedMotion: false });
     }
   }
 
-  const zeraStorage = { get, set, initDefaults, keys: STORAGE_KEYS };
-  window.zeraStorage = zeraStorage;
+  /** Clear all session data on logout – called by auth.js. */
+  function clearSession() {
+    localStorage.removeItem(STORAGE_KEYS.token);
+    localStorage.removeItem(STORAGE_KEYS.user);
+    localStorage.removeItem(STORAGE_KEYS.progress);
+    localStorage.removeItem(STORAGE_KEYS.courses);
+    localStorage.removeItem(STORAGE_KEYS.bookmarks);
+    localStorage.removeItem(STORAGE_KEYS.notes);
+    localStorage.removeItem(STORAGE_KEYS.personalNotes);
+    localStorage.removeItem(STORAGE_KEYS.quizAttempts);
+    localStorage.removeItem(STORAGE_KEYS.mockTests);
+    localStorage.removeItem(STORAGE_KEYS.studyPlan);
+    localStorage.removeItem(STORAGE_KEYS.notifications);
+  }
+
+  window.zeraStorage = { get, set, initDefaults, clearSession, keys: STORAGE_KEYS };
 
   document.addEventListener('DOMContentLoaded', initDefaults);
 })();
