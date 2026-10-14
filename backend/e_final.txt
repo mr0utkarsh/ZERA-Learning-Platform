@@ -1,8 +1,0 @@
-FATAL: cannot reach the database. Refusing to start.
-  
-Invalid `prisma.$queryRaw()` invocation:
-
-
-Can't reach database server at `aws-0-ap-northeast-1.pooler.supabase.com:6543`
-
-Please make sure your database server is running at `aws-0-ap-northeast-1.pooler.supabase.com:6543`.
