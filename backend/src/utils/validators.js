@@ -109,6 +109,41 @@ export const resourceCreateSchema = z.object({
   description: z.string().trim().max(2000).optional()
 });
 
+/** Body for PUT /api/onboarding/academic — all fields optional (skip-friendly). */
+export const academicProfileSchema = z.object({
+  displayName: z.string().trim().max(120).optional(),
+  country: z.string().trim().max(80).optional(),
+  language: z.string().trim().max(40).optional(),
+  educationLevel: z.enum(['school', 'diploma', 'undergraduate', 'postgraduate', 'competitive']).optional(),
+  courseProgram: z.string().trim().max(160).optional(),
+  semester: z.string().trim().max(40).optional(),
+  branch: z.string().trim().max(120).optional(),
+  institution: z.string().trim().max(160).optional(),
+  examType: z.string().trim().max(80).optional(),
+  examDate: z.string().datetime({ offset: true }).optional(),
+  dailyMinutes: z.coerce.number().int().min(0).max(1440).optional(),
+  weeklyHours: z.coerce.number().int().min(0).max(168).optional(),
+  studyDays: z.array(z.string().trim().max(12)).max(7).optional(),
+  studyTimePref: z.enum(['morning', 'afternoon', 'evening', 'night']).optional(),
+  difficultAreas: z.array(z.string().trim().max(120)).max(60).optional(),
+  explanationStyle: z.enum(['simple', 'detailed', 'example-first', 'exam-focused']).optional(),
+  preferredLanguage: z.string().trim().max(40).optional(),
+  subjects: z.array(z.string().trim().max(120)).max(60).optional()
+}).partial();
+
+/** Body for POST /api/study-plans — generate a plan from a confirmed syllabus. */
+export const studyPlanGenerateSchema = z.object({
+  syllabusId: z.string().trim().min(1, 'A confirmed syllabus id is required'),
+  title: z.string().trim().max(200).optional(),
+  examDate: z.string().datetime({ offset: true }).optional(),
+  useAi: z.boolean().optional()
+});
+
+/** Body for PATCH /api/study-plans/tasks/:taskId/reschedule. */
+export const taskRescheduleSchema = z.object({
+  dueDate: z.string().datetime({ offset: true }).nullable().optional()
+});
+
 export const validateProfileSetup = (body) => {
   const result = onboardingProfileSchema.safeParse(body ?? {});
   if (!result.success) {

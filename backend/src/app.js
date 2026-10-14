@@ -14,6 +14,7 @@ import progressRoutes from './routes/progressRoutes.js';
 import quizRoutes from './routes/quizRoutes.js';
 import performanceRoutes from './routes/performanceRoutes.js';
 import resourceRoutes from './routes/resourceRoutes.js';
+import studyPlanRoutes from './routes/studyPlanRoutes.js';
 import { rateLimit } from './middleware/rateLimit.js';
 import { ApiError } from './utils/ApiError.js';
 
@@ -75,6 +76,7 @@ app.use('/api/progress', progressRoutes);
 app.use('/api/quiz', quizRoutes);
 app.use('/api/performance', performanceRoutes);
 app.use('/api/resources', resourceRoutes);
+app.use('/api/study-plans', studyPlanRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
