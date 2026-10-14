@@ -50,6 +50,22 @@ export const env = {
   EMAIL_USER: read('EMAIL_USER'),
   EMAIL_PASS: read('EMAIL_PASS'),
   EMAIL_FROM: read('EMAIL_FROM', 'noreply@example.com'),
+  // ── Supabase Storage (private buckets) ──
+  SUPABASE_URL: read('SUPABASE_URL'),
+  // Service-role key is SERVER-ONLY. It is never sent to a browser.
+  SUPABASE_SERVICE_ROLE_KEY: read('SUPABASE_SERVICE_ROLE_KEY'),
+  SUPABASE_SYLLABI_BUCKET: read('SUPABASE_SYLLABI_BUCKET', 'syllabi'),
+  SUPABASE_HANDWRITING_BUCKET: read('SUPABASE_HANDWRITING_BUCKET', 'handwriting'),
+  SIGNED_URL_EXPIRES_IN: readInt('SIGNED_URL_EXPIRES_IN', 900),
+  // ── Brevo transactional email / SMS ──
+  BREVO_API_KEY: read('BREVO_API_KEY'),
+  BREVO_SMS_SENDER: read('BREVO_SMS_SENDER', 'ZERA'),
+  BREVO_SMS_RECIPIENT: read('BREVO_SMS_RECIPIENT'),
+  // ── OCR provider (optional). When unset, OCR features degrade honestly. ──
+  OCR_PROVIDER: read('OCR_PROVIDER'), // e.g. "http" | "" (disabled)
+  OCR_API_URL: read('OCR_API_URL'),
+  OCR_API_KEY: read('OCR_API_KEY'),
+  OCR_TIMEOUT_MS: readInt('OCR_TIMEOUT_MS', 30_000),
   SESSION_SECRET: read('SESSION_SECRET', 'development-session-secret'),
   PASSWORD_RESET_TOKEN_SECRET: read(
     'PASSWORD_RESET_TOKEN_SECRET',

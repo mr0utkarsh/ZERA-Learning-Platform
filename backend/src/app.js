@@ -17,6 +17,7 @@ import resourceRoutes from './routes/resourceRoutes.js';
 import studyPlanRoutes from './routes/studyPlanRoutes.js';
 import doubtRoutes from './routes/doubtRoutes.js';
 import interviewRoutes from './routes/interviewRoutes.js';
+import handwritingRoutes from './routes/handwritingRoutes.js';
 import { rateLimit } from './middleware/rateLimit.js';
 import { ApiError } from './utils/ApiError.js';
 
@@ -81,6 +82,7 @@ app.use('/api/resources', resourceRoutes);
 app.use('/api/study-plans', studyPlanRoutes);
 app.use('/api/doubts', doubtRoutes);
 app.use('/api/interviews', interviewRoutes);
+app.use('/api/handwriting', handwritingRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
