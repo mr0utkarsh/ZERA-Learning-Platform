@@ -74,6 +74,41 @@ export const topicStatusSchema = z.object({
   status: z.enum(['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'NEEDS_REVISION'])
 });
 
+/** Body for POST /api/quiz — create a validated, user-owned quiz. */
+export const quizCreateSchema = z.object({
+  title: z.string().trim().min(1).max(200).optional(),
+  description: z.string().trim().max(1000).optional(),
+  difficulty: z.enum(['easy', 'medium', 'hard']).optional(),
+  topicId: z.string().trim().min(1).optional(),
+  source: z.enum(['AI', 'MANUAL']).optional(),
+  questions: z.array(z.object({
+    prompt: z.string().trim().min(1, 'A question prompt is required').max(1000),
+    options: z.array(z.string().trim().min(1)).min(2, 'Each question needs at least two options'),
+    correctAnswer: z.string().trim().min(1, 'A correct answer is required'),
+    explanation: z.string().trim().max(2000).optional()
+  })).min(1, 'A quiz needs at least one question').max(50)
+});
+
+/** Body for POST /api/quiz/:id/attempts — submit answers for scoring. */
+export const quizSubmitSchema = z.object({
+  answers: z.array(z.object({
+    questionId: z.string().trim().min(1),
+    answer: z.string().trim().max(500)
+  })).max(50)
+});
+
+/** Body for POST /api/resources (admin) — create a curated resource. */
+export const resourceCreateSchema = z.object({
+  title: z.string().trim().min(1, 'A title is required').max(200),
+  url: z.string().trim().url('A valid URL is required').max(1000),
+  skill: z.string().trim().min(1, 'A skill is required').max(80),
+  technology: z.string().trim().min(1, 'A technology is required').max(80),
+  level: z.enum(['beginner', 'intermediate', 'advanced']),
+  projectType: z.string().trim().max(80).optional(),
+  source: z.string().trim().max(160).optional(),
+  description: z.string().trim().max(2000).optional()
+});
+
 export const validateProfileSetup = (body) => {
   const result = onboardingProfileSchema.safeParse(body ?? {});
   if (!result.success) {

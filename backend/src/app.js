@@ -11,6 +11,9 @@ import aiRoutes from './routes/aiRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import confirmedSyllabusRoutes from './routes/confirmedSyllabusRoutes.js';
 import progressRoutes from './routes/progressRoutes.js';
+import quizRoutes from './routes/quizRoutes.js';
+import performanceRoutes from './routes/performanceRoutes.js';
+import resourceRoutes from './routes/resourceRoutes.js';
 import { rateLimit } from './middleware/rateLimit.js';
 import { ApiError } from './utils/ApiError.js';
 
@@ -69,6 +72,9 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/syllabus', confirmedSyllabusRoutes);
 app.use('/api/progress', progressRoutes);
+app.use('/api/quiz', quizRoutes);
+app.use('/api/performance', performanceRoutes);
+app.use('/api/resources', resourceRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
