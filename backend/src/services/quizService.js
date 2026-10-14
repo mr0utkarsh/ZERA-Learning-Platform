@@ -24,7 +24,13 @@ const normalizeQuestions = (rawQuestions) => {
     if (options.length < 2) throw new ApiError(400, `Question ${i + 1} needs at least two options.`);
     const correctAnswer = norm(q.correctAnswer, 500);
     if (!correctAnswer) throw new ApiError(400, `Question ${i + 1} is missing its correct answer.`);
-    const canonical = options.find((o) => o.toLowerCase() === correctAnswer.toLowerCase());
+    // Accept either the full option text OR a letter index (A/B/C/D) that some
+    // models return, mapping the letter to the concrete option.
+    let canonical = options.find((o) => o.toLowerCase() === correctAnswer.toLowerCase());
+    if (!canonical && /^[A-Z]$/i.test(correctAnswer)) {
+      const idx = correctAnswer.toUpperCase().charCodeAt(0) - 65;
+      if (idx >= 0 && idx < options.length) canonical = options[idx];
+    }
     if (!canonical) throw new ApiError(400, `Question ${i + 1}'s correct answer is not among its options.`);
     return { prompt, options, correctAnswer: canonical, explanation: norm(q.explanation, 2000) || null, type: 'MCQ', sequence: i };
   });

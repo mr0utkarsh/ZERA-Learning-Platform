@@ -126,6 +126,23 @@ describe('resources are curated and bookmarkable', () => {
   });
 });
 
+describe('quiz answers accept AI letter-index format', () => {
+  it('maps a letter answer (A/B/C/D) to the concrete option', async () => {
+    await resetDatabase(prisma);
+    const user = await makeUser();
+    const { createQuiz } = await import('../src/services/quizService.js');
+    const quiz = await createQuiz(user.id, {
+      questions: [{ prompt: 'Pick the first?', options: ['Alpha', 'Beta', 'Gamma'], correctAnswer: 'B', explanation: 'B maps to Beta.' }]
+    });
+    const { getQuizForAttempt, submitAttempt } = await import('../src/services/quizService.js');
+    const forAttempt = await getQuizForAttempt(user.id, quiz.id);
+    const result = await submitAttempt(user.id, quiz.id, [
+      { questionId: forAttempt.questions[0].id, answer: 'Beta' }
+    ]);
+    assert.equal(result.attempt.score, 1, 'letter answer was normalized to the real option');
+  });
+});
+
     const user = await makeUser();
     const { createQuiz, getQuizForAttempt, submitAttempt } = await import('../src/services/quizService.js');
     const { getPerformance } = await import('../src/services/performanceService.js');
