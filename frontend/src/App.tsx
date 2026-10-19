@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import Lenis from '@studio-freight/lenis';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { Layout } from './components/Layout';
@@ -29,6 +31,17 @@ function Protected({ children }: { children: JSX.Element }) {
 
 export default function App() {
   const { user, loading } = useAuth();
+
+  useEffect(() => {
+    const lenis = new Lenis();
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+    return () => lenis.destroy();
+  }, []);
+
   if (loading) return <div className="grid min-h-screen place-items-center text-slate-500">Loading…</div>;
 
   return (

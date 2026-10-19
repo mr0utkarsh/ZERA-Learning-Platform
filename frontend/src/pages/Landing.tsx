@@ -4,8 +4,8 @@ import { useRef } from 'react';
 import { Logo } from '../components/Logo';
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 50 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as any } },
+  hidden: { opacity: 0, y: 20, filter: 'blur(10px)' },
+  visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as any } },
 };
 
 const stagger = {
