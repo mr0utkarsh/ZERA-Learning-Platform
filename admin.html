@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZERA Admin Dashboard</title>
+  <meta name="description" content="Administrative dashboard for managing students and platform analytics." />
+  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/responsive.css" />
+  <script src="./js/storage.js" defer></script>
+  <script src="./js/auth.js" defer></script>
+  <script src="./js/admin.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="./index.html" class="brand" aria-label="ZERA home"><span class="brand-mark"><span>Z</span></span><span>ZERA</span></a>
+      <nav class="nav" aria-label="Admin navigation">
+        <a href="./admin.html" class="active">Overview</a>
+        <a href="./admin-students.html">Students</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn btn-secondary btn-small" type="button" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container app-shell">
+      <aside class="sidebar">
+        <nav>
+          <a class="active" href="./admin.html"><span>Overview</span><span>›</span></a>
+          <a href="./admin-students.html"><span>Students</span><span>›</span></a>
+        </nav>
+      </aside>
+
+      <div class="content-area">
+        <section class="panel">
+          <div class="flex justify-between wrap" style="gap:16px; align-items:center;">
+            <div>
+              <span class="eyebrow" style="color:#2857b1; background:rgba(59,130,246,0.09); border-color:rgba(59,130,246,0.12);">Admin</span>
+              <h2 style="margin-top:12px;">Platform overview</h2>
+            </div>
+            <div class="metric-card" style="min-width:170px;">
+              <span class="kicker">Admin</span>
+              <strong id="adminName">Admin</strong>
+              <span>Access level</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="metrics-row">
+          <article class="metric-card">
+            <span class="kicker">Students</span>
+            <strong id="totalStudents">0</strong>
+            <span>Total accounts</span>
+          </article>
+          <article class="metric-card">
+            <span class="kicker">Active</span>
+            <strong id="activeStudents">0</strong>
+            <span>Active learners</span>
+          </article>
+          <article class="metric-card">
+            <span class="kicker">Suspended</span>
+            <strong id="suspendedStudents">0</strong>
+            <span>Restricted users</span>
+          </article>
+          <article class="metric-card">
+            <span class="kicker">Enrollments</span>
+            <strong id="totalEnrollments">0</strong>
+            <span>Course starts</span>
+          </article>
+        </section>
+
+        <section class="grid-2">
+          <article class="panel">
+            <h3>Recent students</h3>
+            <div id="recentStudentsList" class="task-list"></div>
+          </article>
+          <article class="panel">
+            <h3>Operational metrics</h3>
+            <div class="task-list">
+              <div class="task-item"><strong>Courses</strong><span id="totalCourses">0</span></div>
+              <div class="task-item"><strong>Active ratio</strong><span id="activeRatio">0%</span></div>
+              <div class="task-item"><strong>Suspended ratio</strong><span id="suspendedRatio">0%</span></div>
+            </div>
+          </article>
+        </section>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

@@ -207,20 +207,18 @@ export const buildCourseTree = async (courseId) => {
     where: { id: courseId },
     include: {
       subjects: {
-        orderBy: { title: 'asc' },
+        orderBy: { sequence: 'asc' },
         include: {
           units: {
-            orderBy: { title: 'asc' },
+            orderBy: { sequence: 'asc' },
             include: {
               chapters: {
-                orderBy: { title: 'asc' },
+                orderBy: { sequence: 'asc' },
                 include: {
                   topics: {
-                    orderBy: { title: 'asc' },
+                    orderBy: { sequence: 'asc' },
                     include: {
-                      lessons: {
-                        orderBy: { title: 'asc' }
-                      }
+                      lessons: { orderBy: { sequence: 'asc' } }
                     }
                   }
                 }
@@ -323,11 +321,43 @@ export const seedCourseCatalog = async () => {
   }
 
   const foundations = await prisma.course.findUnique({ where: { slug: 'zera-foundations' } });
+  if (foundations) {
+    const subject = await prisma.subject.findFirst({ where: { courseId: foundations.id }, orderBy: { sequence: 'asc' }, include: { units: { orderBy: { sequence: 'asc' }, include: { chapters: { orderBy: { sequence: 'asc' }, include: { topics: { orderBy: { sequence: 'asc' } } } } } } } });
+    const topic = subject?.units[0]?.chapters[0]?.topics[0];
+    if (subject && topic && !await prisma.pyq.findFirst({ where: { courseId: foundations.id } })) {
+      await prisma.pyq.createMany({ data: [
+        { courseId: foundations.id, subjectId: subject.id, topicId: topic.id, year: 2025, question: 'Explain why active recall is useful for long-term retention.', answer: 'Active recall strengthens retrieval pathways by requiring the learner to produce knowledge from memory.', explanation: 'A complete answer connects retrieval practice with durable memory.', source: 'ZERA Foundations practice archive' },
+        { courseId: foundations.id, subjectId: subject.id, topicId: topic.id, year: 2024, question: 'Which habit best supports a sustainable study routine?', options: ['Manageable repeated sessions', 'One long session before an exam', 'Skipping review', 'Changing goals daily'], answer: 'Manageable repeated sessions', explanation: 'Repeatable sessions support consistency and reduce overload.', source: 'ZERA Foundations practice archive' }
+      ] });
+    }
+    if (subject && topic && !await prisma.resource.findFirst({ where: { courseId: foundations.id } })) {
+      await prisma.resource.createMany({ data: [
+        { courseId: foundations.id, subjectId: subject.id, topicId: topic.id, title: 'Active recall reference', description: 'A concise reference for planning retrieval practice and review cycles.', resourceType: 'GUIDE', url: 'https://learning-scientists.org/spacing' },
+        { courseId: foundations.id, subjectId: subject.id, topicId: topic.id, title: 'Study routine worksheet', description: 'A printable worksheet for planning manageable weekly study sessions.', resourceType: 'TEMPLATE', url: 'https://www.coursera.org/articles/time-management-for-students' }
+      ] });
+    }
+  }
   if (foundations && !await prisma.quiz.findFirst({ where: { title: 'Learning Foundations Check' } })) {
     await prisma.quiz.create({ data: { courseId: foundations.id, title: 'Learning Foundations Check', description: 'A short check on core study habits.', timeLimit: 10, questions: { create: [
       { prompt: 'Which approach supports durable learning?', options: ['Passive rereading only', 'Active recall with review', 'Skipping difficult topics', 'Studying once'], correctAnswer: 'Active recall with review', explanation: 'Retrieval and spaced review strengthen recall.' },
       { prompt: 'What makes a study routine sustainable?', options: ['Unrealistic daily targets', 'Consistent manageable sessions', 'Only studying before exams', 'Never reviewing'], correctAnswer: 'Consistent manageable sessions', explanation: 'Small repeatable sessions build consistency.' }
     ] } } });
+  }
+
+  if (foundations && !await prisma.mockTest.findFirst({ where: { title: 'ZERA Foundations Mock Test' } })) {
+    await prisma.mockTest.create({
+      data: {
+        courseId: foundations.id,
+        title: 'ZERA Foundations Mock Test',
+        description: 'A scored assessment covering the core learning foundations.',
+        durationMin: 15,
+        questions: { create: [
+          { prompt: 'Which practice most directly strengthens retrieval?', options: ['Passive rereading', 'Active recall', 'Copying a chapter', 'Skipping review'], correctAnswer: 'Active recall', explanation: 'Active recall asks you to retrieve information from memory.', sequence: 0 },
+          { prompt: 'What makes a study target sustainable?', options: ['A manageable repeated routine', 'Studying only once', 'Avoiding difficult topics', 'Changing goals every day'], correctAnswer: 'A manageable repeated routine', explanation: 'Repeatable targets create consistency without overload.', sequence: 1 },
+          { prompt: 'Why use spaced review?', options: ['To avoid practice', 'To reinforce memory over time', 'To finish without checking', 'To replace understanding'], correctAnswer: 'To reinforce memory over time', explanation: 'Spacing reviews helps knowledge remain accessible over longer intervals.', sequence: 2 }
+        ] }
+      }
+    });
   }
 
   return await prisma.course.findMany({

@@ -1,13 +1,40 @@
 (function () {
-  const testQuestions = [
-    { question: 'A study system that adapts to the learner\'s needs is called:', options: ['Rigid learning', 'Personalized learning', 'Passive learning', 'Random learning'], answer: 'Personalized learning' },
-    { question: 'Which habit improves memory most effectively?', options: ['Only reading notes', 'Active recall', 'Ignoring mistakes', 'Skipping practice',], answer: 'Active recall' },
-    { question: 'A good revision block should include:', options: ['No review', 'Self-checking and recap', 'Only highlighting text', 'Only copying notes'], answer: 'Self-checking and recap' }
-  ];
+  const API_BASE_URL = 'http://localhost:5000/api/student';
 
-  function renderTest() {
+  async function apiRequest(path, options = {}) {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      method: options.method || 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('zera_token')}`
+      },
+      ...(options.body ? { body: JSON.stringify(options.body) } : {})
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || 'Request failed.');
+    }
+
+    return data.data;
+  }
+
+  async function renderTest() {
     const root = document.getElementById('mockTestApp');
     if (!root) return;
+
+    if (!localStorage.getItem('zera_token')) {
+      window.location.replace('./login.html');
+      return;
+    }
+
+    let tests;
+    try {
+      tests = await apiRequest('/mock-tests');
+    } catch (error) { root.innerHTML = `<div class="empty-state"><strong>Unable to load mock tests</strong><span>${error.message}</span></div>`; return; }
+    const test = tests[0];
+    if (!test || !test.questions?.length) { root.innerHTML = '<div class="empty-state"><strong>No mock test available</strong><span>A published assessment will appear here when it is ready.</span></div>'; return; }
+    const testQuestions = test.questions;
 
     let currentIndex = 0;
     let score = 0;
@@ -21,7 +48,7 @@
             <strong>Question ${currentIndex + 1}/${testQuestions.length}</strong>
             <span class="badge neutral">${Math.round(((currentIndex + 1) / testQuestions.length) * 100)}%</span>
           </div>
-          <h3>${item.question}</h3>
+          <h3>${item.prompt}</h3>
           <div style="display:grid; gap:10px; margin-top:16px;">
             ${item.options.map((opt) => `
               <label style="display:flex; align-items:center; gap:10px; padding:0.8rem 0.9rem; border:1px solid rgba(17,34,55,0.08); border-radius:12px; background:#f5f9ff; cursor:pointer;">
@@ -48,7 +75,7 @@
         }
       });
 
-      root.querySelector('[data-action="next"]').addEventListener('click', () => {
+      root.querySelector('[data-action="next"]').addEventListener('click', async () => {
         const selectedInput = root.querySelector('input[name="mock-answer"]:checked');
         if (!selectedInput) {
           alert('Please select an answer before moving on.');
@@ -57,10 +84,8 @@
         responses[currentIndex] = selectedInput.value;
 
         if (currentIndex === testQuestions.length - 1) {
-          score = testQuestions.reduce((acc, question, idx) => acc + (responses[idx] === question.answer ? 1 : 0), 0);
-          const attempts = JSON.parse(localStorage.getItem('zera_mock_tests') || '[]');
-          attempts.push({ score, total: testQuestions.length, date: new Date().toISOString() });
-          localStorage.setItem('zera_mock_tests', JSON.stringify(attempts));
+          const result = await apiRequest(`/mock-tests/${test.id}/attempts`, { method: 'POST', body: { answers: responses } });
+          score = result.score;
 
           root.innerHTML = `
             <div class="panel">

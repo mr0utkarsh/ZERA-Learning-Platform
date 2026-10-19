@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 (function () {
   const request = (path, options = {}) => window.ZeraApi.request(path, { ...options, base: '/api/student' });
+=======
+(function () {
+  const base = 'http://localhost:5000/api/student';
+  const request = async (path, options = {}) => { const response = await fetch(`${base}${path}`, { method: options.method || 'GET', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('zera_token')}` }, ...(options.body ? { body: JSON.stringify(options.body) } : {}) }); const data = await response.json().catch(() => ({})); if (!response.ok || !data.success) throw new Error(data.message || 'Request failed.'); return data.data; };
+>>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7
   function read(key, fallback) {
     try {
       const raw = localStorage.getItem(key);
@@ -16,11 +22,11 @@
   async function renderNotes() {
     const root = document.getElementById('notesList');
     if (!localStorage.getItem('zera_token')) { window.location.replace('./login.html'); return; }
-    let notes; try { notes = await request('/notes'); } catch (error) { root.innerHTML = `<div class="empty-state"><strong>Unable to load notes</strong><span>${error.message}</span></div>`; return; }
+    let notes; try { notes = await request('/notes'); } catch (error) { if (root) root.innerHTML = `<div class="empty-state"><strong>Unable to load notes</strong><span>${error.message}</span></div>`; return; }
     if (!root) return;
 
     if (!notes.length) {
-      root.innerHTML = '<div class="empty-state"><strong>No notes yet</strong><span>Create a note or generate a demo summary to begin.</span></div>';
+      root.innerHTML = '<div class="empty-state"><strong>No notes yet</strong><span>Create a note or generate an AI summary to begin.</span></div>';
       return;
     }
 
@@ -44,9 +50,22 @@
       const formData = new FormData(form);
       const title = formData.get('title') || 'New AI note';
       const category = formData.get('category') || 'AI-generated';
-      const content = formData.get('content') || 'Topic summary: review the main concept, key definitions, and examples.';
+      const content = String(formData.get('content') || '').trim();
 
-      try { await request('/notes', { method: 'POST', body: { title, category, content } }); await renderNotes(); form.reset(); } catch (error) { alert(error.message); }
+        try {
+          if (!content && category === 'AI-generated') throw new Error('Add a topic or context for the AI note.');
+          let note = { title, category, content };
+          if (category === 'AI-generated') {
+            const generated = await fetch('http://localhost:5000/api/ai/notes', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('zera_token')}` }, body: JSON.stringify({ topic: title, context: content, level: 'beginner' }) }).then((response) => response.json());
+            if (!generated.success) throw new Error(generated.message || 'Unable to generate AI note.');
+            note = { title: generated.data.title, category, content: generated.data.content };
+          }
+          await request('/notes', { method: 'POST', body: note });
+          await renderNotes();
+          form.reset();
+        } catch (error) {
+          alert(error.message);
+        }
     });
   }
 

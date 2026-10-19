@@ -1,4 +1,5 @@
 import express from 'express';
+<<<<<<< HEAD
 import { authenticate, requireAdmin, requireSuperAdmin } from '../middleware/authMiddleware.js';
 import {
   getUsers,
@@ -46,5 +47,19 @@ router.get('/invites/decided', requireSuperAdmin, listDecidedInvites);
 
 // AI configuration monitoring
 router.get('/ai-config', getAiConfig);
+=======
+import { authenticate, requireAdmin } from '../middleware/authMiddleware.js';
+import { adminOverview, listStudents, fetchStudent, setStudentStatus } from '../controllers/adminController.js';
+import { validateRequest, updateStudentStatusSchema } from '../utils/validators.js';
+
+const router = express.Router();
+router.use(authenticate, requireAdmin);
+
+router.get('/overview', adminOverview);
+router.get('/students', listStudents);
+router.get('/students/:studentId', fetchStudent);
+router.patch('/students/:studentId/status', validateRequest(updateStudentStatusSchema), setStudentStatus);
+router.get('/analytics', adminOverview);
+>>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7
 
 export default router;

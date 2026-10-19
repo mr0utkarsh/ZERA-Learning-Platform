@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
@@ -339,3 +340,258 @@ export const verifyOtpAndResetPassword = async (email, otp, newPassword) => {
 
   return { message: 'Password reset successfully.' };
 };
+=======
+import bcrypt from 'bcryptjs';
+import crypto from 'node:crypto';
+import jwt from 'jsonwebtoken';
+import { prisma } from '../config/prisma.js';
+import { env } from '../config/env.js';
+import { emailService, sendOtpEmail } from './emailService.js';
+
+export const sanitizeUser = (user) => {
+  if (!user) return null;
+
+  const { passwordHash, ...safeUser } = user;
+  return safeUser;
+};
+
+export const createAccessToken = (user) => {
+  return jwt.sign(
+    {
+      sub: user.id,
+      email: user.email,
+      role: user.role
+    },
+    env.JWT_SECRET,
+    { expiresIn: env.JWT_EXPIRES_IN }
+  );
+};
+
+export const createPasswordResetToken = (user) => {
+  return jwt.sign(
+    {
+      sub: user.id,
+      email: user.email,
+      purpose: 'password_reset'
+    },
+    env.PASSWORD_RESET_TOKEN_SECRET,
+    { expiresIn: env.PASSWORD_RESET_TOKEN_EXPIRES_IN }
+  );
+};
+
+export const verifyPasswordResetToken = (token) => {
+  return jwt.verify(token, env.PASSWORD_RESET_TOKEN_SECRET);
+};
+
+export const findUserForAuth = async (email) => {
+  return prisma.user.findUnique({
+    where: { email: String(email).trim().toLowerCase() },
+    include: { profile: true }
+  });
+};
+
+export const signupUser = async ({ name, email, password }) => {
+  const normalizedEmail = String(email).trim().toLowerCase();
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email: normalizedEmail }
+  });
+
+  if (existingUser) {
+    const err = new Error('An account with this email already exists.');
+    err.statusCode = 409;
+    throw err;
+  }
+
+  const passwordHash = await bcrypt.hash(password, 12);
+
+  const user = await prisma.user.create({
+    data: {
+      name,
+      email: normalizedEmail,
+      passwordHash,
+      role: 'STUDENT',
+      profile: {
+        create: {}
+      }
+    },
+    include: {
+      profile: true
+    }
+  });
+
+  return {
+    user: sanitizeUser(user),
+    token: createAccessToken(user)
+  };
+};
+
+export const loginUser = async ({ email, password }) => {
+  const normalizedEmail = String(email).trim().toLowerCase();
+
+  const user = await findUserForAuth(normalizedEmail);
+
+  if (!user) {
+    const err = new Error('Invalid email or password.');
+    err.statusCode = 401;
+    throw err;
+  }
+
+  if (user.status === 'SUSPENDED') {
+    const err = new Error('This account has been suspended.');
+    err.statusCode = 403;
+    throw err;
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+
+  if (!isPasswordValid) {
+    const err = new Error('Invalid email or password.');
+    err.statusCode = 401;
+    throw err;
+  }
+
+  return {
+    user: sanitizeUser(user),
+    token: createAccessToken(user)
+  };
+};
+
+export const loginAdminUser = async ({ email, password }) => {
+  const normalizedEmail = String(email).trim().toLowerCase();
+
+  const user = await findUserForAuth(normalizedEmail);
+
+  if (!user) {
+    const err = new Error('Invalid admin credentials.');
+    err.statusCode = 401;
+    throw err;
+  }
+
+  if (user.role !== 'ADMIN') {
+    const err = new Error('Only administrators can access this endpoint.');
+    err.statusCode = 403;
+    throw err;
+  }
+
+  if (user.status === 'SUSPENDED') {
+    const err = new Error('This admin account has been suspended.');
+    err.statusCode = 403;
+    throw err;
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+
+  if (!isPasswordValid) {
+    const err = new Error('Invalid admin credentials.');
+    err.statusCode = 401;
+    throw err;
+  }
+
+  return {
+    user: sanitizeUser(user),
+    token: createAccessToken(user)
+  };
+};
+
+export const getCurrentUser = async (userId) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: { profile: true }
+  });
+
+  if (!user) {
+    const err = new Error('User not found.');
+    err.statusCode = 404;
+    throw err;
+  }
+
+  return sanitizeUser(user);
+};
+
+export const initiatePasswordReset = async (email) => {
+  const normalizedEmail = String(email).trim().toLowerCase();
+
+  const user = await findUserForAuth(normalizedEmail);
+
+  if (!user) {
+    return {
+      success: true,
+      message: 'If an account exists for this email, a password reset instruction will be processed.'
+    };
+  }
+
+  const resetToken = createPasswordResetToken(user);
+
+  try {
+    await emailService.sendPasswordResetEmail(user.email, user.name, resetToken);
+    return {
+      success: true,
+      message: 'If an account exists for this email, a password reset instruction will be processed.'
+    };
+  } catch (error) {
+    const err = new Error(error.message || 'Password reset email could not be sent.');
+    err.statusCode = 500;
+    throw err;
+  }
+};
+
+export const resetPassword = async (token, password) => {
+  let payload;
+
+  try {
+    payload = verifyPasswordResetToken(token);
+  } catch (error) {
+    const err = new Error('Invalid or expired password reset token.');
+    err.statusCode = 401;
+    throw err;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: payload.sub }
+  });
+
+  if (!user) {
+    const err = new Error('User not found for this reset token.');
+    err.statusCode = 404;
+    throw err;
+  }
+
+  const passwordHash = await bcrypt.hash(password, 12);
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      passwordHash
+    }
+  });
+
+  return {
+    success: true,
+    message: 'Password reset successful.'
+  };
+};
+
+export const requestPasswordOtp = async (email) => {
+  const user = await findUserForAuth(email);
+  if (!user) return { success: true, message: 'If an account exists, a verification code will be sent.' };
+  const latest = await prisma.otpChallenge.findFirst({ where: { userId: user.id, purpose: 'PASSWORD_RESET' }, orderBy: { createdAt: 'desc' } });
+  if (latest && Date.now() - latest.lastSentAt.getTime() < 60_000) { const error = new Error('Please wait before requesting another code.'); error.statusCode = 429; throw error; }
+  const otp = String(crypto.randomInt(100000, 1000000));
+  const challenge = await prisma.otpChallenge.create({ data: { userId: user.id, purpose: 'PASSWORD_RESET', codeHash: await bcrypt.hash(otp, 12), expiresAt: new Date(Date.now() + 10 * 60_000) } });
+  try { await sendOtpEmail(user.email, user.name, otp); } catch (error) { await prisma.otpChallenge.delete({ where: { id: challenge.id } }); throw error; }
+  return { success: true, message: 'If an account exists, a verification code will be sent.' };
+};
+
+export const verifyPasswordOtp = async (email, otp) => {
+  const user = await findUserForAuth(email);
+  if (!user) { const error = new Error('Invalid verification code.'); error.statusCode = 401; throw error; }
+  const challenge = await prisma.otpChallenge.findFirst({ where: { userId: user.id, purpose: 'PASSWORD_RESET', verifiedAt: null }, orderBy: { createdAt: 'desc' } });
+  if (!challenge || challenge.expiresAt < new Date()) { const error = new Error('The verification code is invalid or expired.'); error.statusCode = 401; throw error; }
+  if (challenge.attempts >= 5) { const error = new Error('Too many invalid code attempts. Request a new code.'); error.statusCode = 429; throw error; }
+  const valid = await bcrypt.compare(String(otp), challenge.codeHash);
+  if (!valid) { await prisma.otpChallenge.update({ where: { id: challenge.id }, data: { attempts: { increment: 1 } } }); const error = new Error('The verification code is invalid.'); error.statusCode = 401; throw error; }
+  await prisma.otpChallenge.update({ where: { id: challenge.id }, data: { verifiedAt: new Date() } });
+  return { success: true, resetToken: createPasswordResetToken(user) };
+};
+>>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7

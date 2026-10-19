@@ -1,0 +1,11 @@
+-- CreateTable
+CREATE TABLE `OtpChallenge` (`id` VARCHAR(191) NOT NULL, `userId` VARCHAR(191) NOT NULL, `purpose` VARCHAR(191) NOT NULL, `codeHash` VARCHAR(191) NOT NULL, `expiresAt` DATETIME(3) NOT NULL, `attempts` INTEGER NOT NULL DEFAULT 0, `lastSentAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3), `verifiedAt` DATETIME(3) NULL, `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3), INDEX `OtpChallenge_userId_purpose_createdAt_idx`(`userId`, `purpose`, `createdAt`), PRIMARY KEY (`id`)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `OtpChallenge` ADD CONSTRAINT `OtpChallenge_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- CreateTable
+CREATE TABLE `Pyq` (`id` VARCHAR(191) NOT NULL, `courseId` VARCHAR(191) NOT NULL, `subjectId` VARCHAR(191) NULL, `topicId` VARCHAR(191) NULL, `year` INTEGER NOT NULL, `question` TEXT NOT NULL, `answer` TEXT NULL, `options` JSON NULL, `explanation` TEXT NULL, `source` VARCHAR(191) NULL, `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3), `updatedAt` DATETIME(3) NOT NULL, INDEX `Pyq_courseId_year_idx`(`courseId`, `year`), INDEX `Pyq_subjectId_idx`(`subjectId`), INDEX `Pyq_topicId_idx`(`topicId`), PRIMARY KEY (`id`)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `Pyq` ADD CONSTRAINT `Pyq_courseId_fkey` FOREIGN KEY (`courseId`) REFERENCES `Course`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- CreateTable
+CREATE TABLE `Resource` (`id` VARCHAR(191) NOT NULL, `courseId` VARCHAR(191) NULL, `subjectId` VARCHAR(191) NULL, `topicId` VARCHAR(191) NULL, `title` VARCHAR(191) NOT NULL, `description` TEXT NULL, `resourceType` VARCHAR(191) NOT NULL DEFAULT 'REFERENCE', `url` VARCHAR(191) NOT NULL, `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3), `updatedAt` DATETIME(3) NOT NULL, INDEX `Resource_courseId_resourceType_idx`(`courseId`, `resourceType`), INDEX `Resource_subjectId_idx`(`subjectId`), INDEX `Resource_topicId_idx`(`topicId`), PRIMARY KEY (`id`)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `Resource` ADD CONSTRAINT `Resource_courseId_fkey` FOREIGN KEY (`courseId`) REFERENCES `Course`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

@@ -98,8 +98,12 @@
         }
 
         if (mode === 'forgot') {
+<<<<<<< HEAD
           const resp = await api.auth.forgotPassword({ email: String(payload.email).trim().toLowerCase() });
           // Backend may return a config error if email not set; pass that message to UI
+=======
+          const resp = await apiRequest('/request-otp', { email: String(payload.email).trim().toLowerCase() });
+>>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7
           showMessage(messageEl, resp.message || 'If that email is registered, reset instructions are being prepared. Check your configured email provider setup.', 'notice');
           return;
         }
@@ -129,8 +133,8 @@
           const user = result.data.user;
           setUser({ ...user, isLoggedIn: true });
           setToken(result.data.token);
-          showMessage(messageEl, 'Admin login successful. Redirecting to the dashboard.', 'success');
-          setTimeout(() => { window.location.href = './dashboard.html'; }, 500);
+          showMessage(messageEl, 'Admin login successful. Redirecting to the admin dashboard.', 'success');
+          setTimeout(() => { window.location.href = './admin.html'; }, 500);
         }
       } catch (error) {
         showMessage(messageEl, error.message || 'Authentication failed.', 'error');
@@ -149,6 +153,22 @@
     bindForm('forgotForm', 'forgot');
     bindForm('resetForm', 'reset');
     bindForm('adminLoginForm', 'admin-login');
+
+    const otpForm = document.getElementById('otpVerifyForm');
+    if (otpForm) {
+      otpForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const email = document.getElementById('forgotEmail')?.value.trim().toLowerCase();
+        const otp = document.getElementById('otpCode')?.value.trim();
+        const message = document.getElementById('authMessage');
+        try {
+          const result = await apiRequest('/verify-otp', { email, otp });
+          window.location.href = `./reset-password.html?token=${encodeURIComponent(result.data.resetToken)}`;
+        } catch (error) {
+          showMessage(message, error.message, 'error');
+        }
+      });
+    }
 
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {

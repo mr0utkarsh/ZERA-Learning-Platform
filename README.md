@@ -5,6 +5,7 @@ register, complete academic onboarding, upload a syllabus, confirm its
 structure, and receive a personalized study workflow backed by a real backend,
 persistent database, and configurable AI providers.
 
+<<<<<<< HEAD
 ## Architecture
 
 - `frontend/` — React 18 + TypeScript + Vite + Tailwind CSS (Vite build, Vercel-ready).
@@ -13,6 +14,45 @@ persistent database, and configurable AI providers.
 - File storage — private Supabase Storage buckets with short-lived signed URLs.
 - AI — server-side provider abstraction with failover `gemini -> groq -> openrouter -> deepseek`. Keys stay server-side.
 - Email — SMTP (Brevo relay configured). SMS — Brevo transactional API with honest capability reporting.
+=======
+This repository contains a static frontend and an Express/Prisma backend with authenticated MySQL persistence. AI and SMTP features require external provider configuration.
+
+## Core idea
+
+ZERA gives students a structured path through their learning journey without forcing them into paywalls or generic content. It helps learners:
+
+- understand their syllabus
+- generate notes and revision material
+- practice with quizzes and mock tests
+- plan study sessions
+- track course progress
+- build a study streak
+- save bookmarks and personal notes
+- prepare for interview-style questions
+
+## Features
+
+- Premium responsive landing experience
+- About and feature pages for the product narrative
+- Authenticated AI tools hub
+- Dashboard with course progress and next-step guidance
+- Syllabus tracking with states for not started, active, and complete
+- Persisted quiz and mock test assessments
+- Study plan generation and task tracking
+- AI mock interview integration
+- Bookmarks, notifications, and personal notes
+- Authentication UI for login, signup, forgot password, and reset flows
+- Admin login and admin-ready structure
+- Progress, streak, and achievements logic using localStorage
+
+## Frontend architecture
+
+- Static HTML pages at the repository root
+- Shared CSS in `css/`
+- Shared JavaScript in `js/`
+- Assets under `assets/`
+- Documentation in `docs/architecture.md`
+>>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7
 
 ## Local development
 
@@ -44,6 +84,7 @@ npm run dev
 
 Production build:
 
+<<<<<<< HEAD
 ```bash
 cd frontend
 VITE_API_URL=https://<your-backend> npm run build
@@ -55,6 +96,11 @@ VITE_API_URL=https://<your-backend> npm run build
 - Backend → Railway (start command `npx prisma migrate deploy && node src/server.js`, health check `/api/health`).
 - Database → Supabase PostgreSQL. Apply migrations with `prisma migrate deploy` at deploy time.
 - Never commit secrets. Service-role keys stay on the server.
+=======
+## External configuration
+
+Set `DATABASE_URL`, `JWT_SECRET`, and `PASSWORD_RESET_TOKEN_SECRET`. Live Gemini requires `GEMINI_API_KEY`. Password reset and OTP delivery require `EMAIL_PROVIDER=smtp`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_SECURE`, `EMAIL_USER`, `EMAIL_PASS`, `EMAIL_FROM`, and `CLIENT_URL`.
+>>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7
 
 ## Honesty policy
 

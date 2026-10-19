@@ -588,6 +588,7 @@ export const generateStudyNote = async ({ topic, context, level }) => {
 };
 
 export const generateQuiz = async ({ topic, difficulty, count }) => {
+<<<<<<< HEAD
   const prompt = buildPrompt('quiz-generator', { topic, difficulty, count });
 
   const result = await executeStructuredPrompt(prompt, (parsed) => {
@@ -644,4 +645,24 @@ export const analyzeSyllabusWithAi = async (text) => {
     analysis: result.data,
     provider: result.provider
   };
+=======
+  const response = await getGeminiText(buildPrompt('quiz-generator', { topic, difficulty, count }));
+  const parsed = parseJson(response);
+  if (!parsed?.title || !Array.isArray(parsed.questions) || !parsed.questions.length) throw new Error('The AI provider returned an invalid quiz format.');
+  return parsed;
+};
+
+export const generateStudyPlan = async ({ course, targetDate, hours, weakTopic }) => {
+  const response = await getGeminiText(buildPrompt('study-plan', { course, targetDate, hours, weakTopic }));
+  const parsed = parseJson(response);
+  if (!parsed?.title || !parsed.description || !Array.isArray(parsed.schedule)) throw new Error('The AI provider returned an invalid study-plan format.');
+  return parsed;
+};
+
+export const generateMockInterview = async ({ role, domain, difficulty }) => {
+  const response = await getGeminiText(buildPrompt('mock-interview', { role, domain, difficulty }));
+  const parsed = parseJson(response);
+  if (!parsed?.title || !Array.isArray(parsed.questions) || !parsed.questions.length) throw new Error('The AI provider returned an invalid interview format.');
+  return parsed;
+>>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7
 };
