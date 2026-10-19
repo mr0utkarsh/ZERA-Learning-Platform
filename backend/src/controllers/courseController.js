@@ -2,7 +2,6 @@ import {
   seedCourseCatalog,
   listAvailableCourses,
   ensureCourseEnrollment,
-  getDashboardSnapshot,
   getCourseProgressSnapshot,
   markLessonCompleted,
   buildCourseTree,
@@ -42,18 +41,6 @@ export const enrollInCourse = async (req, res, next) => {
       success: true,
       data: result,
       message: 'Enrolled successfully.'
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const getDashboard = async (req, res, next) => {
-  try {
-    const snapshot = await getDashboardSnapshot(req.user.id);
-    return res.status(200).json({
-      success: true,
-      data: snapshot
     });
   } catch (error) {
     next(error);

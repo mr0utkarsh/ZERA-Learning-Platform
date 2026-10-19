@@ -548,63 +548,6 @@ export const markLessonCompleted = async (userId, courseId, lessonId) => {
   };
 };
 
-export const getDashboardSnapshot = async (userId) => {
-  const enrollments = await prisma.enrollment.findMany({
-    where: { userId },
-    orderBy: { enrolledAt: 'desc' },
-    include: {
-      course: true,
-      progress: true
-    }
-  });
-
-  const courseSummaries = await Promise.all(
-    enrollments.map(async (enrollment) => {
-      const courseTree = await buildCourseTree(enrollment.courseId);
-      const lessonSequence = flattenCourseLessons(courseTree);
-      const progress = enrollment.progress[0] || null;
-      const currentIndex = progress?.lastLessonId
-        ? lessonSequence.findIndex((lesson) => lesson.id === progress.lastLessonId)
-        : -1;
-      const completedLessons = currentIndex >= 0 ? currentIndex + 1 : 0;
-      const completionPercentage = lessonSequence.length > 0 ? Math.round((completedLessons / lessonSequence.length) * 100) : 0;
-      const nextLesson = lessonSequence[completedLessons] || null;
-
-      return {
-        id: enrollment.id,
-        courseId: enrollment.courseId,
-        title: enrollment.course.title,
-        slug: enrollment.course.slug,
-        description: enrollment.course.description,
-        status: enrollment.status,
-        completionPercentage,
-        completedLessons,
-        totalLessons: lessonSequence.length,
-        nextLesson,
-        progressId: progress?.id || null
-      };
-    })
-  );
-
-  const overallProgress = courseSummaries.length > 0
-    ? Math.round(courseSummaries.reduce((sum, course) => sum + course.completionPercentage, 0) / courseSummaries.length)
-    : 0;
-
-  const continueLearning = courseSummaries
-    .filter((course) => course.completionPercentage < 100)
-    .sort((courseA, courseB) => courseA.completionPercentage - courseB.completionPercentage)[0] || null;
-
-  return {
-    user: {
-      id: userId
-    },
-    enrolledCourses: courseSummaries,
-    overallProgress,
-    continueLearning,
-    totalCourses: courseSummaries.length
-  };
-};
-
 export const listAvailableCourses = async () => {
   const courses = await prisma.course.findMany({
     orderBy: { title: 'asc' },

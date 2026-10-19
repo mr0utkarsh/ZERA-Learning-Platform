@@ -36,14 +36,14 @@ export default function Performance() {
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         <Card title="Strengths (≥70% accuracy)">
-          {perf.strengths.length ? <ul className="space-y-1 text-sm">{perf.strengths.map((s: any) => <li key={s.topicId}>✓ {s.title} · {s.accuracy}%</li>)}</ul> : <p className="text-sm text-slate-500">No strengths identified yet.</p>}
+          {Array.isArray(perf.strengths) && perf.strengths.length ? <ul className="space-y-1 text-sm">{perf.strengths.map((s: any) => <li key={s.topicId}>✓ {s.title} · {s.accuracy}%</li>)}</ul> : <p className="text-sm text-slate-500">No strengths identified yet.</p>}
         </Card>
         <Card title="Needs attention (<50% accuracy)">
-          {perf.needsAttention.length ? <ul className="space-y-1 text-sm">{perf.needsAttention.map((s: any) => <li key={s.topicId}>! {s.title} · {s.accuracy}%</li>)}</ul> : <p className="text-sm text-slate-500">Nothing flagged.</p>}
+          {Array.isArray(perf.needsAttention) && perf.needsAttention.length ? <ul className="space-y-1 text-sm">{perf.needsAttention.map((s: any) => <li key={s.topicId}>! {s.title} · {s.accuracy}%</li>)}</ul> : <p className="text-sm text-slate-500">Nothing flagged.</p>}
         </Card>
       </div>
       <Card title="Recommended next actions">
-        <ul className="space-y-1 text-sm text-slate-700">{perf.recommendations.map((r: string, i: number) => <li key={i}>→ {r}</li>)}</ul>
+        <ul className="space-y-1 text-sm text-slate-700">{Array.isArray(perf.recommendations) ? perf.recommendations.map((r: string, i: number) => <li key={i}>→ {r}</li>) : null}</ul>
       </Card>
       <p className="text-xs text-slate-400">{perf.methodology}</p>
     </div>

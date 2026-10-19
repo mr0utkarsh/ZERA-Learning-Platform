@@ -56,11 +56,6 @@ export const rateLimit = ({ windowMs = 60_000, max = 60, keyGenerator } = {}) =>
         success: false,
         message: 'Too many requests. Please try again later.'
       });
-
-      return res.status(429).json({
-        success: false,
-        message: 'Too many requests. Please try again later.'
-      });
     }
 
     return next();

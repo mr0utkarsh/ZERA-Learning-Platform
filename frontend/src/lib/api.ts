@@ -64,7 +64,9 @@ export const api = {
   auth: {
     signup: (body: { name: string; email: string; password: string }) => post<any>('/auth/signup', body),
     login: (body: { email: string; password: string }) => post<any>('/auth/login', body),
-    me: () => get<any>('/auth/me')
+    me: () => get<any>('/auth/me'),
+    forgotPassword: (email: string) => post<any>('/auth/forgot-password', { email }),
+    resetPassword: (token: string, password: string) => post<any>('/auth/reset-password', { token, password })
   },
   onboarding: {
     get: () => get<any>('/onboarding'),

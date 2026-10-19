@@ -4,7 +4,6 @@ import {
   initializeCatalog,
   getCatalog,
   enrollInCourse,
-  getDashboard,
   getCourseDetails,
   getCourseProgress,
   completeLesson,
@@ -14,7 +13,6 @@ import {
 const router = express.Router();
 
 router.get('/catalog', authenticate, requireStudent, getCatalog);
-router.get('/dashboard', authenticate, requireStudent, getDashboard);
 
 // Seeding writes to the database, so it must not be reachable anonymously.
 router.post('/initialize-catalog', authenticate, requireAdmin, initializeCatalog);

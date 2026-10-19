@@ -65,9 +65,9 @@ describe('AI provider failover', () => {
     const status = aiStatus();
 
     assert.equal(status.enabled, true);
-    assert.equal(status.activeProvider, 'gemini -> groq -> openrouter -> deepseek');
+    assert.equal(status.activeProvider, 'gemini -> groq -> openrouter -> deepseek -> together -> huggingface -> cloudflare -> mistral -> cohere -> nvidia');
 
-    for (const id of ['gemini', 'groq', 'openrouter', 'deepseek']) {
+    for (const id of ['gemini', 'groq', 'openrouter', 'deepseek', 'together', 'huggingface', 'cloudflare', 'mistral', 'cohere', 'nvidia']) {
       assert.equal(status.providers[id].configured, true, `${id} should be configured`);
     }
   });
@@ -76,7 +76,7 @@ describe('AI provider failover', () => {
     const { aiStatus } = await import('../src/services/aiService.js');
     const serialized = JSON.stringify(aiStatus());
 
-    for (const key of Object.values(process.env).filter((v) => /^(AIza|gsk_|sk-or-v1|sk_TEST)/.test(v || ''))) {
+    for (const key of Object.values(process.env).filter((v) => /^(AIza|gsk_|sk-or-v1|sk_TEST|key_|hf_|cfut_|mstrl_|cohere_|nvapi-)/.test(v || ''))) {
       assert.ok(!serialized.includes(key), 'a key leaked into the status payload');
     }
   });
@@ -138,12 +138,18 @@ describe('AI provider failover', () => {
       { match: 'generativelanguage', status: 500, body: { error: { message: 'a' } } },
       { match: 'api.groq.com', status: 500, body: { error: { message: 'b' } } },
       { match: 'openrouter.ai', status: 500, body: { error: { message: 'c' } } },
-      { match: 'api.deepseek.com', status: 200, body: chatBody('deepseek answered') }
+      { match: 'api.deepseek.com', status: 500, body: { error: { message: 'd' } } },
+      { match: 'api.together.xyz', status: 500, body: { error: { message: 'e' } } },
+      { match: 'api-inference.huggingface.co', status: 500, body: { error: { message: 'f' } } },
+      { match: 'api.cloudflare.com', status: 500, body: { error: { message: 'g' } } },
+      { match: 'api.mistral.ai', status: 500, body: { error: { message: 'h' } } },
+      { match: 'api.cohere.ai', status: 500, body: { error: { message: 'i' } } },
+      { match: 'integrate.api.nvidia.com', status: 200, body: chatBody('nvidia answered') }
     );
 
     const result = await generateDoubtAnswer({ question: 'q' });
-    assert.equal(result.provider, 'deepseek');
-    assert.equal(calls.length, 4);
+    assert.equal(result.provider, 'nvidia');
+    assert.equal(calls.length, 10);
   });
 
   it('fails with a 502 when every provider fails, naming each one', async () => {
@@ -152,14 +158,20 @@ describe('AI provider failover', () => {
       { match: 'generativelanguage', status: 500, body: { error: { message: 'a' } } },
       { match: 'api.groq.com', status: 500, body: { error: { message: 'b' } } },
       { match: 'openrouter.ai', status: 500, body: { error: { message: 'c' } } },
-      { match: 'api.deepseek.com', status: 500, body: { error: { message: 'd' } } }
+      { match: 'api.deepseek.com', status: 500, body: { error: { message: 'd' } } },
+      { match: 'api.together.xyz', status: 500, body: { error: { message: 'e' } } },
+      { match: 'api-inference.huggingface.co', status: 500, body: { error: { message: 'f' } } },
+      { match: 'api.cloudflare.com', status: 500, body: { error: { message: 'g' } } },
+      { match: 'api.mistral.ai', status: 500, body: { error: { message: 'h' } } },
+      { match: 'api.cohere.ai', status: 500, body: { error: { message: 'i' } } },
+      { match: 'integrate.api.nvidia.com', status: 500, body: { error: { message: 'j' } } }
     );
 
     await assert.rejects(
       generateDoubtAnswer({ question: 'q' }),
       (err) => {
         assert.equal(err.statusCode, 502);
-        for (const id of ['gemini', 'groq', 'openrouter', 'deepseek']) {
+        for (const id of ['gemini', 'groq', 'openrouter', 'deepseek', 'together', 'huggingface', 'cloudflare', 'mistral', 'cohere', 'nvidia']) {
           assert.match(err.message, new RegExp(id, 'i'), 'the failure should name the provider');
         }
         return true;
@@ -199,7 +211,13 @@ describe('AI provider failover', () => {
       { match: 'generativelanguage', status: 500, body: { error: { message: 'a' } } },
       { match: 'api.groq.com', status: 500, body: { error: { message: 'b' } } },
       { match: 'openrouter.ai', status: 500, body: { error: { message: 'c' } } },
-      { match: 'api.deepseek.com', status: 500, body: { error: { message: 'd' } } }
+      { match: 'api.deepseek.com', status: 500, body: { error: { message: 'd' } } },
+      { match: 'api.together.xyz', status: 500, body: { error: { message: 'e' } } },
+      { match: 'api-inference.huggingface.co', status: 500, body: { error: { message: 'f' } } },
+      { match: 'api.cloudflare.com', status: 500, body: { error: { message: 'g' } } },
+      { match: 'api.mistral.ai', status: 500, body: { error: { message: 'h' } } },
+      { match: 'api.cohere.ai', status: 500, body: { error: { message: 'i' } } },
+      { match: 'integrate.api.nvidia.com', status: 500, body: { error: { message: 'j' } } }
     );
 
     await assert.rejects(generateDoubtAnswer({ question: 'q' }), (err) => {
@@ -226,13 +244,19 @@ describe('AI structured output handling', () => {
 
   it('rejects a quiz that is not the promised shape instead of returning junk', async () => {
     const { generateQuiz } = await import('../src/services/aiService.js');
-    // Every provider answers conversationally, so all four must be tried and the
+    // Every provider answers conversationally, so all ten must be tried and the
     // request must still fail rather than hand the client a shape-less object.
     queue(
       { match: 'generativelanguage', status: 200, body: geminiBody('I am a chatty model and refused to emit JSON.') },
       { match: 'api.groq.com', status: 200, body: chatBody('also chatty') },
       { match: 'openrouter.ai', status: 200, body: chatBody('still chatty') },
-      { match: 'api.deepseek.com', status: 200, body: chatBody('chatty to the end') }
+      { match: 'api.deepseek.com', status: 200, body: chatBody('chatty to the end') },
+      { match: 'api.together.xyz', status: 200, body: chatBody('chatty too') },
+      { match: 'api-inference.huggingface.co', status: 200, body: chatBody('no json') },
+      { match: 'api.cloudflare.com', status: 200, body: chatBody('nope') },
+      { match: 'api.mistral.ai', status: 200, body: chatBody('nope') },
+      { match: 'api.cohere.ai', status: 200, body: chatBody('nope') },
+      { match: 'integrate.api.nvidia.com', status: 200, body: chatBody('nope') }
     );
 
     await assert.rejects(generateQuiz({ topic: 'OS', difficulty: 'medium', count: 1 }), (err) => {
@@ -265,7 +289,13 @@ describe('AI structured output handling', () => {
       { match: 'generativelanguage', status: 200, body: geminiBody(JSON.stringify({ schedule: [] })) },
       { match: 'api.groq.com', status: 200, body: chatBody('no plan for you') },
       { match: 'openrouter.ai', status: 200, body: chatBody('nope') },
-      { match: 'api.deepseek.com', status: 200, body: chatBody('nope') }
+      { match: 'api.deepseek.com', status: 200, body: chatBody('nope') },
+      { match: 'api.together.xyz', status: 200, body: chatBody('nope') },
+      { match: 'api-inference.huggingface.co', status: 200, body: chatBody('nope') },
+      { match: 'api.cloudflare.com', status: 200, body: chatBody('nope') },
+      { match: 'api.mistral.ai', status: 200, body: chatBody('nope') },
+      { match: 'api.cohere.ai', status: 200, body: chatBody('nope') },
+      { match: 'integrate.api.nvidia.com', status: 200, body: chatBody('nope') }
     );
 
     await assert.rejects(generateStudyPlan({ course: 'OS' }), /no schedule entries/i);

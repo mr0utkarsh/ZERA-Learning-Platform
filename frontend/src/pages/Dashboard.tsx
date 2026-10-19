@@ -63,7 +63,7 @@ export default function Dashboard() {
           <h3 className="font-semibold text-ink-900">Performance</h3>
           {perf && perf.hasData ? (
             <div className="mt-2 space-y-1 text-sm text-slate-600">
-              <p>Avg quiz accuracy: <span className="font-medium text-ink-900">{perf.quizzes.averageAccuracy ?? '—'}%</span></p>
+              <p>Avg quiz accuracy: <span className="font-medium text-ink-900">{perf.quizzes.averageAccuracy ?? '—'}{perf.quizzes.averageAccuracy != null ? '%' : ''}</span></p>
               <p>Completed study tasks: <span className="font-medium text-ink-900">{perf.studyTasks.completed}/{perf.studyTasks.total}</span></p>
               <p>Topics needing revision: <span className="font-medium text-ink-900">{perf.syllabus.needsRevision}</span></p>
               {perf.recommendations?.[0] && <p className="mt-2 rounded-lg bg-brand-50 px-3 py-2 text-brand-800">{perf.recommendations[0]}</p>}

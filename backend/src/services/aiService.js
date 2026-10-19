@@ -1,10 +1,10 @@
 import { env } from '../config/env.js';
 
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
-const DEFAULT_GEMINI_MODEL = env.GEMINI_MODEL || 'gemini-2.0-flash';
+const DEFAULT_GEMINI_MODEL = env.GEMINI_MODEL || 'gemini-2.5-flash';
 
 const GROQ_BASE_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const DEFAULT_GROQ_MODEL = env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+const DEFAULT_GROQ_MODEL = env.GROQ_MODEL || 'llama-3.1-8b-instant';
 
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const DEFAULT_OPENROUTER_MODEL = env.OPENROUTER_MODEL || 'openai/gpt-4o-mini';
@@ -258,6 +258,138 @@ const callDeepSeek = async (promptObj) =>
     label: 'DeepSeek'
   }, promptObj);
 
+const TOGETHER_BASE_URL = 'https://api.together.xyz/v1/chat/completions';
+const DEFAULT_TOGETHER_MODEL = env.TOGETHER_MODEL || 'meta-llama/Llama-3.3-70b-Instruct-Turbo';
+
+const callTogether = async (promptObj) =>
+  callOpenAiCompatible({
+    baseUrl: TOGETHER_BASE_URL,
+    apiKey: env.TOGETHER_API_KEY,
+    model: DEFAULT_TOGETHER_MODEL,
+    label: 'Together AI'
+  }, promptObj);
+
+const HUGGINGFACE_BASE_URL = 'https://api-inference.huggingface.co/v1/chat/completions';
+const DEFAULT_HUGGINGFACE_MODEL = env.HUGGINGFACE_MODEL || 'mistralai/Mistral-7B-Instruct-v0.3';
+
+const callHuggingFace = async (promptObj) =>
+  callOpenAiCompatible({
+    baseUrl: HUGGINGFACE_BASE_URL,
+    apiKey: env.HUGGINGFACE_API_KEY,
+    model: DEFAULT_HUGGINGFACE_MODEL,
+    label: 'HuggingFace'
+  }, promptObj);
+
+const CLOUDFLARE_BASE_URL = 'https://api.cloudflare.com/client/v4/ai/run';
+const DEFAULT_CLOUDFLARE_MODEL = env.CLOUDFLARE_MODEL || '@cf/meta/llama-3.3-70b-instruct-fp8-fp8';
+
+const callCloudflare = async (promptObj) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), env.AI_TIMEOUT_MS);
+
+  try {
+    const res = await fetch(CLOUDFLARE_BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.CLOUDFLARE_API_KEY}`
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: DEFAULT_CLOUDFLARE_MODEL,
+        messages: [
+          { role: 'system', content: promptObj.system },
+          { role: 'user', content: promptObj.user }
+        ],
+        temperature: 0.7,
+        max_tokens: 1500
+      })
+    });
+
+    const payload = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      const msg = payload?.error?.message || `Cloudflare returned HTTP ${res.status}`;
+      throw new Error(msg);
+    }
+
+    const text = payload?.result?.response || '';
+    if (!text.trim()) {
+      throw new Error('Cloudflare returned an empty response.');
+    }
+
+    return text.trim();
+  } finally {
+    clearTimeout(timeoutId);
+  }
+};
+
+const MISTRAL_BASE_URL = 'https://api.mistral.ai/v1/chat/completions';
+const DEFAULT_MISTRAL_MODEL = env.MISTRAL_MODEL || 'mistral-large-latest';
+
+const callMistral = async (promptObj) =>
+  callOpenAiCompatible({
+    baseUrl: MISTRAL_BASE_URL,
+    apiKey: env.MISTRAL_API_KEY,
+    model: DEFAULT_MISTRAL_MODEL,
+    label: 'Mistral'
+  }, promptObj);
+
+const COHERE_BASE_URL = 'https://api.cohere.ai/v2/chat';
+const DEFAULT_COHERE_MODEL = env.COHERE_MODEL || 'command-r-08-2024';
+
+const callCohere = async (promptObj) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), env.AI_TIMEOUT_MS);
+
+  try {
+    const res = await fetch(COHERE_BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.COHERE_API_KEY}`
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: DEFAULT_COHERE_MODEL,
+        messages: [
+          { role: 'system', content: promptObj.system },
+          { role: 'user', content: promptObj.user }
+        ],
+        temperature: 0.7,
+        max_tokens: 1500
+      })
+    });
+
+    const payload = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      const msg = payload?.message || payload?.error?.message || `Cohere returned HTTP ${res.status}`;
+      throw new Error(msg);
+    }
+
+    const text = payload?.text || '';
+    if (!text.trim()) {
+      throw new Error('Cohere returned an empty response.');
+    }
+
+    return text.trim();
+  } finally {
+    clearTimeout(timeoutId);
+  }
+};
+
+const NVIDIA_BASE_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
+const DEFAULT_NVIDIA_MODEL = env.NVIDIA_MODEL || 'meta/llama-3.3-70b-instruct';
+
+const callNvidia = async (promptObj) =>
+  callOpenAiCompatible({
+    baseUrl: NVIDIA_BASE_URL,
+    apiKey: env.NVIDIA_API_KEY,
+    model: DEFAULT_NVIDIA_MODEL,
+    label: 'NVIDIA'
+  }, promptObj);
+
 /**
  * The failover chain, most-preferred first.
  *
@@ -290,6 +422,42 @@ const PROVIDERS = [
     apiKey: env.DEEPSEEK_API_KEY,
     model: DEFAULT_DEEPSEEK_MODEL,
     call: callDeepSeek
+  },
+  {
+    id: 'together',
+    apiKey: env.TOGETHER_API_KEY,
+    model: DEFAULT_TOGETHER_MODEL,
+    call: callTogether
+  },
+  {
+    id: 'huggingface',
+    apiKey: env.HUGGINGFACE_API_KEY,
+    model: DEFAULT_HUGGINGFACE_MODEL,
+    call: callHuggingFace
+  },
+  {
+    id: 'cloudflare',
+    apiKey: env.CLOUDFLARE_API_KEY,
+    model: DEFAULT_CLOUDFLARE_MODEL,
+    call: callCloudflare
+  },
+  {
+    id: 'mistral',
+    apiKey: env.MISTRAL_API_KEY,
+    model: DEFAULT_MISTRAL_MODEL,
+    call: callMistral
+  },
+  {
+    id: 'cohere',
+    apiKey: env.COHERE_API_KEY,
+    model: DEFAULT_COHERE_MODEL,
+    call: callCohere
+  },
+  {
+    id: 'nvidia',
+    apiKey: env.NVIDIA_API_KEY,
+    model: DEFAULT_NVIDIA_MODEL,
+    call: callNvidia
   }
 ];
 

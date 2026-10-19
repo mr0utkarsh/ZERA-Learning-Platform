@@ -64,7 +64,7 @@ export default function Interview() {
         <div className="card">
           <div className="text-3xl font-bold text-brand-700">{feedback.overall}<span className="text-base font-normal text-slate-400">/100</span></div>
           <p className="mt-1 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">{feedback.disclaimer}</p>
-          {feedback.missingConcepts.length > 0 && (
+          {Array.isArray(feedback.missingConcepts) && feedback.missingConcepts.length > 0 && (
             <div className="mt-3">
               <h3 className="font-semibold text-ink-900">Missing concepts</h3>
               <p className="text-sm text-slate-600">{feedback.missingConcepts.join(', ')}</p>
@@ -72,7 +72,7 @@ export default function Interview() {
           )}
           <div className="mt-3">
             <h3 className="font-semibold text-ink-900">Suggestions</h3>
-            <ul className="mt-1 space-y-1 text-sm text-slate-600">{feedback.suggestions.map((s: string, i: number) => <li key={i}>→ {s}</li>)}</ul>
+            <ul className="mt-1 space-y-1 text-sm text-slate-600">{Array.isArray(feedback.suggestions) ? feedback.suggestions.map((s: string, i: number) => <li key={i}>→ {s}</li>) : null}</ul>
           </div>
         </div>
       )}
