@@ -1,4 +1,7 @@
-FROM node:20-alpine
+# Debian slim (glibc + OpenSSL 3) instead of Alpine: Prisma 5.22's query
+# engine requires libssl, which the Alpine image does not provide, causing
+# "Error loading shared library libssl.so.1.1" and a boot-time crash.
+FROM node:20-slim
 
 WORKDIR /app
 
