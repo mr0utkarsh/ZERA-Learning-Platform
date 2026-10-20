@@ -184,7 +184,7 @@
               ${statusBadge(student.status)}
             </div>
           </div>
-          <div style="margin-top:8px; color:#52657a; font-size:0.92rem;">
+          <div style="margin-top:8px; color:#b9b3d2; font-size:0.92rem;">
             Joined: ${escapeHtml(formatDate(student.createdAt))} • Enrollments: ${escapeHtml(counts.enrollments || 0)} • Notes: ${escapeHtml(counts.notes || 0)} • Quizzes: ${escapeHtml(counts.quizAttempts || 0)}
           </div>
           <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
@@ -350,7 +350,7 @@
               ${inviteStatusBadge(invite.status)}
             </div>
           </div>
-          <div style="margin-top:8px; color:#52657a; font-size:0.92rem;">
+          <div style="margin-top:8px; color:#b9b3d2; font-size:0.92rem;">
             Invited by ${escapeHtml(invitedBy)} on ${escapeHtml(formatDate(invite.createdAt))}
           </div>
           ${isPending && !isApproving ? `
@@ -497,9 +497,42 @@
     document.getElementById('inviteStatusFilter')?.addEventListener('change', loadInvites);
   }
 
+  /**
+   * The console header collapses on narrow screens, so the pages carry their
+   * own toggle for the collapsed navigation. The same behaviour lives in
+   * js/app.js for the student pages, which do not load the console script.
+   */
+  function bindMobileNav() {
+    const toggle = document.querySelector('.menu-toggle');
+    const nav = document.querySelector('.mobile-nav');
+    if (!toggle || !nav) return;
+
+    const close = () => {
+      nav.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    };
+
+    toggle.addEventListener('click', () => {
+      const open = nav.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', String(open));
+    });
+
+    // Following a link reloads the page, but the open state has to be cleared
+    // first or the next page opens with the menu already expanded.
+    nav.addEventListener('click', (event) => {
+      if (event.target.closest('a')) close();
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 980) close();
+    });
+  }
+
   // ─── Bootstrap ──────────────────────────────────────────────────────────────
 
   document.addEventListener('DOMContentLoaded', () => {
+    bindMobileNav();
+
     // The console is published both as /admin.html and as /admin, so the route
     // is matched on the page it renders rather than on one exact file name.
     const path = window.location.pathname.replace(/\/+$/, '');

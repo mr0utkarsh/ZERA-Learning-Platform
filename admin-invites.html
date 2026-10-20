@@ -14,8 +14,8 @@
   <script src="./js/auth.js" defer></script>
   <script src="./js/admin.js" defer></script>
 </head>
-<body>
-  <header class="site-header">
+<body class="admin-page">
+  <header class="site-header admin-header">
     <div class="container header-inner">
       <a href="/" class="brand" aria-label="ZERA home"><span class="brand-mark"><span>Z</span></span><span>ZERA</span></a>
       <nav class="nav" aria-label="Admin navigation">
@@ -24,10 +24,19 @@
         <a href="./admin-invites.html" class="active">Invitations</a>
       </nav>
       <div class="header-actions">
+        <button class="btn btn-secondary btn-small menu-toggle" type="button" aria-expanded="false" aria-label="Toggle menu">Menu</button>
         <button class="btn btn-secondary btn-small" type="button" id="logoutBtn">Logout</button>
       </div>
     </div>
   </header>
+
+  <div class="mobile-nav container admin-mobile-nav" aria-label="Mobile navigation">
+    <nav class="nav flex-col">
+      <a href="./admin.html">Overview</a>
+      <a href="./admin-students.html">Students</a>
+      <a href="./admin-invites.html" class="active">Invitations</a>
+    </nav>
+  </div>
 
   <main class="section">
     <div class="container app-shell">
