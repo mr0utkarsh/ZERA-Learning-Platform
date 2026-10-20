@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import bcrypt from 'bcryptjs';
 import { prisma } from '../config/prisma.js';
 import { aiStatus } from '../services/aiService.js';
@@ -78,25 +77,11 @@ export const getUsers = async (req, res, next) => {
     });
 
     res.json({ success: true, data: users });
-=======
-import {
-  getAdminOverview,
-  getStudentDirectory,
-  getStudentDetails,
-  updateStudentStatus
-} from '../services/adminService.js';
-
-export const adminOverview = async (req, res, next) => {
-  try {
-    const data = await getAdminOverview();
-    res.json({ success: true, data });
->>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7
   } catch (error) {
     next(error);
   }
 };
 
-<<<<<<< HEAD
 // ─── Suspend User ─────────────────────────────────────────────────────────────
 export const suspendUser = async (req, res, next) => {
   try {
@@ -115,19 +100,11 @@ export const suspendUser = async (req, res, next) => {
       data: user,
       message: `User ${user.email} has been suspended and their sessions were revoked.`
     });
-=======
-export const listStudents = async (req, res, next) => {
-  try {
-    const { search, status } = req.query;
-    const data = await getStudentDirectory({ search: search || '', status: status || '' });
-    res.json({ success: true, data });
->>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7
   } catch (error) {
     next(error);
   }
 };
 
-<<<<<<< HEAD
 // ─── Restore User ─────────────────────────────────────────────────────────────
 export const restoreUser = async (req, res, next) => {
   try {
@@ -142,18 +119,11 @@ export const restoreUser = async (req, res, next) => {
     });
 
     res.json({ success: true, data: user, message: `User ${user.email} has been restored to active status.` });
-=======
-export const fetchStudent = async (req, res, next) => {
-  try {
-    const data = await getStudentDetails(req.params.studentId);
-    res.json({ success: true, data });
->>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7
   } catch (error) {
     next(error);
   }
 };
 
-<<<<<<< HEAD
 // ─── Delete User ──────────────────────────────────────────────────────────────
 export const deleteUser = async (req, res, next) => {
   try {
@@ -469,12 +439,6 @@ export const getPlatformStats = async (req, res, next) => {
 export const getAiConfig = async (req, res, next) => {
   try {
     res.json({ success: true, data: aiStatus() });
-=======
-export const setStudentStatus = async (req, res, next) => {
-  try {
-    const data = await updateStudentStatus(req.params.studentId, req.body.status);
-    res.json({ success: true, data, message: `Student status updated to ${req.body.status}.` });
->>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7
   } catch (error) {
     next(error);
   }

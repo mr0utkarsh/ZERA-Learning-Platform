@@ -6,7 +6,20 @@
  * The bearer token is attached automatically and cleared on 401.
  */
 
-const BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || '';
+/**
+ * Normalised API origin.
+ *
+ * VITE_API_URL may be given as either the bare origin
+ * (https://backend.example.com) or with a trailing /api segment
+ * (https://backend.example.com/api). Stripping a trailing "/api" here means
+ * every request can safely append "/api/..." exactly once, so we never end
+ * up calling /api/api/... .
+ */
+const RAW_BASE = (import.meta.env.VITE_API_URL as string | undefined)?.trim() || '';
+
+export const API_ORIGIN = RAW_BASE.replace(/\/+$/, '').replace(/\/api$/, '');
+
+const BASE = API_ORIGIN;
 const TOKEN_KEY = 'zera_token';
 
 export const tokenStore = {
@@ -59,6 +72,9 @@ const patch = <T,>(path: string, body?: unknown) =>
 
 const get = <T,>(path: string) => request<T>(path);
 const del = <T,>(path: string) => request<T>(path, { method: 'DELETE' });
+
+/** Full URL for an API path, e.g. apiUrl('/quiz') -> "https://host/api/quiz". */
+export const apiUrl = (path: string) => `${BASE}/api${path}`;
 
 export const api = {
   auth: {

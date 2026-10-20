@@ -2,16 +2,19 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy backend package files
+# Copy dependency manifests AND the Prisma schema first. The backend's
+# "postinstall" script runs `prisma generate`, which fails with
+# "Could not find Prisma Schema" unless prisma/schema.prisma is present.
 COPY backend/package*.json ./
+COPY backend/prisma/ ./prisma/
 
-# Install dependencies
+# Install dependencies (runs `prisma generate` via postinstall)
 RUN npm ci
 
 # Copy backend source
 COPY backend/ ./
 
-# Generate Prisma client
+# Regenerate the client against the final copied schema
 RUN npm run prisma:generate
 
 EXPOSE 5000

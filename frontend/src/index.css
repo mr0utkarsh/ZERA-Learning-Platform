@@ -2,14 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply bg-slate-950 text-slate-50 antialiased overflow-x-hidden;
-  }
-}
-
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 html,
@@ -19,8 +13,10 @@ body,
 }
 
 body {
-  @apply bg-slate-50 text-ink-900 antialiased;
+  @apply bg-void text-fg antialiased overflow-x-hidden;
   font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* Respect users who prefer reduced motion. */
@@ -37,26 +33,248 @@ body {
 
 /* Visible keyboard focus for accessibility. */
 :focus-visible {
-  @apply outline-none ring-2 ring-brand-500 ring-offset-2;
+  outline: 2px solid #19C7D7;
+  outline-offset: 2px;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-white/20;
+}
+
+/* ── Billboard / hero safe-guard ────────────
+   Content must be visible before any JS animation. */
+.hero-safe {
+  animation: heroSafe 0.05s ease both;
+}
+@keyframes heroSafe {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Gradient border ───────────────────────── */
+.gradient-border {
+  --gb-width: 2px;
+  position: relative;
+  background: linear-gradient(to bottom right, #755CFF, #B45DFF, #19C7D7);
+  background-size: 200% 200%;
+  border-radius: var(--rounded, 0.75rem);
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--gb-width));
+  border-radius: calc(var(--rounded, 0.75rem) + var(--gb-width));
+  background: linear-gradient(to bottom right, #755CFF, #B45DFF, #19C7D7);
+  animation: gradient-x 8s ease infinite;
+  pointer-events: none;
+}
+.gradient-border > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes gradient-x {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-gradient-x {
+  animation: gradient-x 8s ease infinite;
+}
+
+/* ── Glow pulse (subtle) ───────────────────── */
+.glow-pulse {
+  animation: glowPulse 4s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 24px -8px rgba(117, 92, 255, 0.4); }
+  50% { box-shadow: 0 0 40px -6px rgba(117, 92, 255, 0.7), 0 0 80px -14px rgba(25, 199, 215, 0.25); }
+}
+
+/* ── Card lift ─────────────────────────────── */
+.card-lift {
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+}
+.card-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px -16px rgba(117, 92, 255, 0.35), 0 0 0 1px rgba(117, 92, 255, 0.15);
 }
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-primary {
-    @apply btn bg-brand-600 text-white hover:bg-brand-700;
+    @apply btn bg-gradient-to-r from-violet-500 to-cyan-500 text-white shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:scale-[1.02] active:scale-[0.98];
+  }
+  .btn-secondary {
+    @apply btn bg-white/5 text-fg ring-1 ring-white/10 hover:bg-white/10 hover:ring-white/20;
+  }
+  .btn-soft {
+    @apply btn bg-violet-500/10 text-violet-300 ring-1 ring-violet-500/20 hover:bg-violet-500/20;
   }
   .btn-ghost {
-    @apply btn bg-white text-ink-800 ring-1 ring-slate-200 hover:bg-slate-50;
+    @apply btn bg-transparent text-fg hover:bg-white/5;
   }
-  .card {
-    @apply rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200;
+  .btn-sm {
+    @apply btn px-3 py-1.5 text-xs;
   }
-  .input {
-    @apply w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500;
+  .btn-lg {
+    @apply btn px-7 py-4 text-base;
   }
-  .label {
-    @apply mb-1 block text-sm font-medium text-slate-700;
+  .btn-icon {
+    @apply p-2 rounded-xl transition-colors hover:bg-white/5;
   }
+
+  .field-label {
+    @apply mb-1.5 block text-xs font-medium text-muted;
+  }
+  .field-input,
+  .field-select,
+  .field-textarea {
+    @apply w-full rounded-xl bg-surface-2 px-4 py-3 text-sm text-fg ring-1 ring-white/10 transition placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/70;
+  }
+  .field-input::placeholder,
+  .field-select::placeholder,
+  .field-textarea::placeholder {
+    @apply text-muted/60;
+  }
+  .field-input[aria-invalid='true'],
+  .field-select[aria-invalid='true'],
+  .field-textarea[aria-invalid='true'] {
+    @apply ring-red-500/60;
+  }
+  .field-textarea {
+    @apply min-h-24 resize-y;
+  }
+  .field-select {
+    @apply appearance-none pr-8 cursor-pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23A8A6B5' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right center;
+    background-repeat: no-repeat;
+  }
+  .field-error {
+    @apply mt-1.5 block text-xs font-medium text-error;
+  }
+  .form-error {
+    @apply mt-3 rounded-xl bg-surface-2 px-3 py-2.5 text-sm text-error border border-red-500/15;
+  }
+
+  .progress-ring {
+    transform: rotate(-90deg);
+  }
+  .progress-ring-circle {
+    transform-origin: center;
+    transition: stroke-dashoffset 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .empty-state {
+    @apply rounded-2xl border border-white/5 bg-surface-2 p-8 text-center;
+  }
+  .empty-state-icon {
+    @apply mb-4 grid h-12 w-12 place-items-center rounded-xl bg-white/5 text-muted;
+  }
+  .empty-state-title {
+    @apply mt-3 text-base font-semibold text-fg;
+  }
+  .empty-state-desc {
+    @apply mt-1.5 text-sm text-muted;
+  }
+  .empty-state-action {
+    @apply mt-5 inline-flex;
+  }
+  .loading-spinner {
+    @apply grid h-8 w-8 place-items-center rounded-xl bg-surface-2;
+  }
+  .loading-spinner::after {
+    content: '';
+    @apply absolute inset-0 m-auto h-5 w-5 animate-spin rounded-full bg-gradient-to-br from-violet-500 to-cyan-500;
+  }
+
+  .sidebar-backdrop {
+    @apply fixed inset-0 z-30 bg-black/50 backdrop-blur-sm transition-opacity duration-300;
+  }
+  .sidebar-backdrop.open {
+    opacity: 1;
+  }
+  .sidebar-panel {
+    @apply fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-white/5 bg-void/95 backdrop-blur-xl transition-transform duration-300 ease-out md:translate-x-0 md:static md:inset-0;
+  }
+  .sidebar-panel.hidden {
+    @apply -translate-x-full;
+  }
+
+  .toast-container {
+    @apply fixed bottom-6 right-6 z-[100] flex flex-col gap-2;
+  }
+  .toast {
+    @apply flex items-center gap-3 rounded-xl bg-surface-1 px-4 py-3.5 ring-1 ring-white/10 shadow-2xl;
+    animation: toastIn 0.3s ease both;
+  }
+  .toast-out {
+    animation: toastOut 0.25s ease both;
+  }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes toastOut {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(12px) scale(0.96); }
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ── Print (for legal page) ────────────────── */
+@media print {
+  body {
+    background: #000;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}
+
+/* ── Page transition (framer-motion) helper ── */
+.page-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.page-exit {
+  opacity: 1;
+}
+.page-exit-active {
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }

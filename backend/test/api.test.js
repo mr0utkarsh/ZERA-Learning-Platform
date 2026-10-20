@@ -112,12 +112,12 @@ describe('authentication and authorization', () => {
   });
 
   it('refuses requests with no token', async () => {
-    const res = await request('/api/dashboard');
+    const res = await request('/api/student/profile');
     assert.equal(res.status, 401);
   });
 
   it('refuses a tampered token', async () => {
-    const res = await request('/api/dashboard', { token: 'not.a.jwt' });
+    const res = await request('/api/student/profile', { token: 'not.a.jwt' });
     assert.equal(res.status, 401);
   });
 

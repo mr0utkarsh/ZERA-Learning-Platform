@@ -1,13 +1,36 @@
-export function Logo({ className = 'h-8' }: { className?: string }) {
+type LogoVariant = 'symbol' | 'primary' | 'dark' | 'monochrome' | 'wordmark';
+
+const MARKS: Record<string, string> = {
+  symbol: '/src/assets/logo-symbol.svg',
+  primary: '/src/assets/logo-primary.svg',
+  dark: '/src/assets/logo-primary-dark.svg',
+  monochrome: '/src/assets/logo-monochrome.svg',
+};
+
+export function Logo({
+  variant = 'symbol',
+  className = 'h-8',
+  showWordmark = false,
+}: {
+  variant?: LogoVariant;
+  className?: string;
+  showWordmark?: boolean;
+}) {
+  const src = MARKS[variant] ?? MARKS.symbol;
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <svg viewBox="0 0 32 32" className="h-8 w-8" aria-hidden="true">
-        <rect width="32" height="32" rx="8" fill="#4f46e5" />
-        <path d="M9 23V9l14 14V9" stroke="#2dd4bf" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-      </svg>
-      <span className="text-lg font-bold tracking-tight text-ink-900">
-        ZERA
-      </span>
+    <div
+      className={`flex items-center gap-2 ${className}`}
+      role="img"
+      aria-label="ZERA — Your New Era of Learning"
+    >
+      <div className="relative h-full w-[1.5em] shrink-0">
+        <img src={src} alt="" aria-hidden="true" className="block h-full w-full" />
+      </div>
+      {showWordmark && (
+        <span className="font-display text-lg font-bold tracking-tight text-fg">
+          ZERA
+        </span>
+      )}
     </div>
   );
 }

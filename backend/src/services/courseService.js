@@ -322,18 +322,32 @@ export const seedCourseCatalog = async () => {
 
   const foundations = await prisma.course.findUnique({ where: { slug: 'zera-foundations' } });
   if (foundations) {
-    const subject = await prisma.subject.findFirst({ where: { courseId: foundations.id }, orderBy: { sequence: 'asc' }, include: { units: { orderBy: { sequence: 'asc' }, include: { chapters: { orderBy: { sequence: 'asc' }, include: { topics: { orderBy: { sequence: 'asc' } } } } } } } });
+    const subject = await prisma.subject.findFirst({
+      where: { courseId: foundations.id },
+      orderBy: { sequence: 'asc' },
+      include: {
+        units: {
+          orderBy: { sequence: 'asc' },
+          include: {
+            chapters: {
+              orderBy: { sequence: 'asc' },
+              include: { topics: { orderBy: { sequence: 'asc' } } }
+            }
+          }
+        }
+      }
+    });
     const topic = subject?.units[0]?.chapters[0]?.topics[0];
-    if (subject && topic && !await prisma.pyq.findFirst({ where: { courseId: foundations.id } })) {
-      await prisma.pyq.createMany({ data: [
-        { courseId: foundations.id, subjectId: subject.id, topicId: topic.id, year: 2025, question: 'Explain why active recall is useful for long-term retention.', answer: 'Active recall strengthens retrieval pathways by requiring the learner to produce knowledge from memory.', explanation: 'A complete answer connects retrieval practice with durable memory.', source: 'ZERA Foundations practice archive' },
-        { courseId: foundations.id, subjectId: subject.id, topicId: topic.id, year: 2024, question: 'Which habit best supports a sustainable study routine?', options: ['Manageable repeated sessions', 'One long session before an exam', 'Skipping review', 'Changing goals daily'], answer: 'Manageable repeated sessions', explanation: 'Repeatable sessions support consistency and reduce overload.', source: 'ZERA Foundations practice archive' }
+    if (subject && topic && !await prisma.previousQuestion.findFirst({ where: { courseId: foundations.id } })) {
+      await prisma.previousQuestion.createMany({ data: [
+        { courseId: foundations.id, title: 'Learning Foundations 2025', subject: subject.title, year: 2025, description: 'ZERA Foundations practice archive — previous year question paper.' },
+        { courseId: foundations.id, title: 'Learning Foundations 2024', subject: subject.title, year: 2024, description: 'ZERA Foundations practice archive — previous year question paper.' }
       ] });
     }
-    if (subject && topic && !await prisma.resource.findFirst({ where: { courseId: foundations.id } })) {
-      await prisma.resource.createMany({ data: [
-        { courseId: foundations.id, subjectId: subject.id, topicId: topic.id, title: 'Active recall reference', description: 'A concise reference for planning retrieval practice and review cycles.', resourceType: 'GUIDE', url: 'https://learning-scientists.org/spacing' },
-        { courseId: foundations.id, subjectId: subject.id, topicId: topic.id, title: 'Study routine worksheet', description: 'A printable worksheet for planning manageable weekly study sessions.', resourceType: 'TEMPLATE', url: 'https://www.coursera.org/articles/time-management-for-students' }
+    if (!await prisma.learningResource.findFirst({ where: { title: 'Active recall reference' } })) {
+      await prisma.learningResource.createMany({ data: [
+        { title: 'Active recall reference', description: 'A concise reference for planning retrieval practice and review cycles.', url: 'https://learning-scientists.org/spacing', skill: 'Learning Science', technology: 'Study Skills', level: 'beginner', source: 'The Learning Scientists' },
+        { title: 'Study routine worksheet', description: 'A printable worksheet for planning manageable weekly study sessions.', url: 'https://www.coursera.org/articles/time-management-for-students', skill: 'Time Management', technology: 'Study Skills', level: 'beginner', source: 'Coursera' }
       ] });
     }
   }

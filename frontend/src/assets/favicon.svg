@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-label="ZERA favicon" role="img">
+  <defs>
+    <linearGradient id="zeraFavGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#755CFF"/>
+      <stop offset="55%" stop-color="#B45DFF"/>
+      <stop offset="100%" stop-color="#19C7D7"/>
+    </linearGradient>
+  </defs>
+  <rect x="1" y="1" width="30" height="30" rx="7" fill="#070711"/>
+  <path d="M6 22 L6 14 L11 14 L16 4 L16 14 L11 14 L6 22" fill="none" stroke="url(#zeraFavGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M16 4 L14 7 L18 7 Z" fill="url(#zeraFavGrad)"/>
+</svg>

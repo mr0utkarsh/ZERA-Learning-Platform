@@ -9,7 +9,6 @@ import onboardingRoutes from './routes/onboardingRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
-<<<<<<< HEAD
 import confirmedSyllabusRoutes from './routes/confirmedSyllabusRoutes.js';
 import progressRoutes from './routes/progressRoutes.js';
 import quizRoutes from './routes/quizRoutes.js';
@@ -21,8 +20,6 @@ import interviewRoutes from './routes/interviewRoutes.js';
 import handwritingRoutes from './routes/handwritingRoutes.js';
 import { rateLimit } from './middleware/rateLimit.js';
 import { ApiError } from './utils/ApiError.js';
-=======
->>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7
 
 const app = express();
 
@@ -77,7 +74,6 @@ app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/admin', adminRoutes);
-<<<<<<< HEAD
 app.use('/api/syllabus', confirmedSyllabusRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/quiz', quizRoutes);
@@ -87,8 +83,6 @@ app.use('/api/study-plans', studyPlanRoutes);
 app.use('/api/doubts', doubtRoutes);
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/handwriting', handwritingRoutes);
-=======
->>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7
 
 app.use((req, res) => {
   res.status(404).json({

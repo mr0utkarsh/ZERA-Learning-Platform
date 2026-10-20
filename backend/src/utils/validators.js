@@ -25,7 +25,6 @@ export const resetPasswordSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters').max(128, 'Password must be 128 characters or fewer')
 });
 
-<<<<<<< HEAD
 export const idSchema = z.object({
   id: z.string().min(1)
 });
@@ -40,30 +39,11 @@ export const onboardingProfileSchema = z.object({
 
 // Only used for the legacy JSON path; the multipart route validates the real
 // file in the controller instead.
-=======
-export const idSchema = z.object({
-  id: z.string().min(1)
-});
-
-export const updateStudentStatusSchema = z.object({
-  status: z.enum(['ACTIVE', 'SUSPENDED'])
-});
-
-export const onboardingProfileSchema = z.object({
-  institution: z.string().trim().max(160).optional().or(z.literal('')),
-  city: z.string().trim().max(120).optional().or(z.literal('')),
-  learningGoal: z.string().trim().min(5, 'Tell us a little about your learning goal').max(500),
-  studyLevel: z.string().trim().min(2, 'Choose your current study level').max(80),
-  weeklyHours: z.coerce.number().int().min(1, 'Choose at least one hour per week').max(80)
-});
-
->>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7
 export const syllabusUploadSchema = z.object({
   fileName: z.string().trim().min(1).max(255),
   mimeType: z.string().trim().max(120).optional(),
   extractedText: z.string().trim().min(1, 'The selected syllabus file is empty').max(100000)
 });
-<<<<<<< HEAD
 
 const topicSchema = z.object({
   title: z.string().trim().min(1, 'A topic title is required').max(200),
@@ -215,8 +195,6 @@ export const otpVerifySchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters').max(128, 'Password must be 128 characters or fewer')
 });
 
-=======
->>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7
 
 export const validateRequest = (schema) => (req, res, next) => {
   const result = schema.safeParse(req.body ?? {});

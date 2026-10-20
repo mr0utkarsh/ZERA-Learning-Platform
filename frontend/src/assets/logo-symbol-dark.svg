@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-label="ZERA logo mark - dark variant" role="img">
+  <defs>
+    <linearGradient id="zeraGradMono" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#755CFF"/>
+      <stop offset="55%" stop-color="#B45DFF"/>
+      <stop offset="100%" stop-color="#19C7D7"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#070711"/>
+  <path d="M12 44 L12 20 L22 20 L32 8 L32 20 L22 20 L12 44" fill="none" stroke="url(#zeraGradMono)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M32 8 L28 14 L36 14 Z" fill="url(#zeraGradMono)"/>
+</svg>

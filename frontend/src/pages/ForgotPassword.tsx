@@ -2,6 +2,7 @@ import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Logo } from '../components/Logo';
 import { api } from '../lib/api';
+import { Mail, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -24,30 +25,44 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="grid min-h-screen place-items-center bg-slate-50 px-4">
-      <div className="card w-full max-w-md">
-        <div className="mb-6 flex flex-col items-center">
-          <Logo />
-          <p className="mt-2 text-sm text-slate-500">Enter your email to receive a password reset link.</p>
+    <div className="min-h-screen bg-void text-fg flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <Logo variant="primary" className="h-10 mx-auto mb-3" showWordmark />
+          <p className="text-sm text-muted">Enter your email to receive a password reset link.</p>
         </div>
-        {!success ? (
-          <form onSubmit={onSubmit} className="space-y-4">
-            <div>
-              <label className="label" htmlFor="email">Email</label>
-              <input id="email" className="input" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+
+        <div className="card-lift zera-card p-8">
+          {!success ? (
+            <form onSubmit={onSubmit} className="space-y-4">
+              <div>
+                <label className="field-label">Email</label>
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-muted shrink-0" />
+                  <input id="email" className="field-input pl-8" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                </div>
+              </div>
+              {error && (
+                <div className="rounded-xl bg-red-500/10 px-3 py-2.5 ring-1 ring-red-500/20 text-sm text-error flex items-start gap-3">
+                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                  <span>{error}</span>
+                </div>
+              )}
+              <button className="btn-primary w-full py-3" disabled={busy}>{busy ? 'Sending…' : 'Send reset link'}</button>
+            </form>
+          ) : (
+            <div className="space-y-4 text-center">
+              <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-success/10">
+                <CheckCircle2 className="h-6 w-6 text-success" />
+              </div>
+              <p className="text-sm font-medium text-success">Reset link sent</p>
+              <p className="text-xs text-muted">If an account exists for this email, a password reset link has been sent. Please check your inbox (and spam folder).</p>
             </div>
-            {error && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
-            <button className="btn-primary w-full" disabled={busy}>{busy ? 'Sending…' : 'Send reset link'}</button>
-          </form>
-        ) : (
-          <div className="space-y-4 text-center">
-            <p className="text-green-700">If an account exists for this email, a password reset link has been sent.</p>
-            <p className="text-sm text-slate-500">Please check your inbox (and spam folder) for the reset email.</p>
-          </div>
-        )}
-        <p className="mt-4 text-center text-sm text-slate-500">
-          <Link className="font-medium text-brand-600 hover:underline" to="/login">Back to sign in</Link>
-        </p>
+          )}
+          <p className="mt-6 text-center text-sm text-muted">
+            <Link className="font-medium text-violet-300 hover:underline" to="/login">Back to sign in</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

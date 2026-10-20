@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-label="ZERA logo - monochrome variant" role="img">
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#0A0A14"/>
+  <path d="M12 44 L12 20 L22 20 L32 8 L32 20 L22 20 L12 44" fill="none" stroke="#F5F4F8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M32 8 L28 14 L36 14 Z" fill="#F5F4F8"/>
+</svg>

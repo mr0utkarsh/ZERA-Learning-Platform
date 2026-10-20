@@ -98,12 +98,8 @@
         }
 
         if (mode === 'forgot') {
-<<<<<<< HEAD
           const resp = await api.auth.forgotPassword({ email: String(payload.email).trim().toLowerCase() });
           // Backend may return a config error if email not set; pass that message to UI
-=======
-          const resp = await apiRequest('/request-otp', { email: String(payload.email).trim().toLowerCase() });
->>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7
           showMessage(messageEl, resp.message || 'If that email is registered, reset instructions are being prepared. Check your configured email provider setup.', 'notice');
           return;
         }

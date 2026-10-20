@@ -14,34 +14,6 @@
     return api.request(path, options);
   }
 
-<<<<<<< HEAD
-=======
-  const fallbackUser = { name: 'Student' };
-
-  function getToken() {
-    return localStorage.getItem('zera_token');
-  }
-
-  async function apiRequest(path, options = {}) {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-      method: options.method || 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
-        ...(options.headers || {})
-      },
-      ...(options.body ? { body: JSON.stringify(options.body) } : {})
-    });
-
-    const data = await response.json().catch(() => ({ success: false, message: 'Request failed.' }));
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.message || 'Request failed.');
-    }
-
-    return data.data;
-  }
->>>>>>> 4804780593c11e68ae22b39c559dc624c40d29a7
 
   function renderDashboardData(snapshot, onboarding) {
     const userData = snapshot?.user || fallbackUser;

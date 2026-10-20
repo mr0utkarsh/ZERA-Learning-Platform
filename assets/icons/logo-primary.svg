@@ -1,34 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" role="img" aria-label="ZERA">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="ZERA logo">
   <defs>
-    <linearGradient id="logoGradient" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#3B82F6"/>
-      <stop offset="50%" stop-color="#6366F1"/>
-      <stop offset="100%" stop-color="#8B5CF6"/>
-    </linearGradient>
-    <linearGradient id="logoGradientDark" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#60A5FA"/>
-      <stop offset="50%" stop-color="#818CF8"/>
-      <stop offset="100%" stop-color="#A78BFA"/>
+    <linearGradient id="zg1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#755CFF"/>
+      <stop offset="0.55" stop-color="#B45DFF"/>
+      <stop offset="1" stop-color="#19C7D7"/>
     </linearGradient>
   </defs>
-  
-  <!-- Symbol: Geometric Z representing learning progression -->
-  <!-- Three connected bars: Foundation → Transformation → Mastery -->
-  <g id="symbol" transform="translate(0, 10)">
-    <!-- Foundation bar (bottom horizontal) -->
-    <rect x="0" y="42" width="50" height="6" rx="3" fill="url(#logoGradient)"/>
-    <!-- Transformation diagonal -->
-    <path d="M46,48 L10,0" stroke="url(#logoGradient)" stroke-width="6" stroke-linecap="round" fill="none"/>
-    <!-- Mastery bar (top horizontal) -->
-    <rect x="10" y="-6" width="40" height="6" rx="3" fill="url(#logoGradient)"/>
-    <!-- Accent dot - represents the "spark" of understanding -->
-    <circle cx="46" cy="-3" r="4" fill="#22C3FF" opacity="0.9"/>
-  </g>
-  
-  <!-- Wordmark: ZERA in custom geometric typography -->
-  <g id="wordmark" transform="translate(70, 0)">
-    <text x="0" y="58" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-size="56" font-weight="800" letter-spacing="-0.04em" fill="#06121F">ZERA</text>
-    <!-- Subtle accent on the Z -->
-    <text x="0" y="58" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-size="56" font-weight="800" letter-spacing="-0.04em" fill="url(#logoGradient)" opacity="0.15">Z</text>
-  </g>
+  <rect x="10" y="10" width="180" height="180" rx="44" fill="url(#zg1)"/>
+  <path d="M55 145 L55 95 L95 95 L145 45 L145 105 L105 105 L55 145 Z" fill="none" stroke="#0A0A14" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M145 45 L115 15" stroke="#0A0A14" stroke-width="22" stroke-linecap="round"/>
+  <path d="M55 145 L85 115" stroke="#0A0A14" stroke-width="22" stroke-linecap="round"/>
 </svg>

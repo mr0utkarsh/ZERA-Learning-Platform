@@ -1,27 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 44" role="img" aria-label="ZERA">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 64" width="200" height="64" role="img" aria-label="ZERA wordmark">
   <defs>
-    <linearGradient id="logoGradient" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#3B82F6"/>
-      <stop offset="50%" stop-color="#6366F1"/>
-      <stop offset="100%" stop-color="#8B5CF6"/>
+    <linearGradient id="wg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#755CFF"/>
+      <stop offset="0.5" stop-color="#B45DFF"/>
+      <stop offset="1" stop-color="#19C7D7"/>
     </linearGradient>
   </defs>
-  
-  <!-- Symbol: Compact geometric Z -->
-  <g id="symbol" transform="translate(0, 6)">
-    <!-- Foundation bar -->
-    <rect x="0" y="24" width="28" height="4" rx="2" fill="url(#logoGradient)"/>
-    <!-- Transformation diagonal -->
-    <path d="M26,28 L4,4" stroke="url(#logoGradient)" stroke-width="4" stroke-linecap="round" fill="none"/>
-    <!-- Mastery bar -->
-    <rect x="4" y="0" width="24" height="4" rx="2" fill="url(#logoGradient)"/>
-    <!-- Accent dot -->
-    <circle cx="26" cy="2" r="2.5" fill="#22C3FF" opacity="0.95"/>
-  </g>
-  
-  <!-- Wordmark -->
-  <g id="wordmark" transform="translate(38, 0)">
-    <text x="0" y="32" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-size="32" font-weight="800" letter-spacing="-0.03em" fill="#06121F">ZERA</text>
-    <text x="0" y="32" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-size="32" font-weight="800" letter-spacing="-0.03em" fill="url(#logoGradient)" opacity="0.15">Z</text>
-  </g>
+  <rect x="0" y="12" width="40" height="40" rx="10" fill="url(#wg)"/>
+  <path d="M13 38 L13 26 L21 26 L27 20 L27 32 L21 32 L13 38 Z" fill="none" stroke="#0A0A14" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M27 20 L23 16" stroke="#0A0A14" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M13 38 L17 34" stroke="#0A0A14" stroke-width="3.5" stroke-linecap="round"/>
+  <text x="56" y="44" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="30" font-weight="800" letter-spacing="-1" fill="#F5F4F8">ZERA</text>
 </svg>
