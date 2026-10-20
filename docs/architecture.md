@@ -78,7 +78,18 @@ Email:
 
 ## Provider configuration
 
-Gemini-powered features require `GEMINI_API_KEY`. Password reset and OTP delivery require `EMAIL_PROVIDER=smtp`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_SECURE`, `EMAIL_USER`, `EMAIL_PASS`, and `EMAIL_FROM`. Missing provider configuration is returned as an explicit error; the backend does not fabricate responses.
+Gemini-powered features require `GEMINI_API_KEY`. Password reset and OTP delivery require `EMAIL_PROVIDER`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASS`, and `EMAIL_FROM`. Missing provider configuration is returned as an explicit error; the backend does not fabricate responses.
+
+`EMAIL_PROVIDER` selects which transport is attempted first; the other stays available as a fallback, and the provider that actually delivered the message is reported.
+
+- `EMAIL_PROVIDER=smtp` — the SMTP relay is tried first, then the Brevo API.
+- `EMAIL_PROVIDER=brevo` — the Brevo HTTPS API is tried first, then the SMTP relay.
+
+`EMAIL_FROM` accepts either a bare address (`no-reply@zera.app`) or a display-name form (`ZERA Live <no-reply@zera.app>`); the address and the display name are resolved separately and used as the sender on both transports. Brevo only accepts senders that are verified on the account, so the configured value must match a verified sender.
+
+### Deployment constraint: Railway blocks outbound SMTP
+
+Railway disables outbound SMTP (ports 25, 465, 587, 2525) on the Free, Trial, and Hobby plans — SMTP is available from the Pro plan upward. On those plans the SMTP relay times out before it can authenticate, so `EMAIL_PROVIDER` must be `brevo` (or another provider's HTTPS API) for mail to be delivered from the deployed service. Adding the deployment's egress IPs to the provider's authorized-IP list does not help, because the connection never reaches the provider.
 
 ## GitHub Pages compatibility
 
