@@ -7,6 +7,7 @@ type AuthState = {
   user: User;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  adminLogin: (email: string, password: string) => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   refresh: () => Promise<void>;
@@ -52,13 +53,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
   };
 
+  // Administrators sign in through a separate endpoint so that a student
+  // account can never reach the admin surface with a student token.
+  const adminLogin = async (email: string, password: string) => {
+    const data = await api.auth.adminLogin({ email, password });
+    tokenStore.set(data.token);
+    setUser(data.user);
+  };
+
   const logout = () => {
     tokenStore.clear();
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout, refresh }}>
+    <AuthContext.Provider value={{ user, loading, login, adminLogin, signup, logout, refresh }}>
       {children}
     </AuthContext.Provider>
   );

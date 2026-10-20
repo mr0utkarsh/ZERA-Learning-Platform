@@ -64,6 +64,11 @@ export default function Login() {
           <p className="mt-6 text-center text-sm text-muted">
             New to ZERA? <Link className="font-medium text-violet-300 hover:underline" to="/signup">Create an account</Link>
           </p>
+          <p className="mt-2 text-center text-xs text-muted">
+            <Link className="font-medium text-muted hover:text-violet-300 hover:underline" to="/admin-login">
+              Administrator sign in
+            </Link>
+          </p>
         </div>
       </div>
     </div>
