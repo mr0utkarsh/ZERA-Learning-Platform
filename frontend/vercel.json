@@ -2,9 +2,11 @@
   "framework": "vite",
   "installCommand": "npm install",
   "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
   "outputDirectory": "dist",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "https://zera-backend-production.up.railway.app/api/$1" },
+    { "source": "/admin", "destination": "/admin.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
