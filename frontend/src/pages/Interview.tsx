@@ -31,7 +31,7 @@ export default function Interview() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">
-      <h1 className="text-2xl font-bold text-ink-900">Mock interview</h1>
+      <h1 className="text-2xl font-bold text-fg">Mock interview</h1>
 
       {!session && (
         <form onSubmit={start} className="card space-y-3">
@@ -43,7 +43,7 @@ export default function Interview() {
           </div>
           <input className="input" placeholder="Skills (comma separated)" value={skills} onChange={(e) => setSkills(e.target.value)} />
           <button className="btn-primary" disabled={busy}>{busy ? 'Starting…' : 'Start interview'}</button>
-          {error && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+          {error && <p role="alert" className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-error ring-1 ring-red-500/20">{error}</p>}
         </form>
       )}
 
@@ -62,16 +62,16 @@ export default function Interview() {
 
       {feedback && (
         <div className="card">
-          <div className="text-3xl font-bold text-brand-700">{feedback.overall}<span className="text-base font-normal text-slate-400">/100</span></div>
+          <div className="text-3xl font-bold text-violet-300">{feedback.overall}<span className="text-base font-normal text-slate-400">/100</span></div>
           <p className="mt-1 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">{feedback.disclaimer}</p>
           {Array.isArray(feedback.missingConcepts) && feedback.missingConcepts.length > 0 && (
             <div className="mt-3">
-              <h3 className="font-semibold text-ink-900">Missing concepts</h3>
+              <h3 className="font-semibold text-fg">Missing concepts</h3>
               <p className="text-sm text-slate-600">{feedback.missingConcepts.join(', ')}</p>
             </div>
           )}
           <div className="mt-3">
-            <h3 className="font-semibold text-ink-900">Suggestions</h3>
+            <h3 className="font-semibold text-fg">Suggestions</h3>
             <ul className="mt-1 space-y-1 text-sm text-slate-600">{Array.isArray(feedback.suggestions) ? feedback.suggestions.map((s: string, i: number) => <li key={i}>→ {s}</li>) : null}</ul>
           </div>
         </div>

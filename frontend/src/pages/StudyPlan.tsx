@@ -39,7 +39,7 @@ export default function StudyPlan() {
   return (
     <div className="mx-auto max-w-3xl space-y-4">
       <div className="card">
-        <h1 className="text-xl font-bold text-ink-900">Personalized study plan</h1>
+        <h1 className="text-xl font-bold text-fg">Personalized study plan</h1>
         <p className="text-sm text-slate-500">Generated from your confirmed syllabus, availability, and exam date. Every task links to a real topic.</p>
         <div className="mt-3 flex gap-2">
           <select className="input max-w-xs" value={syllabusId} onChange={(e) => setSyllabusId(e.target.value)}>
@@ -48,15 +48,15 @@ export default function StudyPlan() {
           </select>
           <button className="btn-primary" onClick={generate} disabled={busy}>{busy ? 'Generating…' : 'Generate plan'}</button>
         </div>
-        {error && <p role="alert" className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        {error && <p role="alert" className="mt-2 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-error ring-1 ring-red-500/20">{error}</p>}
       </div>
 
       {plans.length > 0 && (
         <div className="card">
-          <h3 className="font-semibold text-ink-900">Your plans</h3>
+          <h3 className="font-semibold text-fg">Your plans</h3>
           <div className="mt-2 space-y-2">
             {plans.map((p) => (
-              <button key={p.id} onClick={() => open(p.id)} className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left hover:bg-slate-50">
+              <button key={p.id} onClick={() => open(p.id)} className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left hover:bg-white/5">
                 <span className="text-sm font-medium">{p.title}</span>
                 <span className="text-xs text-slate-400">{p.generator} · {p._count?.tasks ?? '?'} tasks</span>
               </button>
@@ -68,11 +68,11 @@ export default function StudyPlan() {
       {current && (
         <div className="card">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-ink-900">{current.title}</h3>
-            <span className="rounded-full bg-brand-50 px-2 py-1 text-xs text-brand-700">{current.generator}</span>
+            <h3 className="font-semibold text-fg">{current.title}</h3>
+            <span className="rounded-full bg-violet-500/10 px-2 py-1 text-xs text-violet-300">{current.generator}</span>
           </div>
           <p className="mt-1 text-sm text-slate-500">{current.description}</p>
-          <ul className="mt-3 divide-y divide-slate-100">
+          <ul className="mt-3 divide-y divide-white/5">
             {current.tasks?.map((t: any) => (
               <li key={t.id} className="flex items-center gap-3 py-2">
                 <input type="checkbox" checked={t.status === 'COMPLETED'} onChange={() => complete(t.id)} aria-label={`Complete ${t.title}`} />

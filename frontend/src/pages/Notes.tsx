@@ -33,7 +33,7 @@ export default function Notes() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-4">
-      <h1 className="text-2xl font-bold text-ink-900">Notes</h1>
+      <h1 className="text-2xl font-bold text-fg">Notes</h1>
       <form onSubmit={submit} className="card space-y-3">
         <input className="input" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
         <textarea className="input min-h-32" placeholder="Write your note…" value={content} onChange={(e) => setContent(e.target.value)} required />
@@ -42,7 +42,7 @@ export default function Notes() {
           <button className="btn-primary">{editingId ? 'Update note' : 'Add note'}</button>
           {editingId && <button type="button" className="btn-ghost" onClick={() => { setEditingId(null); setTitle(''); setContent(''); }}>Cancel</button>}
         </div>
-        {error && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        {error && <p role="alert" className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-error ring-1 ring-red-500/20">{error}</p>}
       </form>
 
       <input className="input" placeholder="Search notes…" value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -54,7 +54,7 @@ export default function Notes() {
           {filtered.map((n) => (
             <div key={n.id} className="card">
               <div className="flex items-start justify-between">
-                <h3 className="font-semibold text-ink-900">{n.title}</h3>
+                <h3 className="font-semibold text-fg">{n.title}</h3>
                 <div className="flex gap-1">
                   <button className="btn-ghost px-2 py-1 text-xs" onClick={() => edit(n)}>Edit</button>
                   <button className="btn-ghost px-2 py-1 text-xs" onClick={() => remove(n.id)}>Delete</button>

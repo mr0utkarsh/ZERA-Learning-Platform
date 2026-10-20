@@ -26,7 +26,7 @@ export default function SyllabusConfirm({ courseName, setCourseName, semester, s
   return (
     <form onSubmit={onSave} className="mt-4 space-y-4">
       <div className="card space-y-3">
-        <h1 className="text-xl font-bold text-ink-900">Confirm your syllabus</h1>
+        <h1 className="text-xl font-bold text-fg">Confirm your syllabus</h1>
         <p className="text-sm text-slate-500">Review what we detected. Edit, add or remove topics, then confirm. Nothing is invented — what you see came from your file.</p>
         <div className="grid gap-3 sm:grid-cols-2">
           <div><label className="label">Course</label><input className="input" value={courseName} onChange={(e) => setCourseName(e.target.value)} required /></div>
@@ -41,7 +41,7 @@ export default function SyllabusConfirm({ courseName, setCourseName, semester, s
             <button type="button" className="btn-ghost" onClick={() => setSubjects((p) => p.filter((_, i) => i !== si))}>Remove</button>
           </div>
           {subject.units.map((unit, ui) => (
-            <div key={ui} className="mt-3 rounded-xl bg-slate-50 p-3">
+            <div key={ui} className="mt-3 rounded-xl bg-surface-2 p-3">
               <input className="input" placeholder="Unit" value={unit.title} onChange={(e) => updateUnit(si, ui, { title: e.target.value })} />
               <div className="mt-2 space-y-2">
                 {unit.topics.map((topic, ti) => (
@@ -62,7 +62,7 @@ export default function SyllabusConfirm({ courseName, setCourseName, semester, s
       ))}
       <button type="button" className="btn-ghost" onClick={() => setSubjects((p) => [...p, emptySubject()])}>+ Add subject</button>
 
-      {error && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {error && <p role="alert" className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-error ring-1 ring-red-500/20">{error}</p>}
       <button className="btn-primary">Confirm syllabus & continue</button>
     </form>
   );

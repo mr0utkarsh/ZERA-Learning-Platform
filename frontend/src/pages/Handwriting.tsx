@@ -35,18 +35,18 @@ export default function Handwriting() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">
-      <h1 className="text-2xl font-bold text-ink-900">AI handwritten notes</h1>
+      <h1 className="text-2xl font-bold text-fg">AI handwritten notes</h1>
       <form onSubmit={upload} className="card space-y-3">
         <p className="text-sm text-slate-500">Upload a handwriting image or scan (PNG, JPG, WEBP, GIF or PDF).</p>
         <input type="file" accept=".png,.jpg,.jpeg,.webp,.gif,.pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} className="input" />
         <button className="btn-primary" disabled={busy}>{busy ? 'Extracting…' : 'Upload & extract'}</button>
-        {error && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        {error && <p role="alert" className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-error ring-1 ring-red-500/20">{error}</p>}
       </form>
 
       {active && (
         <div className="card">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-ink-900">{active.title}</h3>
+            <h3 className="font-semibold text-fg">{active.title}</h3>
             <span className={`rounded-full px-2 py-1 text-xs ${statusColor(active.ocrStatus)}`}>{active.ocrStatus}</span>
           </div>
           {active.ocrConfidence != null && <p className="text-xs text-slate-400">Confidence: {Math.round(active.ocrConfidence * 100)}%</p>}
@@ -61,10 +61,10 @@ export default function Handwriting() {
 
       {notes.length > 0 && (
         <div className="card">
-          <h3 className="font-semibold text-ink-900">Your scans</h3>
+          <h3 className="font-semibold text-fg">Your scans</h3>
           <div className="mt-2 space-y-2">
             {notes.map((n) => (
-              <div key={n.id} className="flex items-center justify-between rounded-lg px-3 py-2 hover:bg-slate-50">
+              <div key={n.id} className="flex items-center justify-between rounded-lg px-3 py-2 hover:bg-white/5">
                 <span className="text-sm">{n.title}</span>
                 <span className={`rounded-full px-2 py-1 text-xs ${statusColor(n.ocrStatus)}`}>{n.ocrStatus}</span>
               </div>
@@ -77,4 +77,4 @@ export default function Handwriting() {
 }
 
 const statusColor = (s: string) =>
-  s === 'DONE' ? 'bg-green-100 text-green-700' : s === 'FAILED' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600';
+  s === 'DONE' ? 'bg-success/10 text-success' : s === 'FAILED' ? 'bg-red-500/10 text-error' : 'bg-white/5 text-muted';

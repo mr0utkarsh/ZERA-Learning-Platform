@@ -24,12 +24,12 @@ export default function Progress() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-4">
-      <h1 className="text-2xl font-bold text-ink-900">Syllabus progress</h1>
+      <h1 className="text-2xl font-bold text-fg">Syllabus progress</h1>
       <select className="input max-w-xs" value={syllabusId} onChange={(e) => setSyllabusId(e.target.value)}>
         <option value="">Select a confirmed syllabus</option>
         {syllabi.map((s) => <option key={s.id} value={s.id}>{s.courseName}</option>)}
       </select>
-      {error && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {error && <p role="alert" className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-error ring-1 ring-red-500/20">{error}</p>}
 
       {!syllabusId && <p className="text-sm text-slate-500">Confirm a syllabus first to track topic-by-topic progress.</p>}
 
@@ -38,7 +38,7 @@ export default function Progress() {
           <div className="card flex items-center justify-between">
             <div>
               <div className="text-sm text-slate-500">Overall progress</div>
-              <div className="text-3xl font-bold text-brand-700">{progress.overallPercentage ?? 0}%</div>
+              <div className="text-3xl font-bold text-violet-300">{progress.overallPercentage ?? 0}%</div>
             </div>
             <div className="text-right text-sm text-slate-500">
               {progress.completedTopics}/{progress.totalTopics} topics completed
@@ -49,12 +49,12 @@ export default function Progress() {
             {progress.subjects.map((subject: any) => (
               <div key={subject.id} className="card">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-ink-900">{subject.title}</h3>
+                  <h3 className="font-semibold text-fg">{subject.title}</h3>
                   <span className="text-sm text-slate-500">{subject.percentage ?? 0}%</span>
                 </div>
                 <div className="mt-2 space-y-2">
                   {subject.units.map((unit: any) => (
-                    <div key={unit.id} className="rounded-xl bg-slate-50 p-3">
+                    <div key={unit.id} className="rounded-xl bg-surface-2 p-3">
                       <div className="text-sm font-medium">{unit.title} <span className="text-slate-400">· {unit.percentage ?? 0}%</span></div>
                       <div className="mt-2 space-y-1">
                         {unit.topics.map((topic: any) => (

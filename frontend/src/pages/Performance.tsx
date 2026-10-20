@@ -19,7 +19,7 @@ export default function Performance() {
   if (!perf?.hasData) {
     return (
       <div className="card mx-auto max-w-2xl text-center">
-        <h1 className="text-xl font-bold text-ink-900">No activity yet</h1>
+        <h1 className="text-xl font-bold text-fg">No activity yet</h1>
         <p className="mt-2 text-sm text-slate-500">{perf?.message || 'Attempt a quiz, complete a study task, or update your syllabus progress to unlock analytics.'}</p>
         <p className="mt-3 text-xs text-slate-400">{perf?.methodology}</p>
       </div>
@@ -28,10 +28,10 @@ export default function Performance() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-4">
-      <h1 className="text-2xl font-bold text-ink-900">Performance analysis</h1>
+      <h1 className="text-2xl font-bold text-fg">Performance analysis</h1>
       <div className="grid gap-4 md:grid-cols-3">
-        <Card title="Quiz accuracy"><span className="text-3xl font-bold text-brand-700">{perf.quizzes.averageAccuracy ?? '—'}%</span></Card>
-        <Card title="Study tasks done"><span className="text-3xl font-bold text-brand-700">{perf.studyTasks.completed}/{perf.studyTasks.total}</span></Card>
+        <Card title="Quiz accuracy"><span className="text-3xl font-bold text-violet-300">{perf.quizzes.averageAccuracy ?? '—'}%</span></Card>
+        <Card title="Study tasks done"><span className="text-3xl font-bold text-violet-300">{perf.studyTasks.completed}/{perf.studyTasks.total}</span></Card>
         <Card title="Topics needing revision"><span className="text-3xl font-bold text-amber-600">{perf.syllabus.needsRevision}</span></Card>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
@@ -51,6 +51,6 @@ export default function Performance() {
 }
 
 function Card({ title, children }: { title: string; children: ReactNode }) {
-  return <div className="card"><h3 className="font-semibold text-ink-900">{title}</h3><div className="mt-2">{children}</div></div>;
+  return <div className="card"><h3 className="font-semibold text-fg">{title}</h3><div className="mt-2">{children}</div></div>;
 }
-function Skeleton() { return <div className="h-64 animate-pulse rounded-2xl bg-slate-200" />; }
+function Skeleton() { return <div className="h-64 animate-pulse rounded-2xl bg-white/5" />; }
