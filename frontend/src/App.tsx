@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
-import { Layout } from './components/Layout';
+import { AppShell } from './components/AppShell';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -51,7 +51,7 @@ export default function App() {
       <Route path="/reset-password" element={user ? <Navigate to="/dashboard" replace /> : <ResetPassword />} />
       <Route path="/about" element={<About />} />
       <Route path="/support" element={<Support />} />
-      <Route element={<Protected><Layout /></Protected>}>
+      <Route element={<Protected><AppShell /></Protected>}>
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/syllabus" element={<Syllabus />} />

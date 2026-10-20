@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { AppSidebar, MobileNav } from './Sidebar';
+import { AppSidebar, MobileNavButton } from './Sidebar';
 import { TopBar } from './TopBar';
 
 export function AppShell() {
@@ -9,12 +9,12 @@ export function AppShell() {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen flex bg-void text-fg">
+    <div className="flex min-h-screen bg-void text-fg">
       <AppSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex items-center gap-3 border-b border-white/5 bg-void/60 px-4 py-3 backdrop-blur-xl md:px-6">
+        <div className="flex items-center gap-3 bg-void/60 px-4 backdrop-blur-xl md:px-6">
           <div className="md:hidden">
-            <MobileNav />
+            <MobileNavButton onClick={() => setSidebarOpen(true)} />
           </div>
           <TopBar title={user?.name ? `Welcome, ${user.name.split(' ')[0]}` : 'Dashboard'} />
         </div>

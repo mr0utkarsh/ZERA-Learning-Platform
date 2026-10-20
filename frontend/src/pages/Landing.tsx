@@ -96,20 +96,20 @@ export default function Landing() {
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
       </div>
 
-      <header className="site-header zera-header backdrop-blur-xl bg-black/40 sticky top-0 z-50 border-b border-white/5">
-        <div className="container header-inner flex items-center justify-between py-4">
+      <header className="zera-header sticky top-0 z-50 border-b border-white/5 bg-black/40 backdrop-blur-xl">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-6 py-4">
           <Link to="/" className="zera-logo" aria-label="ZERA home">
             <Logo />
           </Link>
-          <nav className="nav zera-nav hidden md:flex gap-8" aria-label="Main navigation">
-            <a href="#experience" className="text-slate-400 hover:text-white transition-colors">Experience</a>
-            <a href="#journey" className="text-slate-400 hover:text-white transition-colors">Journey</a>
-            <a href="#tools" className="text-slate-400 hover:text-white transition-colors">Tools</a>
-            <a href="/resources" className="text-slate-400 hover:text-white transition-colors">Resources</a>
+          <nav className="zera-nav hidden gap-8 md:flex" aria-label="Main navigation">
+            <a href="#experience" className="text-slate-400 transition-colors hover:text-white">Experience</a>
+            <a href="#journey" className="text-slate-400 transition-colors hover:text-white">Journey</a>
+            <a href="#tools" className="text-slate-400 transition-colors hover:text-white">Tools</a>
+            <a href="/resources" className="text-slate-400 transition-colors hover:text-white">Resources</a>
           </nav>
-          <div className="header-actions flex items-center gap-4">
-            <Link className="text-slate-400 hover:text-white transition-colors" to="/login">Log in</Link>
-            <MagneticButton className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow" to="/signup">Join ZERA ↗</MagneticButton>
+          <div className="header-actions flex items-center gap-3 sm:gap-4">
+            <Link className="text-slate-400 transition-colors hover:text-white" to="/login">Log in</Link>
+            <MagneticButton className="rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-shadow hover:shadow-indigo-500/40 sm:px-5" to="/signup">Join ZERA ↗</MagneticButton>
           </div>
         </div>
       </header>
@@ -118,10 +118,10 @@ export default function Landing() {
         <motion.section
           ref={heroRef}
           style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
-          className="zera-hero relative min-h-screen flex items-center pt-20"
+          className="zera-hero relative flex min-h-screen items-center pt-20"
           aria-labelledby="hero-title"
         >
-          <div className="container zera-hero-grid grid md:grid-cols-2 gap-12 items-center">
+          <div className="zera-hero-grid mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-12 px-6 md:grid-cols-2">
             <motion.div initial="hidden" animate="visible" variants={stagger} className="zera-hero-copy">
               <motion.p variants={fadeUp} className="text-indigo-400 text-sm font-semibold tracking-widest uppercase mb-4 flex items-center gap-2">
                 <span className="w-8 h-px bg-indigo-500" /> A more intentional way to learn
@@ -133,11 +133,11 @@ export default function Landing() {
               <motion.p variants={fadeUp} className="text-slate-400 text-lg max-w-md mt-6">
                 One place to shape your syllabus, build a study rhythm, test your understanding, and keep moving forward.
               </motion.p>
-              <motion.div variants={fadeUp} className="zera-hero-actions flex gap-4 mt-10">
-                <MagneticButton className="px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold shadow-2xl shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all" to="/signup">
+              <motion.div variants={fadeUp} className="zera-hero-actions mt-10 flex flex-wrap items-center gap-4">
+                <MagneticButton className="rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-7 py-4 font-bold text-white shadow-2xl shadow-indigo-500/30 transition-all hover:shadow-indigo-500/50 sm:px-8" to="/signup">
                   Begin your journey ↗
                 </MagneticButton>
-                <a className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 px-4 py-4" href="#experience">
+                <a className="flex w-full items-center justify-center gap-2 px-4 py-4 text-slate-400 transition-colors hover:text-white sm:w-auto sm:justify-start" href="#experience">
                   Discover ZERA <span>↓</span>
                 </a>
               </motion.div>
@@ -196,7 +196,7 @@ export default function Landing() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={stagger}
-          className="py-32 relative"
+          className="relative py-20 md:py-32"
         >
           <div className="container max-w-6xl mx-auto px-6">
             <motion.p variants={fadeUp} className="text-indigo-400 text-sm font-semibold tracking-widest uppercase mb-4">01 — The ZERA Experience</motion.p>
@@ -243,7 +243,7 @@ export default function Landing() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.15 }}
           variants={stagger}
-          className="py-32 relative"
+          className="relative py-20 md:py-32"
         >
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-950/20 to-transparent" />
           <div className="container max-w-6xl mx-auto px-6 relative z-10">
@@ -297,7 +297,7 @@ export default function Landing() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.15 }}
           variants={stagger}
-          className="py-32 relative"
+          className="relative py-20 md:py-32"
         >
           <div className="container max-w-6xl mx-auto px-6">
             <motion.p variants={fadeUp} className="text-indigo-400 text-sm font-semibold tracking-widest uppercase mb-4">03 — The toolkit</motion.p>
@@ -339,7 +339,7 @@ export default function Landing() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
           variants={stagger}
-          className="py-32 relative overflow-hidden"
+          className="relative overflow-hidden py-20 md:py-32"
         >
           <motion.div
             className="absolute inset-0"
