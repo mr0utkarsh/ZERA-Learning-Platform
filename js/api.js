@@ -16,8 +16,19 @@
    * The API origin. Kept on `window.ZERA_API_BASE` so a deployment can override
    * it from any page without editing source: e.g. in an inline script before
    * this file loads, `window.ZERA_API_BASE = 'https://api.example.com'`.
+   *
+   * Without an override the page talks to its own origin, which is what the
+   * deployment wants: the host proxies `/api` to the backend, so there is no
+   * CORS round trip and no hard-coded host. A page served from localhost has no
+   * such proxy, so it keeps calling the backend directly.
    */
-  const ORIGIN = global.ZERA_API_BASE || 'http://localhost:5000';
+  const defaultOrigin = (() => {
+    const loc = global.location;
+    if (!loc) return '';
+    const isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(loc.hostname || '');
+    return isLocal ? 'http://localhost:5000' : loc.origin;
+  })();
+  const ORIGIN = global.ZERA_API_BASE || defaultOrigin;
 
   const TOKEN_KEY = 'zera_token';
   const USER_KEY = 'zera_user';
@@ -241,12 +252,25 @@
 
   const admin = {
     stats: () => request('/admin/stats'),
-    users: () => request('/admin/users'),
+    /**
+     * @param {object} [params]
+     * @param {string} [params.role]    STUDENT | ADMIN | SUPER_ADMIN
+     * @param {string} [params.status]  ACTIVE | SUSPENDED
+     * @param {string} [params.search]   Name or email fragment
+     */
+    users: (params = {}) => {
+      const query = new URLSearchParams();
+      if (params.role) query.set('role', params.role);
+      if (params.status) query.set('status', params.status);
+      if (params.search) query.set('search', params.search);
+      const suffix = query.toString() ? `?${query.toString()}` : '';
+      return request(`/admin/users${suffix}`);
+    },
     suspendUser: (id) => request(`/admin/users/${id}/suspend`, { method: 'PATCH' }),
     restoreUser: (id) => request(`/admin/users/${id}/restore`, { method: 'PATCH' }),
     deleteUser: (id) => request(`/admin/users/${id}`, { method: 'DELETE' }),
     updateUserRole: (id, role) => request(`/admin/users/${id}/role`, { method: 'PATCH', body: { role } }),
-    invites: () => request('/admin/invites'),
+    invites: (status) => request(`/admin/invites${status ? `?status=${encodeURIComponent(status)}` : ''}`),
     createInvite: (body) => request('/admin/invites', { method: 'POST', body }),
     approveInvite: (id, body) => request(`/admin/invites/${id}/approve`, { method: 'POST', body }),
     revokeInvite: (id) => request(`/admin/invites/${id}/revoke`, { method: 'POST' }),

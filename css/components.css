@@ -1272,6 +1272,46 @@ button {
   border-color: rgba(16, 185, 129, 0.2);
 }
 
+.status-badge.success {
+  background: rgba(16, 185, 129, 0.12);
+
+  color: #0e8a61;
+
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.status-badge.warning {
+  background: rgba(245, 158, 11, 0.12);
+
+  color: #9f6500;
+
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.status-badge.danger {
+  background: rgba(239, 68, 68, 0.12);
+
+  color: #b91c1c;
+
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.status-badge.info {
+  background: rgba(59, 130, 246, 0.12);
+
+  color: #1d4ed8;
+
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.status-badge.neutral {
+  background: rgba(71, 85, 105, 0.08);
+
+  color: #475569;
+
+  border-color: rgba(71, 85, 105, 0.16);
+}
+
 
 /* =========================
    APP SHELL
@@ -1613,6 +1653,24 @@ button {
 
   border:
     1px solid rgba(59, 130, 246, 0.12);
+}
+
+.admin-select {
+  border: 1px solid rgba(10, 30, 50, 0.12);
+
+  border-radius: 12px;
+
+  padding: 0.56rem 0.9rem;
+
+  font-size: 0.85rem;
+
+  font-weight: 600;
+
+  color: var(--dark);
+
+  background: var(--card);
+
+  cursor: pointer;
 }
 
 

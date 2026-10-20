@@ -113,3 +113,26 @@ PORT=
 ## Notes
 
 This design enables future growth without making false claims in the static frontend version currently stored in the repository.
+
+## Deployed surface vs. legacy static files
+
+The deployed frontend is the React application under `frontend/`, built to `frontend/dist` and served by Vercel (`outputDirectory: frontend/dist`). The root-level HTML files, `css/`, `js/` and `assets/` are pre-React-migration leftovers and are **not** published as a set: `vercel.json` rewrites every unmatched path to the SPA's `index.html`.
+
+The one exception is the administrator console. `admin-login.html`, `admin.html`, `admin-students.html` and `admin-invites.html` are the original static console, and `scripts/publish-legacy-admin.mjs` copies exactly those pages plus the stylesheets, scripts and icon they need into `frontend/dist` after the Vite build. The legacy `index.html` is deliberately **not** copied, so the SPA keeps the site root.
+
+The published routes are:
+
+| Route | Purpose |
+|---|---|
+| `/login` | student sign-in (React) |
+| `/admin-login.html` | administrator sign-in, posts to `POST /api/auth/admin/login` |
+| `/admin` | admin console overview, rewritten to `/admin.html` |
+| `/admin.html` | admin console overview |
+| `/admin-students.html` | student management (search, filter, suspend, role, delete) |
+| `/admin-invites.html` | administrator invitations (invite, approve, revoke) |
+
+The console talks to the same backend as the SPA. `js/api.js` resolves its origin from `window.location.origin`, so the pages use the same-origin `/api` prefix that `vercel.json` proxies to the Railway backend, and they share one session in `localStorage` (`zera_token`, `zera_user`).
+
+Access is guarded in two places: the backend requires an `ADMIN` or `SUPER_ADMIN` account for every `/api/admin` route, and the pages themselves check the stored session before rendering, sending a missing or non-administrator session back to `/admin-login.html`. Signing out of the console returns to `/admin-login.html`; signing out of the student app returns to `/login`.
+
+The student sign-in page links to the console through `/admin-login.html`, so an administrator invited by email can reach the surface from the site the users already know.

@@ -80,32 +80,9 @@ export const api = {
   auth: {
     signup: (body: { name: string; email: string; password: string }) => post<any>('/auth/signup', body),
     login: (body: { email: string; password: string }) => post<any>('/auth/login', body),
-    adminLogin: (body: { email: string; password: string }) => post<any>('/auth/admin/login', body),
     me: () => get<any>('/auth/me'),
     forgotPassword: (email: string) => post<any>('/auth/forgot-password', { email }),
     resetPassword: (token: string, password: string) => post<any>('/auth/reset-password', { token, password })
-  },
-  admin: {
-    stats: () => get<any>('/admin/stats'),
-    aiConfig: () => get<any>('/admin/ai-config'),
-    users: (params?: { role?: string; status?: string; search?: string }) => {
-      const query = new URLSearchParams();
-      if (params?.role) query.set('role', params.role);
-      if (params?.status) query.set('status', params.status);
-      if (params?.search) query.set('search', params.search);
-      const qs = query.toString();
-      return get<any>(`/admin/users${qs ? `?${qs}` : ''}`);
-    },
-    suspendUser: (id: string) => patch<any>(`/admin/users/${id}/suspend`, {}),
-    restoreUser: (id: string) => patch<any>(`/admin/users/${id}/restore`, {}),
-    deleteUser: (id: string) => del<any>(`/admin/users/${id}`),
-    updateUserRole: (id: string, role: string) => patch<any>(`/admin/users/${id}/role`, { role }),
-    invites: (status?: string) => get<any>(`/admin/invites${status ? `?status=${status}` : ''}`),
-    decidedInvites: () => get<any>('/admin/invites/decided'),
-    inviteAdmin: (body: { name: string; email: string; role?: string }) => post<any>('/admin/invites', body),
-    approveInvite: (inviteId: string, body: { name?: string; password: string }) =>
-      post<any>(`/admin/invites/${inviteId}/approve`, body),
-    revokeInvite: (inviteId: string) => post<any>(`/admin/invites/${inviteId}/revoke`, {})
   },
   onboarding: {
     get: () => get<any>('/onboarding'),

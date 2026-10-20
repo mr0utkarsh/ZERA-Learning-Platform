@@ -380,6 +380,8 @@ export const getPlatformStats = async (req, res, next) => {
     const [
       totalUsers,
       totalStudents,
+      activeStudents,
+      suspendedStudents,
       totalAdmins,
       totalSuperAdmins,
       suspendedUsers,
@@ -393,6 +395,8 @@ export const getPlatformStats = async (req, res, next) => {
     ] = await Promise.all([
       prisma.user.count(),
       prisma.user.count({ where: { role: 'STUDENT' } }),
+      prisma.user.count({ where: { role: 'STUDENT', status: 'ACTIVE' } }),
+      prisma.user.count({ where: { role: 'STUDENT', status: 'SUSPENDED' } }),
       prisma.user.count({ where: { role: 'ADMIN' } }),
       prisma.user.count({ where: { role: 'SUPER_ADMIN' } }),
       prisma.user.count({ where: { status: 'SUSPENDED' } }),
@@ -415,6 +419,8 @@ export const getPlatformStats = async (req, res, next) => {
         counts: {
           totalUsers,
           totalStudents,
+          activeStudents,
+          suspendedStudents,
           totalAdmins,
           totalSuperAdmins,
           suspendedUsers,

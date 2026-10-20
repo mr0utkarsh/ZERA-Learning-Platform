@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZERA Admin Invitations</title>
+  <meta name="description" content="Invite, approve and revoke administrator accounts in the ZERA admin portal." />
+  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/responsive.css" />
+  <script src="./js/api.js" defer></script>
+  <script src="./js/storage.js" defer></script>
+  <script src="./js/auth.js" defer></script>
+  <script src="./js/admin.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand" aria-label="ZERA home"><span class="brand-mark"><span>Z</span></span><span>ZERA</span></a>
+      <nav class="nav" aria-label="Admin navigation">
+        <a href="./admin.html">Overview</a>
+        <a href="./admin-students.html">Students</a>
+        <a href="./admin-invites.html" class="active">Invitations</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn btn-secondary btn-small" type="button" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container app-shell">
+      <aside class="sidebar">
+        <nav>
+          <a href="./admin.html"><span>Overview</span><span>›</span></a>
+          <a href="./admin-students.html"><span>Students</span><span>›</span></a>
+          <a class="active" href="./admin-invites.html"><span>Invitations</span><span>›</span></a>
+        </nav>
+      </aside>
+
+      <div class="content-area">
+        <section class="panel">
+          <div class="flex justify-between wrap" style="gap:16px; align-items:center;">
+            <div>
+              <span class="eyebrow" style="color:#2857b1; background:rgba(59,130,246,0.09); border-color:rgba(59,130,246,0.12);">Administrator access</span>
+              <h2 style="margin-top:12px;">Invite an administrator</h2>
+              <p style="margin-top:8px;">An invited account stays inactive until an administrator approves it and sets its password.</p>
+            </div>
+          </div>
+
+          <form id="inviteForm" class="form-grid" style="margin-top:20px; align-items:end;">
+            <div class="field">
+              <label for="inviteName">Full name</label>
+              <input id="inviteName" type="text" autocomplete="name" placeholder="Aarav Sharma" required />
+            </div>
+            <div class="field">
+              <label for="inviteEmail">Email</label>
+              <input id="inviteEmail" type="email" autocomplete="email" placeholder="aarav@example.com" required />
+            </div>
+            <div class="field">
+              <label for="inviteRole">Role</label>
+              <select id="inviteRole">
+                <option value="ADMIN">Admin</option>
+                <option value="SUPER_ADMIN" id="inviteRoleSuper">Super admin</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" type="submit" id="sendInviteBtn">Send invitation</button>
+          </form>
+        </section>
+
+        <section class="panel" style="margin-top:22px;">
+          <div class="flex justify-between wrap" style="gap:16px; align-items:center; margin-bottom:16px;">
+            <h3 style="margin:0;">Invitations</h3>
+            <div class="field" style="min-width:180px;">
+              <label for="inviteStatusFilter">Status</label>
+              <select id="inviteStatusFilter">
+                <option value="">All</option>
+                <option value="PENDING">Pending</option>
+                <option value="APPROVED">Approved</option>
+                <option value="REVOKED">Revoked</option>
+              </select>
+            </div>
+          </div>
+          <div id="adminNotice" class="notice" style="margin-bottom:16px; display:none;"></div>
+          <div id="invitesList" class="task-list"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

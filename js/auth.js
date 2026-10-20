@@ -169,18 +169,33 @@
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', function () {
+        // The admin console and the student app share one origin and one
+        // localStorage session, so the redirect target follows the page the
+        // user is signing out of.
         clearSession();
-        window.location.href = './login.html';
+        window.location.href = isAdminPage() ? './admin-login.html' : './login.html';
       });
     }
 
     const currentUser = getState();
     const hasToken = api.isLoggedIn();
-    if (currentUser && currentUser.isLoggedIn && hasToken && window.location.pathname.endsWith('login.html')) {
+    if (!isAdminLoginPage() && !isAdminPage() && currentUser && currentUser.isLoggedIn && hasToken && window.location.pathname.endsWith('login.html')) {
       redirectAfterStudentAuth().catch(() => {
         // A stale or expired session must not trap the student in a login/onboarding redirect loop.
         clearSession();
       });
     }
   });
+
+  function isAdminLoginPage() {
+    return window.location.pathname.endsWith('admin-login.html');
+  }
+
+  function isAdminPage() {
+    const path = window.location.pathname.replace(/\/+$/, '');
+    return path.endsWith('/admin')
+      || path.endsWith('/admin.html')
+      || path.endsWith('/admin-students.html')
+      || path.endsWith('/admin-invites.html');
+  }
 })();

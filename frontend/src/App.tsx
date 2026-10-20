@@ -3,8 +3,6 @@ import { useAuth } from './context/AuthContext';
 import { Layout } from './components/Layout';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
-import AdminLogin from './pages/AdminLogin';
-import AdminDashboard from './pages/AdminDashboard';
 import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
@@ -36,18 +34,9 @@ function Protected({ children }: { children: JSX.Element }) {
 }
 
 /**
- * The admin surface is reachable only with an administrator account. A signed
- * in student who lands here is sent to the admin sign-in page instead of the
- * student app, so the two entry points never blur into each other.
+ * The administrator surface is the legacy static console under /admin.html,
+ * which is published next to this bundle by scripts/publish-legacy-admin.mjs.
  */
-function AdminOnly({ children }: { children: JSX.Element }) {
-  const { user, loading } = useAuth();
-  if (loading) return <div className="grid min-h-screen place-items-center text-fg">Loading…</div>;
-  if (!user) return <Navigate to="/admin-login" replace />;
-  if (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN') return <Navigate to="/admin-login" replace />;
-  return children;
-}
-
 export default function App() {
   const { user, loading } = useAuth();
 
@@ -57,8 +46,6 @@ export default function App() {
     <Routes>
       <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Landing />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
-      <Route path="/admin-login" element={user ? <Navigate to="/admin" replace /> : <AdminLogin />} />
-      <Route path="/admin" element={<AdminOnly><AdminDashboard /></AdminOnly>} />
       <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <Signup />} />
       <Route path="/forgot-password" element={user ? <Navigate to="/dashboard" replace /> : <ForgotPassword />} />
       <Route path="/reset-password" element={user ? <Navigate to="/dashboard" replace /> : <ResetPassword />} />

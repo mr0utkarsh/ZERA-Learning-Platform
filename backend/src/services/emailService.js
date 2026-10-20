@@ -249,7 +249,7 @@ export const emailService = {
 
     const clientUrl = (env.CLIENT_URL || 'http://localhost:5500').replace(/\/$/, '');
 
-    const text = `Hello ${invitedName || 'there'},\n\n${invitedByEmail || 'An administrator'} has invited you to join the ZERA Learning Platform as an administrator.\n\nSign in as an existing administrator to review and approve this invitation at:\n\n${clientUrl}/admin-login\n\nYour account is not active until the invitation is approved.\n\nRegards,\nZERA Learning Platform`;
+    const text = `Hello ${invitedName || 'there'},\n\n${invitedByEmail || 'An administrator'} has invited you to join the ZERA Learning Platform as an administrator.\n\nSign in as an existing administrator to review and approve this invitation at:\n\n${clientUrl}/admin-login.html\n\nYour account is not active until the invitation is approved.\n\nRegards,\nZERA Learning Platform`;
 
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
@@ -257,7 +257,7 @@ export const emailService = {
         <p>Hello ${escapeHtml(invitedName || 'there')},</p>
         <p>${escapeHtml(invitedByEmail || 'An administrator')} has invited you to join as an administrator.</p>
         <p>
-          <a href="${clientUrl}/admin-login" style="display:inline-block;padding:12px 20px;background:#2563eb;color:white;text-decoration:none;border-radius:6px;">
+          <a href="${clientUrl}/admin-login.html" style="display:inline-block;padding:12px 20px;background:#2563eb;color:white;text-decoration:none;border-radius:6px;">
             Review invitation
           </a>
         </p>

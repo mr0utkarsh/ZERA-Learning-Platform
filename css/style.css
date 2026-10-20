@@ -445,6 +445,14 @@ body:not(.zera-home) .field label { color:#e8e3f7; } body:not(.zera-home) .field
 body:not(.zera-home) .btn-primary { background:linear-gradient(135deg,#e2dbff,#9d86ff); color:#171126; } body:not(.zera-home) .btn-secondary { color:#e5e1f5; background:rgba(255,255,255,.055); border-color:rgba(225,219,255,.13); }
 body:not(.zera-home) .notice { background:rgba(160,139,255,.1); border-color:rgba(183,163,255,.2); color:#dcd3ff; } body:not(.zera-home) .demo-box { color:#cac3e5; background:linear-gradient(135deg,rgba(151,125,255,.12),rgba(100,194,255,.08)); border-color:rgba(170,150,255,.28); }
 body:not(.zera-home) .card-icon { background:rgba(164,143,255,.13); color:#cfc4ff; } body:not(.zera-home) .footer { position:relative; background:#05050a; border-top:1px solid rgba(225,219,255,.09); }
+/* Notices carry a result tone, so the dark theme needs to state it explicitly. */
+body:not(.zera-home) .notice.info { background:rgba(160,139,255,.1); border-color:rgba(183,163,255,.2); color:#dcd3ff; }
+body:not(.zera-home) .notice.success { background:rgba(16,185,129,.12); border-color:rgba(16,185,129,.26); color:#79f0c5; }
+body:not(.zera-home) .notice.error { background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.26); color:#ffb4ac; }
+/* Metric cards sit on the dark surface, so their values must not use the light-theme ink. */
+body:not(.zera-home) .metric-card { background:linear-gradient(135deg,rgba(145,119,255,.16),rgba(98,183,255,.09)); border:1px solid rgba(184,167,255,.16); box-shadow:0 15px 32px rgba(0,0,0,.16); }
+body:not(.zera-home) .metric-card strong { color:#f0edff; } body:not(.zera-home) .metric-card .kicker { color:#b9b3d2; } body:not(.zera-home) .metric-card span { color:#b9b3d2; }
+body:not(.zera-home) .admin-select { color:#f1edff; background:rgba(255,255,255,.055); border-color:rgba(225,219,255,.13); }
 
 /* Login-only cinematic scene: video-like movement without a heavyweight video download. */
 .auth-shell:has(.auth-cinematic) { grid-template-columns:minmax(330px,500px) minmax(400px,620px); gap:clamp(30px,7vw,110px); justify-content:center; align-items:center; }
