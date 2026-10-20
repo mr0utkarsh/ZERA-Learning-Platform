@@ -453,6 +453,19 @@ body:not(.zera-home) .notice.error { background:rgba(239,68,68,.12); border-colo
 body:not(.zera-home) .metric-card { background:linear-gradient(135deg,rgba(145,119,255,.16),rgba(98,183,255,.09)); border:1px solid rgba(184,167,255,.16); box-shadow:0 15px 32px rgba(0,0,0,.16); }
 body:not(.zera-home) .metric-card strong { color:#f0edff; } body:not(.zera-home) .metric-card .kicker { color:#b9b3d2; } body:not(.zera-home) .metric-card span { color:#b9b3d2; }
 body:not(.zera-home) .admin-select { color:#f1edff; background:rgba(255,255,255,.055); border-color:rgba(225,219,255,.13); }
+/* The sign-in card is dark, so the light card in components.css would leave its own labels unreadable. */
+body:not(.zera-home) .auth-shell { background:radial-gradient(circle at 76% 22%,rgba(113,89,255,.38),transparent 25%),radial-gradient(circle at 20% 85%,rgba(78,190,255,.18),transparent 28%),#090910; }
+body:not(.zera-home) .auth-card { background:linear-gradient(145deg,rgba(31,29,54,.94),rgba(12,11,23,.95)); border:1px solid rgba(228,222,255,.2); color:#eeeaff; }
+body:not(.zera-home) .auth-card h1 { color:#f7f4ff; } body:not(.zera-home) .auth-card p { color:#b9b3cf; }
+body:not(.zera-home) .auth-card .brand { color:#f3f0ff !important; }
+body:not(.zera-home) .auth-card .field label { color:#e6e0f6; }
+body:not(.zera-home) .auth-card .field input { background:rgba(255,255,255,.05); color:#f2eeff; border-color:rgba(226,219,255,.16); }
+body:not(.zera-home) .auth-card .field input::placeholder { color:#8f88a8; }
+body:not(.zera-home) .auth-card .btn-primary { background:linear-gradient(135deg,#e1d9ff,#9d85ff); color:#171125; }
+body:not(.zera-home) .auth-card .auth-links { color:#c4b6ff; }
+body:not(.zera-home) .auth-card .notice { color:#d7cfff; background:rgba(161,138,255,.1); border-color:rgba(183,163,255,.18); }
+body:not(.zera-home) .auth-card .notice.error { color:#ffb4ac; background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.26); }
+body:not(.zera-home) .auth-card .notice.success { color:#79f0c5; background:rgba(16,185,129,.12); border-color:rgba(16,185,129,.26); }
 
 /* Login-only cinematic scene: video-like movement without a heavyweight video download. */
 .auth-shell:has(.auth-cinematic) { grid-template-columns:minmax(330px,500px) minmax(400px,620px); gap:clamp(30px,7vw,110px); justify-content:center; align-items:center; }
