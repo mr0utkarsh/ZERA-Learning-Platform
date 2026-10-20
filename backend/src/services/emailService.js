@@ -2,6 +2,9 @@ import nodemailer from 'nodemailer';
 import { env } from '../config/env.js';
 import { brevoService } from './brevoService.js';
 
+const DEFAULT_SENDER_NAME = 'ZERA';
+const DEFAULT_SENDER_EMAIL = 'no-reply@zera.app';
+
 // Built lazily so that importing this module never opens a connection attempt
 // against an unconfigured or unreachable SMTP host.
 let transporter = null;
@@ -33,57 +36,129 @@ const escapeHtml = (value) =>
     ({ '&': '&', '<': '<', '>': '>', '"': '"', "'": "'" }[char])
   );
 
-async function sendViaBrevo({ to, subject, html, text }) {
-  if (!brevoService.isConfigured()) {
+/**
+ * Resolves the outgoing sender from EMAIL_FROM.
+ *
+ * EMAIL_FROM is either a bare address (`no-reply@zera.app`) or a display-name
+ * form (`ZERA Live <no-reply@zera.app>`). Both the SMTP relay and the Brevo API
+ * need the address and the display name separately, so the value is parsed
+ * instead of being copied verbatim into the `from` header.
+ */
+export const resolveSender = (raw = env.EMAIL_FROM) => {
+  const value = String(raw ?? '').trim().replace(/^["']|["']$/g, '').trim();
+  const match = value.match(/^(.*?)\s*<\s*([^<>]+?)\s*>$/);
+
+  if (match) {
+    const name = match[1].trim().replace(/^["']|["']$/g, '').trim();
+    return {
+      name: name || DEFAULT_SENDER_NAME,
+      address: match[2].trim() || DEFAULT_SENDER_EMAIL
+    };
+  }
+
+  return {
+    name: DEFAULT_SENDER_NAME,
+    address: value || DEFAULT_SENDER_EMAIL
+  };
+};
+
+const smtpConfigured = () =>
+  Boolean(env.EMAIL_HOST && env.EMAIL_PORT && env.EMAIL_USER && env.EMAIL_PASS && env.EMAIL_FROM);
+
+const brevoConfigured = () => brevoService.isConfigured();
+
+/**
+ * The SMTP relay and the Brevo API are two routes to the same inbox.
+ * EMAIL_PROVIDER decides which one is attempted first; the other stays
+ * available as a fallback so a single failing path cannot drop every mail.
+ */
+const useSmtpFirst = () => {
+  const provider = (env.EMAIL_PROVIDER || '').toLowerCase();
+  if (provider === 'brevo' || provider === 'api') return false;
+  return smtpConfigured();
+};
+
+async function sendViaBrevo({ to, subject, html, text, fromEmail, fromName, replyTo }) {
+  if (!brevoConfigured()) {
     throw new Error('Brevo API is not configured. Set BREVO_API_KEY.');
   }
-  const fromEmail = (env.EMAIL_FROM || 'noreply@zera.app').replace(/^.*<|>.*$/g, '').trim();
-  const fromName = (env.EMAIL_FROM || 'ZERA').replace(/<.*$/, '').trim();
   return brevoService.sendEmail({
     to,
     subject,
     html,
     text,
     fromEmail,
-    fromName
+    fromName,
+    replyTo
   });
 }
 
-async function sendWithFallback(smtpSend, brevoPayload) {
-  try {
-    const result = await smtpSend();
-    return { ...result, provider: 'smtp' };
-  } catch (smtpError) {
-    console.warn('SMTP send failed, falling back to Brevo API:', smtpError.message);
+/**
+ * Sends through the configured transports in order and reports the provider
+ * that actually delivered the message. When every transport fails, the exact
+ * provider errors are surfaced instead of a generic failure.
+ */
+async function deliver({ to, subject, text, html }) {
+  const sender = resolveSender();
+  const from = { name: sender.name, address: sender.address };
+
+  const smtpSend = smtpConfigured()
+    ? () => getTransporter().sendMail({
+        from,
+        replyTo: sender.address,
+        to,
+        subject,
+        text,
+        html
+      })
+    : null;
+
+  const brevoSend = brevoConfigured()
+    ? () => sendViaBrevo({
+        to,
+        subject,
+        html,
+        text,
+        fromEmail: sender.address,
+        fromName: sender.name,
+        replyTo: sender.address
+      })
+    : null;
+
+  const transports = useSmtpFirst()
+    ? [{ provider: 'smtp', send: smtpSend }, { provider: 'brevo-api', send: brevoSend }]
+    : [{ provider: 'brevo-api', send: brevoSend }, { provider: 'smtp', send: smtpSend }];
+
+  const failures = [];
+
+  for (const transport of transports) {
+    if (!transport.send) continue;
     try {
-      const result = await sendViaBrevo(brevoPayload);
-      return { ...result, provider: 'brevo-api' };
-    } catch (apiError) {
-      const err = new Error(`Both SMTP and Brevo API failed. SMTP: ${smtpError.message}. API: ${apiError.message}`);
-      err.statusCode = 502;
-      throw err;
+      const result = await transport.send();
+      return { ...result, provider: transport.provider };
+    } catch (error) {
+      failures.push(`${transport.provider}: ${error.message}`);
+      console.warn(`[email] ${transport.provider} send failed:`, error.message);
     }
   }
+
+  if (failures.length === 0) {
+    const err = new Error(NOT_CONFIGURED);
+    err.statusCode = 503;
+    throw err;
+  }
+
+  const err = new Error(`Email delivery failed. ${failures.join(' | ')}`);
+  err.statusCode = 502;
+  throw err;
 }
 
 export const emailService = {
   isConfigured() {
     const provider = (env.EMAIL_PROVIDER || '').toLowerCase();
-    // Allow SMTP
-    if (provider === 'smtp') {
-      return Boolean(
-        env.EMAIL_HOST &&
-        env.EMAIL_PORT &&
-        env.EMAIL_USER &&
-        env.EMAIL_PASS &&
-        env.EMAIL_FROM
-      );
-    }
-    // Allow Brevo API (brevo, api, or any provider if BREVO_API_KEY is set)
-    if (brevoService.isConfigured()) {
-      return true;
-    }
-    return false;
+    if (provider === 'smtp') return smtpConfigured();
+    if (provider === 'brevo' || provider === 'api') return brevoConfigured();
+    return smtpConfigured() || brevoConfigured();
   },
 
   async sendPasswordResetEmail(email, userName, resetToken) {
@@ -125,16 +200,12 @@ export const emailService = {
       </div>
     `;
 
-    return sendWithFallback(
-      () => getTransporter().sendMail({
-        from: env.EMAIL_FROM,
-        to: email,
-        subject: 'ZERA Learning Platform \u2013 Password Reset',
-        text,
-        html
-      }),
-      { to: email, subject: 'ZERA Learning Platform \u2013 Password Reset', text, html }
-    );
+    return deliver({
+      to: email,
+      subject: 'ZERA Learning Platform \u2013 Password Reset',
+      text,
+      html
+    });
   },
 
   async sendOtpEmail(email, userName, otp) {
@@ -161,22 +232,19 @@ export const emailService = {
       </div>
     `;
 
-    return sendWithFallback(
-      () => getTransporter().sendMail({
-        from: env.EMAIL_FROM,
-        to: email,
-        subject: 'ZERA Learning Platform \u2013 Your Password Reset OTP',
-        text,
-        html
-      }),
-      { to: email, subject: 'ZERA Learning Platform \u2013 Your Password Reset OTP', text, html }
-    );
+    return deliver({
+      to: email,
+      subject: 'ZERA Learning Platform \u2013 Your Password Reset OTP',
+      text,
+      html
+    });
   },
 
   async sendAdminInviteEmail(email, invitedName, invitedByEmail) {
     if (!this.isConfigured()) {
       throw new Error(NOT_CONFIGURED);
     }
+
     if (!email) throw new Error('A valid email address is required.');
 
     const clientUrl = (env.CLIENT_URL || 'http://localhost:5500').replace(/\/$/, '');
@@ -198,15 +266,11 @@ export const emailService = {
       </div>
     `;
 
-    return sendWithFallback(
-      () => getTransporter().sendMail({
-        from: env.EMAIL_FROM,
-        to: email,
-        subject: 'ZERA Learning Platform \u2013 Administrator Invitation',
-        text,
-        html
-      }),
-      { to: email, subject: 'ZERA Learning Platform \u2013 Administrator Invitation', text, html }
-    );
+    return deliver({
+      to: email,
+      subject: 'ZERA Learning Platform \u2013 Administrator Invitation',
+      text,
+      html
+    });
   }
 };

@@ -13,3 +13,8 @@ __pycache__/
 *.pyc
 *.log
 .vercel
+
+# Local deployment probe output
+brevo_check.js
+health_check.txt
+root_check.html

@@ -14,6 +14,11 @@ import { env } from '../config/env.js';
  *    rather than claiming delivery.
  */
 const BREVO_BASE = 'https://api.brevo.com';
+const DEFAULT_SENDER_NAME = 'ZERA';
+const DEFAULT_SENDER_EMAIL = 'no-reply@zera.app';
+
+/** Trims an address and removes stray whitespace around the "@" separator. */
+const normalizeEmail = (value) => String(value || '').trim().replace(/\s+@/g, '@');
 
 export const brevoService = {
   isConfigured() {
@@ -29,21 +34,25 @@ export const brevoService = {
     };
   },
 
-  async sendEmail({ to, subject, html, text, fromEmail, fromName }) {
+  async sendEmail({ to, subject, html, text, fromEmail, fromName, replyTo }) {
     if (!this.isConfigured()) {
       const err = new Error('Brevo is not configured. Set BREVO_API_KEY.');
       err.statusCode = 503;
       throw err;
     }
     if (!to) throw Object.assign(new Error('A recipient email is required.'), { statusCode: 400 });
-    const senderEmail = String(fromEmail || '').trim() || 'no-reply@zera.app';
-    const senderName = String(fromName || '').trim() || 'ZERA';
+    // Brevo only accepts a sender that is verified on the account, so the
+    // configured EMAIL_FROM is used as-is instead of a hard-coded address.
+    const senderEmail = normalizeEmail(fromEmail) || DEFAULT_SENDER_EMAIL;
+    const senderName = String(fromName || '').trim() || DEFAULT_SENDER_NAME;
+    const replyToEmail = normalizeEmail(replyTo) || senderEmail;
     const res = await fetch(`${BREVO_BASE}/v3/smtp/email`, {
       method: 'POST',
       headers: { 'api-key': env.BREVO_API_KEY, 'Content-Type': 'application/json', accept: 'application/json' },
       body: JSON.stringify({
         sender: { email: senderEmail, name: senderName },
-        to: [{ email: to }],
+        replyTo: { email: replyToEmail, name: senderName },
+        to: [{ email: normalizeEmail(to) }],
         subject: subject || 'ZERA',
         htmlContent: html || `<p>${String(text || '').replace(/</g, '&lt;')}</p>`,
         textContent: text || ''
