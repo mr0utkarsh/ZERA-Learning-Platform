@@ -29,18 +29,20 @@ export const brevoService = {
     };
   },
 
-  async sendEmail({ to, subject, html, text }) {
+  async sendEmail({ to, subject, html, text, fromEmail, fromName }) {
     if (!this.isConfigured()) {
       const err = new Error('Brevo is not configured. Set BREVO_API_KEY.');
       err.statusCode = 503;
       throw err;
     }
     if (!to) throw Object.assign(new Error('A recipient email is required.'), { statusCode: 400 });
+    const senderEmail = String(fromEmail || '').trim() || 'no-reply@zera.app';
+    const senderName = String(fromName || '').trim() || 'ZERA';
     const res = await fetch(`${BREVO_BASE}/v3/smtp/email`, {
       method: 'POST',
       headers: { 'api-key': env.BREVO_API_KEY, 'Content-Type': 'application/json', accept: 'application/json' },
       body: JSON.stringify({
-        sender: { email: 'no-reply@zera.app', name: 'ZERA' },
+        sender: { email: senderEmail, name: senderName },
         to: [{ email: to }],
         subject: subject || 'ZERA',
         htmlContent: html || `<p>${String(text || '').replace(/</g, '&lt;')}</p>`,

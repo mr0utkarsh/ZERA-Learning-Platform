@@ -43,7 +43,9 @@ async function sendViaBrevo({ to, subject, html, text }) {
     to,
     subject,
     html,
-    text
+    text,
+    fromEmail,
+    fromName
   });
 }
 
