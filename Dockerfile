@@ -1,7 +1,12 @@
-# Debian slim (glibc + OpenSSL 3) instead of Alpine: Prisma 5.22's query
-# engine requires libssl, which the Alpine image does not provide, causing
-# "Error loading shared library libssl.so.1.1" and a boot-time crash.
+# Debian slim (glibc) so Prisma engines load. The slim image ships no
+# OpenSSL, so Prisma's generate/runtime detection falls back to the
+# openssl-1.1.x engine, which then crashes with "libssl.so.1.1: No such
+# file or directory". Installing openssl (3.x) lets Prisma generate and
+# load the debian-openssl-3.0.x engine.
 FROM node:20-slim
+
+RUN apt-get update -y && apt-get install -y --no-install-recommends openssl \
+  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
