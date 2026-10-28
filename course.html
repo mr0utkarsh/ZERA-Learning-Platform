@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZERA Course</title>
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <script src="./js/storage.js" defer></script>
+  <script src="./js/course.js" defer></script>
+  <script src="./js/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="./index.html" class="brand"><span class="brand-mark"><span>Z</span></span><span>ZERA</span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./syllabus.html">Syllabus</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn btn-secondary btn-small" href="./profile.html">Profile</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="breadcrumb"><a href="./dashboard.html">Dashboard</a> <span>/</span> <span id="courseTitle">Course</span></div>
+
+      <section class="panel" style="margin-top:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+          <div>
+            <h1 id="courseTitleHeader">Course title</h1>
+            <p id="courseDescription">Loading course details...</p>
+          </div>
+          <div style="text-align:right; min-width:220px;">
+            <div class="progress-bar" style="height:12px; margin-bottom:8px;">
+              <span id="courseProgressBar" style="width:0%"></span>
+            </div>
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+              <button class="btn btn-primary" id="enrollBtn">Enroll</button>
+              <a class="btn btn-secondary" id="openCourseBtn" href="#">Open lesson</a>
+            </div>
+            <small id="progressSummary" style="display:block; margin-top:8px; color:#415772;">0 of 0 lessons completed</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="hierarchyPanel" style="margin-top:16px;">
+        <h3>Course syllabus</h3>
+        <div id="hierarchyContainer">Loading syllabus...</div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><small>© 2026 ZERA</small></div></footer>
+</body>
+</html>

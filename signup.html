@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZERA Signup</title>
+  <meta name="description" content="Create a ZERA account and access your personalized learning dashboard." />
+  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/responsive.css" />
+  <script src="./js/storage.js" defer></script>
+  <script src="./js/auth.js" defer></script>
+</head>
+<body>
+  <div class="auth-shell">
+    <div class="auth-card">
+      <a href="./index.html" class="brand" aria-label="ZERA home" style="color:#0c1d31; margin-bottom: 18px; display:inline-flex;">
+        <span class="brand-mark"><span>Z</span></span><span>ZERA</span>
+      </a>
+      <h1>Create your account</h1>
+      <p>Join ZERA and start your personalized learning journey.</p>
+      <form id="signupForm" style="margin-top: 18px;">
+        <div class="field">
+          <label for="signupName">Full name</label>
+          <input id="signupName" name="name" type="text" placeholder="Your name" required />
+        </div>
+        <div class="field" style="margin-top: 14px;">
+          <label for="signupEmail">Email</label>
+          <input id="signupEmail" name="email" type="email" placeholder="student@zera.app" required />
+        </div>
+        <div class="field" style="margin-top: 14px;">
+          <label for="signupPassword">Password</label>
+          <input id="signupPassword" name="password" type="password" placeholder="••••••••" required />
+        </div>
+        <div class="auth-links" style="margin-top: 14px;">
+          <a href="./login.html">Already have an account?</a>
+        </div>
+        <div style="margin-top: 18px;"><button class="btn btn-primary" type="submit">Create account</button></div>
+        <div id="authMessage" class="notice" style="margin-top: 16px;">Demo mode is active.</div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

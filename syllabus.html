@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZERA Syllabus | Course Structure</title>
+  <meta name="description" content="Review your ZERA syllabus and track learning progress across topics and units." />
+  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/responsive.css" />
+  <script src="./js/storage.js" defer></script>
+  <script src="./js/progress.js" defer></script>
+  <script src="./js/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="./index.html" class="brand" aria-label="ZERA home"><span class="brand-mark"><span>Z</span></span><span>ZERA</span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./syllabus.html" class="active">Syllabus</a>
+        <a href="./notes.html">Notes</a>
+        <a href="./quiz.html">Quiz</a>
+        <a href="./study-plan.html">Study Plan</a>
+        <a href="./resources.html">Resources</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn btn-secondary btn-small" href="./profile.html">Profile</a>
+        <a class="btn btn-primary btn-small" href="./dashboard.html">Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="page-hero" style="padding: 30px 0; border-radius: 26px; background: linear-gradient(180deg,#0c1e34,#0f2946);">
+        <div class="container">
+          <div class="breadcrumb"><span>Dashboard</span> <span>/</span> <span class="current">Syllabus</span></div>
+          <h1>Course syllabus</h1>
+          <p>Understand your learning path and focus on the next concept that needs attention.</p>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top: 26px;">
+        <article class="panel">
+          <h3>Current course</h3>
+          <div class="topic-list">
+            <div class="topic-item"><span>Introduction to Learning Systems</span><span class="badge neutral">In progress</span></div>
+            <div class="topic-item"><span>Study Methods and Habit Design</span><span class="badge neutral">Planned</span></div>
+            <div class="topic-item"><span>Course Planning Basics</span><span class="badge neutral">Planned</span></div>
+            <div class="topic-item"><span>Revision Techniques</span><span class="badge neutral">Planned</span></div>
+          </div>
+        </article>
+        <article class="panel">
+          <h3>Progress overview</h3>
+          <div class="progress-bar" data-progress="25"><span></span></div>
+          <p style="margin-top: 14px; color:#415772;">25% completed overall for the current module.</p>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><small>© 2026 ZERA</small></div></footer>
+</body>
+</html>

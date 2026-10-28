@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lesson - ZERA</title>
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <script src="./js/storage.js" defer></script>
+  <script src="./js/lesson.js" defer></script>
+  <script src="./js/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="./index.html" class="brand"><span class="brand-mark"><span>Z</span></span><span>ZERA</span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./syllabus.html">Syllabus</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn btn-secondary btn-small" href="./profile.html">Profile</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="breadcrumb"><a href="./dashboard.html">Dashboard</a> <span>/</span> <a id="courseBreadcrumb" href="#">Course</a> <span>/</span> <span id="lessonBreadcrumb">Lesson</span></div>
+
+      <section class="panel" style="margin-top:18px;">
+        <h1 id="lessonTitle">Loading lesson...</h1>
+        <div style="color:#6b7b8f; margin-bottom:12px;" id="lessonMeta"></div>
+        <article id="lessonContent">Loading &hellip;</article>
+
+        <div style="margin-top:18px; display:flex; gap:12px;">
+          <button class="btn btn-secondary" id="prevBtn">Previous</button>
+          <button class="btn btn-secondary" id="nextBtn">Next</button>
+          <button class="btn btn-primary" id="completeBtn">Mark as complete</button>
+        </div>
+
+        <div id="messageArea" style="margin-top:12px;"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><small>© 2026 ZERA</small></div></footer>
+</body>
+</html>

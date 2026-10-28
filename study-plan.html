@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZERA Study Plan | Build a Learning Schedule</title>
+  <meta name="description" content="Build a study plan and schedule for your course with personalized ZERA recommendations." />
+  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/responsive.css" />
+  <script src="./js/storage.js" defer></script>
+  <script src="./js/study-plan.js" defer></script>
+  <script src="./js/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="./index.html" class="brand" aria-label="ZERA home"><span class="brand-mark"><span>Z</span></span><span>ZERA</span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./syllabus.html">Syllabus</a>
+        <a href="./notes.html">Notes</a>
+        <a href="./quiz.html">Quiz</a>
+        <a href="./study-plan.html" class="active">Study Plan</a>
+        <a href="./resources.html">Resources</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn btn-secondary btn-small" href="./profile.html">Profile</a>
+        <a class="btn btn-primary btn-small" href="./dashboard.html">Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="page-hero" style="padding: 30px 0; border-radius: 26px; background: linear-gradient(180deg,#0a1d33,#102b43);">
+        <div class="container">
+          <div class="breadcrumb"><span>Dashboard</span> <span>/</span> <span class="current">Study Plan</span></div>
+          <h1>Study planner</h1>
+          <p>Arrange your practice, revision, and topic recovery blocks with a structured schedule.</p>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:26px;">
+        <article class="panel">
+          <h3>Create a study plan</h3>
+          <form id="studyPlanForm">
+            <div class="field">
+              <label for="planCourse">Course</label>
+              <input id="planCourse" name="course" type="text" value="ZERA Foundations" />
+            </div>
+            <div class="field" style="margin-top:14px;">
+              <label for="planExamDate">Target date</label>
+              <input id="planExamDate" name="examDate" type="text" value="14 days" />
+            </div>
+            <div class="field" style="margin-top:14px;">
+              <label for="planHours">Daily study hours</label>
+              <input id="planHours" name="hours" type="number" min="1" value="2" />
+            </div>
+            <div class="field" style="margin-top:14px;">
+              <label for="planWeakTopic">Weak topic</label>
+              <input id="planWeakTopic" name="weakTopic" type="text" value="Revision loops" />
+            </div>
+            <div style="margin-top:16px;"><button class="btn btn-primary" type="submit">Generate plan</button></div>
+          </form>
+        </article>
+
+        <article class="panel">
+          <h3>Daily schedule</h3>
+          <div id="studyPlanList"></div>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><small>© 2026 ZERA</small></div></footer>
+</body>
+</html>

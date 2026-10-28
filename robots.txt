@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mr0utkarsh.github.io/ZERA-Learning-Platform/sitemap.xml

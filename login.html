@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZERA Login</title>
+  <meta name="description" content="Log in to your ZERA account or access the demo learning dashboard." />
+  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/responsive.css" />
+  <script src="./js/storage.js" defer></script>
+  <script src="./js/auth.js" defer></script>
+</head>
+<body>
+  <div class="auth-shell">
+    <div class="auth-card">
+      <a href="./index.html" class="brand" aria-label="ZERA home" style="color:#0c1d31; margin-bottom: 18px; display:inline-flex;">
+        <span class="brand-mark"><span>Z</span></span><span>ZERA</span>
+      </a>
+      <h1>Welcome back</h1>
+      <p>Sign in to continue learning with ZERA.</p>
+      <form id="loginForm" style="margin-top: 18px;">
+        <div class="field">
+          <label for="loginEmail">Email</label>
+          <input id="loginEmail" name="email" type="email" placeholder="student@zera.app" required />
+        </div>
+        <div class="field" style="margin-top: 14px;">
+          <label for="loginPassword">Password</label>
+          <input id="loginPassword" name="password" type="password" placeholder="••••••••" required />
+        </div>
+        <div class="auth-links" style="margin-top: 14px;">
+          <a href="./forgot-password.html">Forgot password?</a>
+          <a href="./signup.html">Create account</a>
+        </div>
+        <div style="margin-top: 18px;"><button class="btn btn-primary" type="submit">Login</button></div>
+        <div id="authMessage" class="notice" style="margin-top: 16px;">Demo mode is active.</div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
