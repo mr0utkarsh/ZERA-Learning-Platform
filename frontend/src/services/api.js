@@ -3,7 +3,7 @@
  * reverse proxy in production) forwards to the backend. Auth travels in
  * an httpOnly cookie — no tokens in JS memory/localStorage.
  */
-const API_BASE_URL = String(import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+export const API_BASE_URL = String(import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
 async function request(method, path, body, isForm = false) {
   const options = {

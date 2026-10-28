@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ErrorAlert } from '../../components/ui';
 import { AuthDivider, AuthShell } from '../../components/auth/AuthShell';
@@ -8,16 +8,32 @@ import SocialAuth from '../../components/auth/SocialAuth';
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+  const [oauthNotice, setOauthNotice] = useState(null);
+
+  React.useEffect(() => {
+    const code = new URLSearchParams(location.search).get('oauth_error');
+    const messages = {
+      not_configured: { tone: 'warn', text: 'Social sign-in is not configured yet. Please use your email and password.' },
+      cancelled: { tone: 'info', text: 'Sign-in was cancelled. You can try again or use your email and password.' },
+      invalid_state: { tone: 'error', text: 'We could not verify that sign-in request. Please try again.' },
+      account_unavailable: { tone: 'error', text: 'This email is linked to an unavailable account. Please contact support.' },
+      unsupported_provider: { tone: 'error', text: 'That sign-in provider is not supported.' },
+      failed: { tone: 'error', text: 'Social sign-in could not be completed. Please try again or use your email.' },
+    };
+    setOauthNotice(messages[code] || null);
+  }, [location.search]);
 
   const submit = async (e) => {
     e.preventDefault();
     setBusy(true);
     setError(null);
+    setOauthNotice(null);
     try {
       const user = await login(email.trim(), password);
       navigate(user.role === 'ADMIN' ? '/admin' : '/dashboard');
@@ -39,6 +55,7 @@ export default function Login() {
 
       <SocialAuth mode="login" />
       <AuthDivider />
+      {oauthNotice && <div className={`alert alert-${oauthNotice.tone}`} role="status">{oauthNotice.text}</div>}
       <ErrorAlert error={error} />
 
       <form onSubmit={submit} className="auth-form">
