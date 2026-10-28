@@ -31,3 +31,12 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Auth pages responsive */
+@media (max-width: 480px) {
+  .auth-card { width: 100%; max-width: 100%; border-radius: 0; padding: 24px 16px; }
+  .auth-shell { padding: 24px 12px; min-height: auto; }
+  .oauth-buttons { gap: 8px; }
+  .btn-oauth { padding: 0.85rem 1rem; font-size: 0.9rem; }
+  .field label { font-size: 0.9rem; }
+}

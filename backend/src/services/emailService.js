@@ -7,6 +7,11 @@ const getResetUrl = (resetToken) => {
   return `${baseUrl}${separator}token=${encodeURIComponent(resetToken)}`;
 };
 
+const getVerifyUrl = (verificationToken) => {
+  const baseUrl = (env.CLIENT_URL || 'http://localhost:8000').replace(/\/$/, '');
+  return `${baseUrl}/verify-email.html?token=${encodeURIComponent(verificationToken)}`;
+};
+
 export const emailService = {
   isConfigured() {
     const provider = (env.EMAIL_PROVIDER || '').toLowerCase();
@@ -49,6 +54,36 @@ export const emailService = {
       subject: 'Reset your ZERA password',
       text: `Hello ${userName || 'ZERA user'},\n\nUse this link to reset your password: ${resetUrl}\n\nThis link expires in ${env.PASSWORD_RESET_TOKEN_EXPIRES_IN}. If you did not request it, you can ignore this email.`,
       html: `<p>Hello ${userName || 'ZERA user'},</p><p>Use the link below to reset your ZERA password:</p><p><a href="${resetUrl}">Reset password</a></p><p>This link expires in ${env.PASSWORD_RESET_TOKEN_EXPIRES_IN}. If you did not request it, you can ignore this email.</p>`
+    });
+
+    return { success: true };
+  },
+
+  async sendVerificationEmail(email, userName, verificationToken) {
+    if (!this.isConfigured()) {
+      throw new Error(
+        'Email verification is not configured. Please set EMAIL_PROVIDER, EMAIL_HOST, EMAIL_USER, EMAIL_PASS, and EMAIL_FROM in the environment.'
+      );
+    }
+
+    if (!email) {
+      throw new Error('A valid email address is required to send a verification email.');
+    }
+
+    const verifyUrl = getVerifyUrl(verificationToken);
+    const transporter = nodemailer.createTransport({
+      host: env.EMAIL_HOST,
+      port: env.EMAIL_PORT,
+      secure: env.EMAIL_SECURE || env.EMAIL_PORT === 465,
+      auth: { user: env.EMAIL_USER, pass: env.EMAIL_PASS }
+    });
+
+    await transporter.sendMail({
+      from: env.EMAIL_FROM,
+      to: email,
+      subject: 'Verify your ZERA email address',
+      text: `Hello ${userName || 'ZERA user'},\n\nPlease verify your email address by clicking this link: ${verifyUrl}\n\nThis link expires in ${env.PASSWORD_RESET_TOKEN_EXPIRES_IN}. If you did not create a ZERA account, you can ignore this email.`,
+      html: `<p>Hello ${userName || 'ZERA user'},</p><p>Please verify your email address by clicking the link below:</p><p><a href="${verifyUrl}">Verify email address</a></p><p>This link expires in ${env.PASSWORD_RESET_TOKEN_EXPIRES_IN}. If you did not create a ZERA account, you can ignore this email.</p>`
     });
 
     return { success: true };

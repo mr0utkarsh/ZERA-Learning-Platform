@@ -40,9 +40,12 @@ model User {
   id              String           @id @default(cuid())
   name            String
   email           String           @unique
-  passwordHash    String
+  passwordHash    String?
   role            Role             @default(STUDENT)
   status          UserStatus       @default(ACTIVE)
+  emailVerified   Boolean          @default(false)
+  googleId        String?          @unique
+  githubId        String?          @unique
   profile         Profile?
   enrollments     Enrollment[]
   progress        Progress[]
@@ -55,6 +58,8 @@ model User {
   bookmarks       Bookmark[]
   notifications   Notification[]
   supportRequests SupportRequest[]
+  passwordResetTokens PasswordResetToken[]
+  verificationTokens VerificationToken[]
   syllabusUploads SyllabusUpload[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
@@ -76,8 +81,32 @@ model Profile {
   weeklyHours     Int?
   onboardingCompleted Boolean @default(false)
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique @db.VarChar(500)
+  expiresAt DateTime
+  usedAt    DateTime?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model VerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique @db.VarChar(500)
+  expiresAt DateTime
+  usedAt    DateTime?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
 }
 
 model UserSettings {

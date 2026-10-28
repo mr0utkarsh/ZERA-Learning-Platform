@@ -5,9 +5,20 @@ import {
   adminLogin,
   me,
   forgotPassword,
-  resetPasswordRequest
+  resetPasswordRequest,
+  oauthGoogleAuthorize,
+  oauthGoogleCallback,
+  oauthGithubAuthorize,
+  oauthGithubCallback,
+  resendVerification,
+  verifyEmailAddress
 } from '../controllers/authController.js';
 import { authenticate } from '../middleware/authMiddleware.js';
+import {
+  authRateLimiter,
+  strictAuthRateLimiter,
+  oauthRateLimiter
+} from '../middleware/rateLimitMiddleware.js';
 import {
   createUserSchema,
   loginSchema,
@@ -18,11 +29,19 @@ import {
 
 const router = express.Router();
 
-router.post('/signup', validateRequest(createUserSchema), signup);
-router.post('/login', validateRequest(loginSchema), login);
-router.post('/admin/login', validateRequest(loginSchema), adminLogin);
+router.post('/signup', authRateLimiter, validateRequest(createUserSchema), signup);
+router.post('/login', authRateLimiter, validateRequest(loginSchema), login);
+router.post('/admin/login', strictAuthRateLimiter, validateRequest(loginSchema), adminLogin);
 router.get('/me', authenticate, me);
-router.post('/forgot-password', validateRequest(forgotPasswordSchema), forgotPassword);
-router.post('/reset-password', validateRequest(resetPasswordSchema), resetPasswordRequest);
+router.post('/forgot-password', authRateLimiter, validateRequest(forgotPasswordSchema), forgotPassword);
+router.post('/reset-password', authRateLimiter, validateRequest(resetPasswordSchema), resetPasswordRequest);
+
+router.get('/oauth/google', oauthRateLimiter, oauthGoogleAuthorize);
+router.get('/oauth/google/callback', oauthRateLimiter, oauthGoogleCallback);
+router.get('/oauth/github', oauthRateLimiter, oauthGithubAuthorize);
+router.get('/oauth/github/callback', oauthRateLimiter, oauthGithubCallback);
+
+router.post('/resend-verification', authenticate, authRateLimiter, resendVerification);
+router.get('/verify-email', authRateLimiter, verifyEmailAddress);
 
 export default router;

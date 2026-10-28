@@ -20,7 +20,13 @@ export const env = {
   PASSWORD_RESET_URL: process.env.PASSWORD_RESET_URL || '',
   SESSION_SECRET: process.env.SESSION_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'development-session-secret'),
   PASSWORD_RESET_TOKEN_SECRET: process.env.PASSWORD_RESET_TOKEN_SECRET || process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'development-secret-change-me'),
-  PASSWORD_RESET_TOKEN_EXPIRES_IN: process.env.PASSWORD_RESET_TOKEN_EXPIRES_IN || '1h'
+  PASSWORD_RESET_TOKEN_EXPIRES_IN: process.env.PASSWORD_RESET_TOKEN_EXPIRES_IN || '1h',
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
+  GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID || '',
+  GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET || '',
+  OAUTH_CALLBACK_BASE: process.env.OAUTH_CALLBACK_BASE || process.env.CLIENT_URL || 'http://localhost:8000',
+  FRONTEND_URL: process.env.FRONTEND_URL || process.env.CLIENT_URL || 'http://localhost:8000'
 };
 
 export const ensureRequiredEnv = () => {

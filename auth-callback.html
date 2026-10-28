@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Completing sign-in - ZERA</title>
+  <meta name="description" content="Completing your ZERA sign-in." />
+  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/responsive.css" />
+  <script>
+    window.ZERA_API_BASE = '';
+  </script>
+</head>
+<body>
+  <div class="auth-shell">
+    <div class="auth-card">
+      <a href="./index.html" class="brand" aria-label="ZERA home">
+        <span class="brand-mark"><span>Z</span></span><span>ZERA</span>
+      </a>
+      <h1 class="auth-heading">Completing sign-in…</h1>
+      <p id="callbackStatus" class="auth-subheading">Please wait while we finalize your account.</p>
+      <div id="authMessage" class="notice notice--live" aria-live="polite"></div>
+      <p class="hint" style="margin-top: 14px;"><a href="./login.html">Return to sign in</a></p>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const API_BASE = (window.ZERA_API_BASE && String(window.ZERA_API_BASE).replace(/\/$/, '')) || 'http://localhost:5000';
+      const statusEl = document.getElementById('callbackStatus');
+      const messageEl = document.getElementById('authMessage');
+
+      function show(text, type = 'info') {
+        if (!messageEl) return;
+        messageEl.textContent = text;
+        messageEl.className = 'notice notice--live ' + type;
+      }
+
+      function getTokenFromUrl() {
+        const qs = new URLSearchParams(window.location.search);
+        const token = qs.get('token') || qs.get('oauth_token');
+        if (token) return token;
+        const hash = new URLSearchParams(window.location.hash.slice(1));
+        return hash.get('token') || null;
+      }
+
+      function stripTokenFromUrl() {
+        const url = window.location;
+        const qs = new URLSearchParams(url.search);
+        qs.delete('token'); qs.delete('oauth_token');
+        let hash = url.hash.slice(1);
+        if (hash) {
+          const h = new URLSearchParams(hash);
+          h.delete('token');
+          hash = h.toString();
+        }
+        const clean = url.origin + url.pathname + (qs.toString() ? '?' + qs.toString() : '') + (hash ? '#' + hash : '');
+        window.history.replaceState({}, document.title, clean);
+      }
+
+      async function run() {
+        const token = getTokenFromUrl();
+        if (!token) {
+          statusEl.textContent = 'Unable to complete sign-in.';
+          show('No sign-in token was found in the return URL.', 'error');
+          return;
+        }
+
+        stripTokenFromUrl();
+
+        try {
+          localStorage.setItem('zera_token', token);
+          const response = await fetch(`${API_BASE}/api/auth/me`, {
+            headers: { Authorization: 'Bearer ' + token }
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || !data.success) {
+            throw new Error(data.message || 'Unable to load your account.');
+          }
+          const user = data.data || {};
+          localStorage.setItem('zera_user', JSON.stringify({ ...user, isLoggedIn: true }));
+
+          statusEl.textContent = 'Sign-in complete. Redirecting…';
+          show('Welcome back, ' + (user.name || 'student') + '.', 'success');
+
+          const isComplete = Boolean(data.data && data.data.onboardingCompleted);
+          setTimeout(() => {
+            window.location.href = isComplete ? './dashboard.html' : './onboarding.html';
+          }, 700);
+        } catch (error) {
+          statusEl.textContent = 'Sign-in failed.';
+          show(error.message || 'Authentication failed. Please try signing in again.', 'error');
+        }
+      }
+
+      run();
+    })();
+  </script>
+</body>
+</html>

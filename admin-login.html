@@ -3,34 +3,51 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ZERA Admin Login</title>
+  <title>Admin login - ZERA</title>
   <meta name="description" content="Secure admin login for the ZERA platform." />
   <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="./css/style.css" />
   <link rel="stylesheet" href="./css/components.css" />
   <link rel="stylesheet" href="./css/responsive.css" />
+  <script>
+    window.ZERA_API_BASE = '';
+  </script>
   <script src="./js/storage.js" defer></script>
   <script src="./js/auth.js" defer></script>
 </head>
 <body>
   <div class="auth-shell">
     <div class="auth-card">
-      <a href="./index.html" class="brand" aria-label="ZERA home" style="color:#0c1d31; margin-bottom: 18px; display:inline-flex;">
+      <a href="./index.html" class="brand" aria-label="ZERA home">
         <span class="brand-mark"><span>Z</span></span><span>ZERA</span>
       </a>
-      <h1>Admin login</h1>
-      <p>Access the secure admin monitoring portal.</p>
-      <form id="adminLoginForm" style="margin-top:18px;">
+      <h1 class="auth-heading">Admin login</h1>
+      <p class="auth-subheading">Access the secure admin monitoring portal.</p>
+
+      <form id="adminLoginForm" class="auth-form" novalidate autocomplete="on">
         <div class="field">
-          <label for="adminEmail">Admin email</label>
-          <input id="adminEmail" name="email" type="email" placeholder="admin@zera.app" required />
+          <label for="adminEmail">Admin email address</label>
+          <input id="adminEmail" name="email" type="email" inputmode="email" autocomplete="email"
+            placeholder="admin@example.com" required />
+          <span class="error-text" id="adminEmailError" aria-live="polite"></span>
         </div>
-        <div class="field" style="margin-top:14px;">
+        <div class="field">
           <label for="adminPassword">Password</label>
-          <input id="adminPassword" name="password" type="password" placeholder="••••••••" required />
+          <div class="password-input">
+            <input id="adminPassword" name="password" type="password" autocomplete="current-password"
+              placeholder="••••••••" required />
+            <button type="button" class="password-toggle" id="toggleAdminPassword"
+              aria-label="Show password" aria-pressed="false">Show</button>
+          </div>
+          <span class="error-text" id="adminPasswordError" aria-live="polite"></span>
         </div>
-        <div style="margin-top:18px;"><button class="btn btn-primary" type="submit">Access admin</button></div>
-        <div id="authMessage" class="notice" style="margin-top:16px;">Admin authentication is enabled.</div>
+        <div class="auth-links" style="margin-top: 6px;">
+          <a href="./login.html">Student sign in</a>
+        </div>
+        <div class="field field--submit">
+          <button class="btn btn-primary btn--block" type="submit" id="adminLoginSubmit">Access admin</button>
+        </div>
+        <div id="authMessage" class="notice notice--live" aria-live="polite"></div>
       </form>
     </div>
   </div>
