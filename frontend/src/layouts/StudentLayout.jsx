@@ -7,7 +7,7 @@ import { Brand } from './PublicLayout';
 const NAV = [
   { section: 'Learn' },
   { to: '/dashboard', ico: '🏠', label: 'Dashboard' },
-  { to: '/courses', ico: '📚', label: 'My Courses' },
+  { to: '/courses', ico: '📚', label: 'Syllabus & Courses' },
   { to: '/progress', ico: '📈', label: 'Progress' },
   { section: 'Practice' },
   { to: '/quiz', ico: '❓', label: 'Quizzes' },
@@ -17,6 +17,7 @@ const NAV = [
   { to: '/notes', ico: '✍️', label: 'Notes' },
   { to: '/doubts', ico: '💬', label: 'Doubt Solver' },
   { to: '/interview', ico: '🎤', label: 'Mock Interview' },
+  { to: '/learning/resources', ico: '🚀', label: 'Skills & Resources' },
   { section: 'Plan' },
   { to: '/study-plan', ico: '🗓️', label: 'Study Plan' },
   { to: '/performance', ico: '📊', label: 'Performance' },

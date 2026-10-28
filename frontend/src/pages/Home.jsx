@@ -2,30 +2,24 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const FEATURES = [
-  { emoji: '🗂️', title: 'Structured syllabus', body: 'Course → Subject → Unit → Chapter → Topic → Lesson. Upload your syllabus and get a clean structure you can track.' },
-  { emoji: '🤖', title: 'AI notes generator', body: 'Generate exam-focused notes for any subject, unit, chapter, topic or lesson — with key points and summaries.' },
-  { emoji: '✍️', title: 'Handwritten-style notes', body: 'Readable handwritten-style study sheets you can preview, save and download.' },
-  { emoji: '💬', title: 'AI doubt solver', body: 'Ask anything, get step-by-step explanations with examples, and continue the conversation with follow-ups.' },
-  { emoji: '❓', title: 'Quizzes & mock tests', body: 'Generate MCQ, true/false and short-answer quizzes with timers, automatic grading and full reviews.' },
-  { emoji: '🗓️', title: 'Personalized study plans', body: 'Daily study time + target exam date + your weak areas = a realistic day-by-day schedule.' },
-  { emoji: '📊', title: 'Real performance analysis', body: 'Accuracy, subject-wise stats, strong/weak areas and trends — computed from your actual attempts.' },
-  { emoji: '🎤', title: 'AI mock interviews', body: 'Practice role-based interviews, get scored feedback on every answer and a final evaluation.' },
+const JOURNEY = [
+  { icon: '01', emoji: '📤', title: 'Syllabus upload & AI analysis', body: 'Turn a syllabus into a reviewable course structure.', to: '/courses' },
+  { icon: '02', emoji: '📚', title: 'Notes & study material', body: 'Build a dependable home for each subject and lesson.', to: '/courses' },
+  { icon: '03', emoji: '✍️', title: 'AI handwritten notes', body: 'Create readable study sheets from your learning notes.', to: '/notes' },
+  { icon: '04', emoji: '🗂️', title: 'PYQs & important questions', body: 'Practice previous-year questions and revisit tricky topics.', to: '/pyqs' },
+  { icon: '05', emoji: '💬', title: 'AI doubt solver', body: 'Work through concepts with step-by-step explanations.', to: '/doubts' },
+  { icon: '06', emoji: '⚡', title: 'AI quiz generator', body: 'Check recall with focused, syllabus-linked quizzes.', to: '/quiz' },
+  { icon: '07', emoji: '📊', title: 'Performance analysis', body: 'See strengths and gaps based on your real attempts.', to: '/performance' },
+  { icon: '08', emoji: '🗓️', title: 'Personalized study plan', body: 'Turn your target date into a practical daily schedule.', to: '/study-plan' },
+  { icon: '09', emoji: '✅', title: 'Syllabus progress tracking', body: 'Know what is done, what is next, and what remains.', to: '/progress' },
+  { icon: '10', emoji: '🎤', title: 'AI mock interview', body: 'Practice role-based questions and get answer feedback.', to: '/interview' },
+  { icon: '11', emoji: '🚀', title: 'Skills & project resources', body: 'Find external courses, documentation and project practice.', to: '/resources' },
 ];
 
-const STEPS = [
-  { title: 'Create your account', body: 'Sign up in seconds and verify your email with a one-time code.' },
-  { title: 'Add your syllabus', body: 'Upload a PDF/DOCX/TXT syllabus or build your course structure manually.' },
-  { title: 'Study with AI support', body: 'Read lessons, generate notes, and clear doubts with the AI tutor.' },
-  { title: 'Practice & track', body: 'Take quizzes and mock tests, follow your study plan and watch progress grow.' },
-];
-
-const FAQS = [
-  { q: 'Is ZERA free to use?', a: 'Creating an account and using the learning platform is free in this deployment. Some AI-powered features require the server to be configured with an AI provider; when it is not configured, those features clearly say so instead of pretending to work.' },
-  { q: 'Do I need to upload my syllabus?', a: 'No. You can also create courses manually — course, subjects, units, chapters, topics and lessons. Uploading a syllabus just lets the AI propose a structure for you to review and save.' },
-  { q: 'How is my progress calculated?', a: 'Progress is calculated only from lessons you actually mark complete, plus your real quiz and test results. Nothing is estimated or faked.' },
-  { q: 'Who can see my data?', a: 'Your learning data belongs to you. Administrators can see account-level statistics for moderation, but your answers and notes stay tied to your account.' },
-  { q: 'Does ZERA have a teacher module?', a: 'No — ZERA is intentionally student-focused. Everything is built around one learner’s journey.' },
+const AUDIENCES = [
+  { emoji: '🎓', title: 'For university students', body: 'Organize semester syllabi, revise with questions, and make steady progress before exams.' },
+  { emoji: '💼', title: 'For job seekers', body: 'Strengthen technical skills, build projects, prepare for interviews, and keep a plan.' },
+  { emoji: '🔥', title: 'For everyday momentum', body: 'A real study streak rewards consistency, while your progress stays tied to work you actually complete.' },
 ];
 
 export default function Home() {
@@ -33,94 +27,54 @@ export default function Home() {
   const ctaTarget = user ? (user.role === 'ADMIN' ? '/admin' : '/dashboard') : '/signup';
 
   return (
-    <div>
-      <section className="hero">
-        <span className="tagline">AI-powered personalized learning</span>
-        <h1>ZERA — Your <span className="grad">New Era</span> of Learning</h1>
-        <p className="lead">
-          One place for your entire study journey: structured courses, AI-generated notes,
-          an always-available tutor, quizzes, mock tests, previous-year questions,
-          progress tracking and personalized study plans.
-        </p>
-        <div className="hero-cta">
-          <Link className="btn btn-primary btn-lg" to={ctaTarget}>Start Learning</Link>
-          <Link className="btn btn-outline btn-lg" to="/features">Explore Features</Link>
-        </div>
-      </section>
-
-      <section className="section" id="why">
-        <h2>Why ZERA?</h2>
-        <p className="sub">
-          Studying is scattered — PDFs, videos, notes, doubts left unanswered.
-          ZERA brings structure, guidance and measurement into one calm workspace.
-        </p>
-        <div className="grid grid-3">
-          <div className="feature-card"><span className="emoji">🧭</span><h3>Clarity</h3><p>See your whole syllabus as a tree with real completion percentages at every level — never wonder “what’s left?” again.</p></div>
-          <div className="feature-card"><span className="emoji">⚡</span><h3>Speed</h3><p>Notes, quizzes and study plans generated around your actual syllabus structure, not generic content.</p></div>
-          <div className="feature-card"><span className="emoji">🎯</span><h3>Honest tracking</h3><p>Every metric comes from what you actually completed and attempted. Empty charts say “not enough data yet” — they never invent numbers.</p></div>
-        </div>
-      </section>
-
-      <section className="section">
-        <h2>Everything a student needs</h2>
-        <p className="sub">From your first lesson to your final mock interview.</p>
-        <div className="grid grid-4">
-          {FEATURES.map((f) => (
-            <div className="feature-card" key={f.title}>
-              <span className="emoji">{f.emoji}</span>
-              <h3>{f.title}</h3>
-              <p>{f.body}</p>
+    <div className="home-page">
+      <section className="home-hero">
+        <div className="home-hero-inner">
+          <div className="home-copy">
+            <span className="eyebrow"><span className="eyebrow-dot" /> Your learning, all connected</span>
+            <h1>Make your next chapter <span>your best one.</span></h1>
+            <p className="home-lead">A focused learning platform for university students and job seekers. Bring your syllabus, build skills, practice for what matters, and keep showing up — one day at a time.</p>
+            <div className="hero-cta">
+              <Link className="btn btn-primary btn-lg" to={ctaTarget}>Start your learning journey <span aria-hidden="true">→</span></Link>
+              <Link className="home-secondary-link" to="/features">Explore all features <span aria-hidden="true">↗</span></Link>
             </div>
-          ))}
+            <div className="hero-trust"><span>🎓</span> University learning <i /> <span>💼</span> Career readiness <i /> <span>🔥</span> Daily consistency</div>
+          </div>
+          <div className="hero-art" aria-label="Illustration of a connected study journey">
+            <div className="hero-orbit orbit-one" /><div className="hero-orbit orbit-two" />
+            <div className="hero-note-card"><div className="mini-card-head"><span className="mini-app-icon">Z</span><span>YOUR STUDY SPACE</span><span className="live-dot" /></div><div className="mini-welcome">One step at a time<span>✦</span></div><div className="mini-path"><span className="mini-path-icon">📚</span><span><b>Learn with a plan</b><small>Make room for focused progress</small></span><span className="mini-chevron">↗</span></div><div className="mini-path"><span className="mini-path-icon green">✓</span><span><b>Practice what you learn</b><small>Turn understanding into confidence</small></span><span className="mini-chevron">↗</span></div><div className="mini-habit"><div><span className="mini-fire">🔥</span><b>Keep your daily rhythm</b></div><div className="mini-days"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div></div></div>
+            <div className="floating-chip chip-top"><span>✦</span> AI study tools</div><div className="floating-chip chip-bottom"><span>↗</span> Your next step, clear</div>
+          </div>
+        </div>
+        <div className="hero-bottom-line"><span>LESS SCATTER. MORE MOMENTUM.</span><span>LEARN · PRACTICE · GROW</span></div>
+      </section>
+
+      <section className="home-section journey-section" id="journey">
+        <div className="section-heading">
+          <span className="eyebrow">One connected workflow</span>
+          <h2>From syllabus to next opportunity.</h2>
+          <p>Start with what you need to learn. ZERA brings the next useful step into reach — from exam prep to career practice.</p>
+        </div>
+        <div className="journey-list">
+          {JOURNEY.map((step) => <Link to={user ? (step.to === '/resources' ? '/learning/resources' : step.to) : '/signup'} className="journey-item" key={step.icon}>
+            <span className="journey-number">{step.icon}</span><span className="journey-emoji">{step.emoji}</span><span className="journey-copy"><b>{step.title}</b><small>{step.body}</small></span><span className="journey-arrow" aria-hidden="true">↗</span>
+          </Link>)}
+        </div>
+        <p className="journey-footnote">AI features depend on server configuration. Syllabus structures are reviewable before saving, and learning metrics come from your actual activity.</p>
+      </section>
+
+      <section className="home-audience">
+        <div className="home-section audience-inner">
+          <div className="section-heading align-left"><span className="eyebrow">Made for what comes next</span><h2>Study for today.<br />Build toward tomorrow.</h2><p>Whether finals are around the corner or you’re preparing for your first role, build a learning routine that fits your goals.</p><Link className="btn btn-dark" to={user ? '/dashboard' : '/signup'}>Build your routine <span aria-hidden="true">→</span></Link></div>
+          <div className="audience-cards">{AUDIENCES.map((item) => <article className="audience-card" key={item.title}><span>{item.emoji}</span><div><h3>{item.title}</h3><p>{item.body}</p></div><span className="audience-spark">✳</span></article>)}</div>
         </div>
       </section>
 
-      <section className="section">
-        <h2>How it works</h2>
-        <p className="sub">Four steps from signup to steady progress.</p>
-        <div className="steps">
-          {STEPS.map((s) => (
-            <div className="step" key={s.title}><h4>{s.title}</h4><p>{s.body}</p></div>
-          ))}
-        </div>
+      <section className="home-section resources-promo">
+        <div className="resource-promo-icon">↗</div><div><span className="eyebrow">Beyond the classroom</span><h2>Find your next skill to build.</h2><p>Explore learning sites, technical documentation, coding practice and project ideas curated for students and early-career learners.</p></div><Link className="btn btn-outline" to="/resources">Browse resources <span aria-hidden="true">→</span></Link>
       </section>
 
-      <section className="section">
-        <h2>AI that stays in its lane</h2>
-        <p className="sub">
-          ZERA’s AI features run through a secure backend: your documents are parsed,
-          responses are validated before they’re stored, and if the AI service isn’t
-          configured, ZERA tells you plainly instead of making things up.
-        </p>
-        <div className="grid grid-3">
-          <div className="feature-card"><span className="emoji">🔒</span><h3>Private by design</h3><p>API keys live on the server. Your browser never sees them.</p></div>
-          <div className="feature-card"><span className="emoji">✅</span><h3>Validated output</h3><p>AI structures and questions are checked and cleaned before you ever see them.</p></div>
-          <div className="feature-card"><span className="emoji">🪞</span><h3>No fake numbers</h3><p>No invented testimonials, user counts or progress — what you see is your real data.</p></div>
-        </div>
-      </section>
-
-      <section className="section">
-        <h2>Frequently asked questions</h2>
-        <p className="sub">The short, honest answers.</p>
-        <div style={{ maxWidth: 720, margin: '0 auto' }}>
-          {FAQS.map((f) => (
-            <details className="faq-item" key={f.q}>
-              <summary>{f.q}</summary>
-              <div className="faq-body">{f.a}</div>
-            </details>
-          ))}
-        </div>
-      </section>
-
-      <section className="section" style={{ textAlign: 'center' }}>
-        <div className="card" style={{ padding: '44px 28px', background: 'linear-gradient(135deg, #f4f2ff, #e9fbf5)' }}>
-          <h2 style={{ marginBottom: 8 }}>Ready for your new era of learning?</h2>
-          <p className="muted" style={{ maxWidth: 460, margin: '0 auto 22px' }}>
-            Create your free account, bring your syllabus, and let ZERA structure the way you study.
-          </p>
-          <Link className="btn btn-primary btn-lg" to={ctaTarget}>Start Learning</Link>
-        </div>
-      </section>
+      <section className="home-cta"><div><span className="eyebrow">A little progress adds up</span><h2>Make today count.</h2><p>Set up your learning space and take the first small step toward your goal.</p><Link className="btn btn-light btn-lg" to={ctaTarget}>Get started for free <span aria-hidden="true">→</span></Link></div><div className="cta-mark" aria-hidden="true">Z<span>✦</span></div></section>
     </div>
   );
 }
