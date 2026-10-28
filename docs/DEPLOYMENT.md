@@ -32,7 +32,6 @@ DATABASE_URL="postgresql://USER:PASS@HOST:5432/zera?schema=public" npm run db:de
    - `NODE_ENV=production`
    - `FRONTEND_URL=https://your-app.vercel.app` (CORS + cookie policy)
    - `BACKEND_URL=https://api.your-domain.com`
-   - Optional social login: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
    - SMTP: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM`
    - AI: `AI_PROVIDER=openai`, `AI_API_KEY`, optional `AI_MODEL`, `OPENAI_BASE_URL`
    - **Leave `DEV_SHOW_OTP` unset/false in production** (OTPs must travel only by email)
@@ -45,14 +44,6 @@ Notes:
   must be served over HTTPS and call the backend with credentials.
 - `uploads/` only holds transient syllabus files (deleted right after parsing);
   no persistent storage is required.
-
-### Optional Google / GitHub sign-in
-
-Create OAuth apps with these exact callback URLs:
-- Google: `${BACKEND_URL}/api/auth/oauth/google/callback` (authorized redirect URI)
-- GitHub: `${BACKEND_URL}/api/auth/oauth/github/callback` (authorization callback URL)
-
-Set each provider's client ID and secret on the backend only. The login screen checks `/api/auth/oauth/providers` and enables only configured providers. Google and GitHub must supply a verified email address before ZERA creates or signs into a student account.
 
 ## 3. Frontend (Vercel / Netlify / static host)
 

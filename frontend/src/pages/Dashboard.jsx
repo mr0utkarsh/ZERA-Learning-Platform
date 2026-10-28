@@ -36,31 +36,13 @@ export default function Dashboard() {
 
           <div className="grid grid-4 mb-12" style={{ marginBottom: 18 }}>
             <StatCard label="Overall progress" value={`${data.overallProgress}%`} foot={`${data.completedLessons} of ${data.totalLessons} lessons`} />
-            <StatCard label="Daily study streak" value={`${data.streak} ${data.streak === 1 ? 'day' : 'days'}`} foot={data.streak ? 'Your consistency is adding up 🔥' : 'Start today with one small study session'} />
+            <StatCard label="Study streak" value={`${data.streak} ${data.streak === 1 ? 'day' : 'days'}`} foot="Keep it going 🔥" />
             <StatCard label="Study time" value={fmtMinutes(data.studyMinutes)} foot="Total recorded" />
             <StatCard
               label="Quiz average"
               value={data.quizPerformance.average !== null ? `${data.quizPerformance.average}%` : '—'}
               foot={data.quizPerformance.attempts.length ? `${data.quizPerformance.attempts.length} recent quizzes` : 'No quizzes yet'}
             />
-          </div>
-
-          <section className="daily-focus" aria-label="Daily study focus">
-            <div className="daily-focus-copy">
-              <span className="daily-focus-kicker"><span aria-hidden="true">🔥</span> DAILY MOMENTUM</span>
-              <h2>{data.streak ? `${data.streak}-day streak. Keep it growing.` : 'Your next study streak starts today.'}</h2>
-              <p>One focused lesson, quiz or study session is a meaningful step forward.</p>
-            </div>
-            <Link className="btn btn-light" to={data.continueLearning ? `/lessons/${data.continueLearning.nextLesson.id}` : '/courses'}>
-              {data.continueLearning ? 'Study next lesson' : 'Choose a course'} <span aria-hidden="true">→</span>
-            </Link>
-          </section>
-
-          <div className="dashboard-shortcuts" aria-label="Learning tools">
-            <Link to="/courses"><span>📤</span><b>Upload syllabus</b><small>Build your study map</small></Link>
-            <Link to="/notes"><span>✍️</span><b>Study notes</b><small>Review saved material</small></Link>
-            <Link to="/pyqs"><span>🗂️</span><b>Practice PYQs</b><small>Prepare with questions</small></Link>
-            <Link to="/learning/resources"><span>🚀</span><b>Build a skill</b><small>Find courses & projects</small></Link>
           </div>
 
           {/* Continue learning */}

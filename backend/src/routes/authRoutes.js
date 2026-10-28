@@ -1,6 +1,5 @@
 const express = require('express');
 const ctrl = require('../controllers/authController');
-const oauth = require('../controllers/oauthController');
 const { authenticate } = require('../middleware/auth');
 const { authLimiter, otpLimiter } = require('../middleware/rateLimiters');
 
@@ -8,9 +7,6 @@ const router = express.Router();
 
 router.post('/signup', authLimiter, ctrl.signup);
 router.post('/login', authLimiter, ctrl.login);
-router.get('/oauth/providers', oauth.providers);
-router.get('/oauth/:provider', authLimiter, oauth.start);
-router.get('/oauth/:provider/callback', authLimiter, oauth.callback);
 router.post('/logout', ctrl.logout);
 router.get('/me', authenticate, ctrl.me);
 

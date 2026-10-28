@@ -33,7 +33,6 @@ const PYQs = lazy(() => import('./pages/PYQs'));
 const Performance = lazy(() => import('./pages/Performance'));
 const StudyPlan = lazy(() => import('./pages/StudyPlan'));
 const Interview = lazy(() => import('./pages/Interview'));
-const Resources = lazy(() => import('./pages/Resources'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Settings = lazy(() => import('./pages/Settings'));
 
@@ -81,7 +80,6 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/features" element={<Features />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/resources" element={<Resources />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -107,7 +105,6 @@ export default function App() {
           <Route path="/performance" element={<Performance />} />
           <Route path="/study-plan" element={<StudyPlan />} />
           <Route path="/interview" element={<Interview />} />
-          <Route path="/learning/resources" element={<Resources />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
