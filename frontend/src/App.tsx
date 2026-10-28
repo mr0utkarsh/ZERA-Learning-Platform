@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import AuthCallback from './pages/AuthCallback';
 import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
 import Syllabus from './pages/Syllabus';
@@ -49,6 +50,7 @@ export default function App() {
       <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <Signup />} />
       <Route path="/forgot-password" element={user ? <Navigate to="/dashboard" replace /> : <ForgotPassword />} />
       <Route path="/reset-password" element={user ? <Navigate to="/dashboard" replace /> : <ResetPassword />} />
+      <Route path="/auth-callback" element={<AuthCallback />} />
       <Route path="/about" element={<About />} />
       <Route path="/support" element={<Support />} />
       <Route element={<Protected><AppShell /></Protected>}>

@@ -7,7 +7,13 @@ import {
   forgotPassword,
   resetPasswordRequest,
   sendOtp,
-  verifyOtp
+  verifyOtp,
+  oauthGoogleAuthorize,
+  oauthGoogleCallback,
+  oauthGithubAuthorize,
+  oauthGithubCallback,
+  resendVerification,
+  verifyEmailAddress
 } from '../controllers/authController.js';
 import { authenticate } from '../middleware/authMiddleware.js';
 import {
@@ -34,6 +40,16 @@ router.post('/reset-password', validateRequest(resetPasswordSchema), resetPasswo
 // ─── OTP-based password reset ─────────────────────────────────────────────────
 router.post('/send-otp', validateRequest(otpSendSchema), sendOtp);
 router.post('/verify-otp', validateRequest(otpVerifySchema), verifyOtp);
+
+// ─── OAuth (Google / GitHub) ─────────────────────────────────────────────────
+router.get('/oauth/google', oauthGoogleAuthorize);
+router.get('/oauth/google/callback', oauthGoogleCallback);
+router.get('/oauth/github', oauthGithubAuthorize);
+router.get('/oauth/github/callback', oauthGithubCallback);
+
+// ─── Email verification ─────────────────────────────────────────────────────
+router.post('/resend-verification', authenticate, resendVerification);
+router.post('/verify-email', validateRequest(otpVerifySchema), verifyEmailAddress);
 
 // ─── Authenticated route ──────────────────────────────────────────────────────
 router.get('/me', authenticate, me);

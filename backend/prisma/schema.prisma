@@ -108,10 +108,13 @@ model User {
   id               String            @id @default(cuid())
   name             String
   email            String            @unique
-  passwordHash     String
+  passwordHash     String?
   role             Role              @default(STUDENT)
   status           UserStatus        @default(ACTIVE)
   tokenVersion     Int               @default(0)
+  emailVerified    Boolean           @default(false)
+  googleId         String?           @unique
+  githubId         String?           @unique
   lastLoginAt      DateTime?
   profile          Profile?
   settings         UserSettings?

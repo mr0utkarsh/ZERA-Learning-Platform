@@ -82,7 +82,11 @@ export const api = {
     login: (body: { email: string; password: string }) => post<any>('/auth/login', body),
     me: () => get<any>('/auth/me'),
     forgotPassword: (email: string) => post<any>('/auth/forgot-password', { email }),
-    resetPassword: (token: string, password: string) => post<any>('/auth/reset-password', { token, password })
+    resetPassword: (token: string, password: string) => post<any>('/auth/reset-password', { token, password }),
+    resendVerification: () => post<any>('/auth/resend-verification'),
+    verifyEmail: (email: string, otp: string) => post<any>('/auth/verify-email', { email, otp }),
+    oauthGoogleAuthorize: () => get<any>('/auth/oauth/google'),
+    oauthGithubAuthorize: () => get<any>('/auth/oauth/github')
   },
   onboarding: {
     get: () => get<any>('/onboarding'),

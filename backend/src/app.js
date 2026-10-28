@@ -67,6 +67,9 @@ app.use('/api/auth/signup', rateLimit({ windowMs: 60 * 60_000, max: 10 }));
 app.use('/api/auth/forgot-password', rateLimit({ windowMs: 60 * 60_000, max: 5 }));
 app.use('/api/auth/reset-password', rateLimit({ windowMs: 60 * 60_000, max: 5 }));
 app.use('/api/auth/verify-otp', rateLimit({ windowMs: 15 * 60_000, max: 10 }));
+// OAuth authorization endpoints are rate-limited to prevent abuse.
+app.use('/api/auth/oauth/google', rateLimit({ windowMs: 10 * 60_000, max: 10 }));
+app.use('/api/auth/oauth/github', rateLimit({ windowMs: 10 * 60_000, max: 10 }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api', courseRoutes);
