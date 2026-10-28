@@ -25,7 +25,7 @@ export const env = {
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
   GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID || '',
   GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET || '',
-  OAUTH_CALLBACK_BASE: process.env.OAUTH_CALLBACK_BASE || process.env.CLIENT_URL || 'http://localhost:8000',
+  OAUTH_CALLBACK_BASE: process.env.OAUTH_CALLBACK_BASE || 'http://localhost:5000',
   FRONTEND_URL: process.env.FRONTEND_URL || process.env.CLIENT_URL || 'http://localhost:8000'
 };
 
