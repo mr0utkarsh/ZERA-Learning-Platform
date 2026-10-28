@@ -37,5 +37,5 @@ export function AuthShell({ children, mode = 'login' }) {
 }
 
 export function AuthDivider() {
-  return <div className="auth-divider"><span />or continue with email<span /></div>;
+  return <div className="auth-divider"><span />Sign in with email<span /></div>;
 }

@@ -725,7 +725,7 @@ table.data tr:hover td { background: #fafaff; }
 .social-auth-button { min-height: 43px; position: relative; display: flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid #e1e2e8; border-radius: 10px; background: #fff; color: #353847; font: inherit; font-size: 11px; font-weight: 650; transition: border-color .18s, background .18s, transform .18s, box-shadow .18s; }
 .social-auth-button:not(:disabled) { cursor: pointer; }
 .social-auth-button:not(:disabled):hover { border-color: #c9c3fb; background: #fbfaff; box-shadow: 0 4px 13px rgba(38,37,57,.06); transform: translateY(-1px); }
-.social-auth-button:disabled { color: #757884; background: #fff; cursor: not-allowed; }
+.social-auth-button:disabled { color: #757884; background: #f8f8fa; border-color: #e7e7eb; opacity: .78; cursor: not-allowed; }
 .social-auth-button svg { width: 17px; height: 17px; }
 .social-auth-button small { position: absolute; top: -7px; right: 6px; padding: 2px 5px; border: 1px solid #f0eee9; border-radius: 4px; color: #8f9098; background: #fbfaf7; font-size: 6px; letter-spacing: .4px; }
 .social-auth-note { margin: 8px 0 0; text-align: center; color: #92949d; font-size: 9px; line-height: 1.5; }

@@ -44,12 +44,12 @@ export default function SocialAuth({ mode = 'login' }) {
               aria-label={`${verb} with ${provider.label}${!enabled ? ' (not configured)' : ''}`}
               title={enabled ? `${verb} with ${provider.label}` : `${provider.label} sign-in is not configured on this server`}
             >
-              {provider.icon}<span>{provider.label}</span>{checked && !enabled && <small>NOT SET UP</small>}
+              {provider.icon}<span>{provider.label}</span>
             </button>
           );
         })}
       </div>
-      {checked && !enabledCount && <p className="social-auth-note">Google and GitHub sign-in are not configured yet. Continue with your email, or ask the site administrator to set up OAuth.</p>}
+      {checked && !enabledCount && <p className="social-auth-note">Google/GitHub sign-in needs OAuth credentials from the site administrator. Email sign-in is available below.</p>}
     </div>
   );
 }
